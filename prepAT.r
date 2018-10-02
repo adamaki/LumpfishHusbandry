@@ -1,0 +1,37 @@
+#source("prepAT.r")
+
+#library(plot3D)##added in for checking, doesn't work
+library(hexbin)
+library(scatterplot3d)
+library(rgl)
+library(rJava) ##Make sure RStudio and Java are the same 64 or 32-bit
+library(XLConnectJars)
+library(XLConnect) 
+library(RColorBrewer)
+library(colorspace)
+library(colorRamps)
+library(stats)##not in this version
+library(ggplot2)
+library(animation)
+#detach("package:dplyr") ##can't find, this line was messing with loading xlsx packages using the source(prepAT.r) command on working file 
+library(openxlsx)
+library(xlsx)
+#detach(xlxs when doing csv in code lumphus script)
+library(chron)
+library(lubridate)
+library(magick)
+#library(plyr)
+library(dplyr)
+#library(plotflow)
+library(gridExtra)
+library(cowplot)
+library(zoo)
+#library(adehabitat)##not in this version
+library(adehabitatHR)
+library(maptools)
+library(sp)
+library(Rwave)
+#library(sowas)
+library(WaveletComp)
+library(dplyr)
+library(tidyr)
