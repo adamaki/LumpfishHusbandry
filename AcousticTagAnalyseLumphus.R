@@ -414,7 +414,6 @@ write.csv(dayfile, file = dayfile.loc) #write output to file
 
 # probability density functions
 
-
 df = ggplot(subset(dayfile, PEN == '7' | PEN == '8'), aes(x=BLSEC, colour = PEN)) + theme(panel.background = element_rect(fill = 'white', colour = 'black'))
 df = df + scale_x_log10(breaks = c(0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100), labels = c(0.01, '', '', '', '', '', '', '', '', 0.1, '', '', '', '', '', '', '', '', 1, '', '', '', '', '', '', '', '', 10, '', '', '', '', '', '', '', '', 100))
 df = df + scale_y_log10(breaks = c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000, 10000), labels = c(1, '', '', '', '', '', '', '', '', 10, '', '', '', '', '', '', '', '', 100, '', '', '', '', '', '', '', '', 1000, '', '', '', '', '', '', '', '', 10000)) 
@@ -552,6 +551,17 @@ dayfile <- subset(daytemp, BS == 'Rr')
 
 bstab <- table(dayfile$BS)
 round(bstab/sum(bstab)*100, 2)
+
+
+# code to create sequence of date/times for env. probe data
+
+start <- as.POSIXct('05/28/18 16:30:00', format = '%m/%d/%y %H:%M:%S', tz = 'GMT')
+interval <- 60
+end <- start + as.difftime(67, units = 'days')
+timeseq <- seq(from = start, by = interval*30, to = end)
+write.csv(timeseq, 'timesequence.csv')
+
+
 
 # kernel utilisation distributions using adehabitat
 
