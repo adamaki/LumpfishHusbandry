@@ -13,29 +13,29 @@ library(dplyr)
 library(tidyr)
 
 #ENTER YOUR VARIABLES HERE
-workingdir = "G:/Data/2018 Lumpfish Husbandry/Data processing/5. Day CSV" # change to location of data
-dayfile.loc = "R1_LBF18S100194_day.csv" # change to file to be analysed
-masterfileloc = "H:/Data processing/AcousticTagFile_2018v6.xlsx" # change to location of AcousticTagFile.xlsx
-day = '194' # day of the year
-bottom.threshold = 15 # threshold for fish at bottom of cage coding (depth in metres)
-water.height = 35
+workingdir <- ifelse(Sys.info()['user'] == 'Laptop', "G:/Data/2018 Lumpfish Husbandry/Data processing/5. Day CSV", 'C:/Macpath') # change to location of data
+dayfile.loc <- "R1_LBF18S100207_day.csv" # change to file to be analysed
+masterfileloc <- "G:/Data/2018 Lumpfish Husbandry/AcousticTagFile_2018v6.xlsx" # change to location of AcousticTagFile.xlsx
+day <- '207' # day of the year
+bottom.threshold <- 15 # threshold for fish at bottom of cage coding (depth in metres)
+water.height <- 35
 rot.ang <- 14.24 # grid rotation angle in radians
 UTMeast <- -1230064.57 # grid origin x-axis
 UTMnorth <- 6170474.26 #  grid origin y-axis
 
 # Enter periods of hide tags
-hidetag12ET = 15919
-hidetag12EB = 15863
-hidetag12WT = 15695
-hidetag12WB = 15471
-hidetag14ET = 15751
-hidetag14EB = 15527
-hidetag14WT = 15639
-hidetag14WB = 15807
-hidetag15ET = 15415
-hidetag15EB = 15583
-hidetag15WT = 15975
-hidetag15WB = 15359
+hidetag12ET <- 15919
+hidetag12EB <- 15863
+hidetag12WT <- 15695
+hidetag12WB <- 15471
+hidetag14ET <- 15751
+hidetag14EB <- 15527
+hidetag14WT <- 15639
+hidetag14WB <- 15807
+hidetag15ET <- 15415
+hidetag15EB <- 15583
+hidetag15WT <- 15975
+hidetag15WB <- 15359
 
 # Toggle hides in or out of water
 
@@ -130,39 +130,39 @@ rownames(locations.lookup) <- locations.lookup$Code
 
 #LOAD ENVIRONMENTAL PROBE READINGS
 probe.DOT2 <- read.xlsx(masterfileloc, sheet = 12, startRow = 3, cols = c(1, 2, 3))
-probe.DOT2$DO.time.2m <- as.POSIXct(strptime(probe.DOT2$DO.time.2m, "%m/%d/%y %I:%M:%S %p", tz = 'UTC'))
+probe.DOT2$DO.time.2m <- as.POSIXct(strptime(probe.DOT2$DO.time.2m, "%Y-%m-%d %H:%M:%S", tz = 'UTC'))
 probe.DOT2$DO.time.2m <- probe.DOT2$DO.time.2m - as.difftime(1, unit = 'hours')
 #probe.DOT2 <- probe.DOT2 %>% mutate_each(funs(round(.,2)), DO.2m, Temp.2m)
 probe.DOT2 <- probe.DOT2 %>% mutate_at(vars(DO.2m, Temp.2m), funs(round(.,2)))
 probe.sal2 <- read.xlsx(masterfileloc, sheet = 12, startRow = 3, cols = c(4, 5))
-probe.sal2$Sal.time.2m <- as.POSIXct(strptime(probe.sal2$Sal.time.2m, "%m/%d/%y %I:%M:%S %p", tz = 'UTC'))
+probe.sal2$Sal.time.2m <- as.POSIXct(strptime(probe.sal2$Sal.time.2m, "%Y-%m-%d %H:%M:%S", tz = 'UTC'))
 probe.sal2$Sal.time.2m <- probe.sal2$Sal.time.2m - as.difftime(1, unit = 'hours')
 probe.sal2 <- probe.sal2 %>% mutate(Sal.2m = round(Sal.2m, 2))
 probe.DOT4 <- read.xlsx(masterfileloc, sheet = 12, startRow = 3, cols = c(6, 7, 8))
-probe.DOT4$DO.time.4m <- as.POSIXct(strptime(probe.DOT4$DO.time.4m, "%m/%d/%y %I:%M:%S %p", tz = 'UTC'))
+probe.DOT4$DO.time.4m <- as.POSIXct(strptime(probe.DOT4$DO.time.4m, "%Y-%m-%d %H:%M:%S", tz = 'UTC'))
 probe.DOT4$DO.time.4m <- probe.DOT4$DO.time.4m - as.difftime(1, unit = 'hours')
 #probe.DOT4 <- probe.DOT4 %>% mutate_each(funs(round(.,2)), DO.4m, Temp.4m)
 probe.DOT4 <- probe.DOT4 %>% mutate_at(vars(DO.4m, Temp.4m), funs(round(.,2)))
 probe.sal4 <- read.xlsx(masterfileloc, sheet = 12, startRow = 3, cols = c(9, 10))
-probe.sal4$Sal.time.4m <- as.POSIXct(strptime(probe.sal4$Sal.time.4m, "%m/%d/%y %I:%M:%S %p", tz = 'UTC'))
+probe.sal4$Sal.time.4m <- as.POSIXct(strptime(probe.sal4$Sal.time.4m, "%Y-%m-%d %H:%M:%S", tz = 'UTC'))
 probe.sal4$Sal.time.4m <- probe.sal4$Sal.time.4m - as.difftime(1, unit = 'hours')
 probe.sal4 <- probe.sal4 %>% mutate(Sal.4m = round(Sal.4m, 2))
 probe.DOT7 <- read.xlsx(masterfileloc, sheet = 12, startRow = 3, cols = c(11, 12, 13))
-probe.DOT7$DO.time.7m <- as.POSIXct(strptime(probe.DOT7$DO.time.7m, "%m/%d/%y %I:%M:%S %p", tz = 'UTC'))
+probe.DOT7$DO.time.7m <- as.POSIXct(strptime(probe.DOT7$DO.time.7m, "%Y-%m-%d %H:%M:%S", tz = 'UTC'))
 probe.DOT7$DO.time.7m <- probe.DOT7$DO.time.7m - as.difftime(1, unit = 'hours')
 #probe.DOT7 <- probe.DOT7 %>% mutate_each(funs(round(.,2)), DO.7m, Temp.7m)
 probe.DOT7 <- probe.DOT7 %>% mutate_at(vars(DO.7m, Temp.7m), funs(round(.,2)))
 probe.sal7 <- read.xlsx(masterfileloc, sheet = 12, startRow = 3, cols = c(14, 15))
-probe.sal7$Sal.time.7m <- as.POSIXct(strptime(probe.sal7$Sal.time.7m, "%m/%d/%y %I:%M:%S %p", tz = 'UTC'))
+probe.sal7$Sal.time.7m <- as.POSIXct(strptime(probe.sal7$Sal.time.7m, "%Y-%m-%d %H:%M:%S", tz = 'UTC'))
 probe.sal7$Sal.time.7m <- probe.sal7$Sal.time.7m - as.difftime(1, unit = 'hours')
 probe.sal7 <- probe.sal7 %>% mutate(Sal.7m = round(Sal.7m, 2))
 probe.DOT10 <- read.xlsx(masterfileloc, sheet = 12, startRow = 3, cols = c(16, 17, 18))
-probe.DOT10$DO.time.10m <- as.POSIXct(strptime(probe.DOT10$DO.time.10m, "%m/%d/%y %I:%M:%S %p", tz = 'UTC'))
+probe.DOT10$DO.time.10m <- as.POSIXct(strptime(probe.DOT10$DO.time.10m, "%Y-%m-%d %H:%M:%S", tz = 'UTC'))
 probe.DOT10$DO.time.10m <- probe.DOT10$DO.time.10m - as.difftime(1, unit = 'hours')
 #probe.DOT10 <- probe.DOT10 %>% mutate_each(funs(round(.,2)), DO.10m, Temp.10m)
 probe.DOT10 <- probe.DOT10 %>% mutate_at(vars(DO.10m, Temp.10m), funs(round(.,2)))
 probe.sal10 <- read.xlsx(masterfileloc, sheet = 12, startRow = 3, cols = c(19, 20))
-probe.sal10$Sal.time.10m <- as.POSIXct(strptime(probe.sal10$Sal.time.10m, "%m/%d/%y %I:%M:%S %p", tz = 'UTC'))
+probe.sal10$Sal.time.10m <- as.POSIXct(strptime(probe.sal10$Sal.time.10m, "%Y-%m-%d %H:%M:%S", tz = 'UTC'))
 probe.sal10$Sal.time.10m <- probe.sal10$Sal.time.10m - as.difftime(1, unit = 'hours')
 probe.sal10 <- probe.sal10 %>% mutate(Sal.10m = round(Sal.10m, 2))
 
@@ -277,50 +277,50 @@ dayfile$WVIS <- as.factor(mastercode[day,'WVIS'])
 dayfile$MOON <- as.factor(mastercode[day,'MOON']) 
 
 #LICE DATA # commented out where no lice data collected yet
-#dayfile$TOT_P12 <- as.numeric(mastercode[day,'LICE_P12_TOT']) 
-#dayfile$PA_A_P12 <- as.numeric(mastercode[day,'LICE_P12_FGPAA']) 
-#dayfile$FG_P12 <- as.numeric(mastercode[day,'LICE_P12_FG']) 
-#dayfile$A_P12 <- as.numeric(mastercode[day,'LICE_P12_A']) 
-#dayfile$PA_P12 <- as.numeric(mastercode[day,'LICE_P12_PA']) 
-#dayfile$CHAL_P12 <- as.numeric(mastercode[day,'LICE_P12_CHAL']) 
-#dayfile$CAL_P12 <- as.numeric(mastercode[day,'LICE_P12_CAL']) 
-#dayfile$TOT_P14 <- as.numeric(mastercode[day,'LICE_P14_TOT']) 
-#dayfile$PA_A_P14 <- as.numeric(mastercode[day,'LICE_P14_FGPAA']) 
-#dayfile$FG_P14 <- as.numeric(mastercode[day,'LICE_P14_FG']) 
-##dayfile$A_P14 <- as.numeric(mastercode[day,'LICE_P14_A']) 
-#dayfile$PA_P14 <- as.numeric(mastercode[day,'LICE_P14_PA']) 
-#dayfile$CHAL_P14 <- as.numeric(mastercode[day,'LICE_P14_CHAL']) 
-#dayfile$CAL_P14 <- as.numeric(mastercode[day,'LICE_P14_CAL']) 
-#dayfile$TOT_P15 <- as.numeric(mastercode[day,'LICE_P15_TOT']) 
-#dayfile$PA_A_P15 <- as.numeric(mastercode[day,'LICE_P15_FGPAA']) 
-#dayfile$FG_P15 <- as.numeric(mastercode[day,'LICE_P15_FG']) 
-#dayfile$A_P15 <- as.numeric(mastercode[day,'LICE_P15_A']) 
-#dayfile$PA_P15 <- as.numeric(mastercode[day,'LICE_P15_PA']) 
-#dayfile$CHAL_P15 <- as.numeric(mastercode[day,'LICE_P15_CHAL']) 
-#dayfile$CAL_P15 <- as.numeric(mastercode[day,'LICE_P15_CAL']) 
+dayfile$TOT_P12 <- as.numeric(mastercode[day,'LICE_P12_TOT']) 
+dayfile$PA_A_P12 <- as.numeric(mastercode[day,'LICE_P12_FGPAA']) 
+dayfile$FG_P12 <- as.numeric(mastercode[day,'LICE_P12_FG']) 
+dayfile$A_P12 <- as.numeric(mastercode[day,'LICE_P12_A']) 
+dayfile$PA_P12 <- as.numeric(mastercode[day,'LICE_P12_PA']) 
+dayfile$CHAL_P12 <- as.numeric(mastercode[day,'LICE_P12_CHAL']) 
+dayfile$CAL_P12 <- as.numeric(mastercode[day,'LICE_P12_CAL']) 
+dayfile$TOT_P14 <- as.numeric(mastercode[day,'LICE_P14_TOT']) 
+dayfile$PA_A_P14 <- as.numeric(mastercode[day,'LICE_P14_FGPAA']) 
+dayfile$FG_P14 <- as.numeric(mastercode[day,'LICE_P14_FG']) 
+dayfile$A_P14 <- as.numeric(mastercode[day,'LICE_P14_A']) 
+dayfile$PA_P14 <- as.numeric(mastercode[day,'LICE_P14_PA']) 
+dayfile$CHAL_P14 <- as.numeric(mastercode[day,'LICE_P14_CHAL']) 
+dayfile$CAL_P14 <- as.numeric(mastercode[day,'LICE_P14_CAL']) 
+dayfile$TOT_P15 <- as.numeric(mastercode[day,'LICE_P15_TOT']) 
+dayfile$PA_A_P15 <- as.numeric(mastercode[day,'LICE_P15_FGPAA']) 
+dayfile$FG_P15 <- as.numeric(mastercode[day,'LICE_P15_FG']) 
+dayfile$A_P15 <- as.numeric(mastercode[day,'LICE_P15_A']) 
+dayfile$PA_P15 <- as.numeric(mastercode[day,'LICE_P15_PA']) 
+dayfile$CHAL_P15 <- as.numeric(mastercode[day,'LICE_P15_CHAL']) 
+dayfile$CAL_P15 <- as.numeric(mastercode[day,'LICE_P15_CAL']) 
 
 # temporary NAs where no data collected yet
-dayfile$TOT_P12 <- NA 
-dayfile$PA_A_P12 <- NA 
-dayfile$FG_P12 <- NA 
-dayfile$A_P12 <- NA 
-dayfile$PA_P12 <- NA 
-dayfile$CHAL_P12 <- NA 
-dayfile$CAL_P12 <- NA 
-dayfile$TOT_P14 <- NA 
-dayfile$PA_A_P14 <- NA 
-dayfile$FG_P14 <- NA
-dayfile$A_P14 <- NA
-dayfile$PA_P14 <- NA
-dayfile$CHAL_P14 <- NA
-dayfile$CAL_P14 <- NA 
-dayfile$TOT_P15 <- NA
-dayfile$PA_A_P15 <- NA
-dayfile$FG_P15 <- NA
-dayfile$A_P15 <- NA 
-dayfile$PA_P15 <- NA
-dayfile$CHAL_P15 <- NA
-dayfile$CAL_P15 <- NA
+#dayfile$TOT_P12 <- NA 
+#dayfile$PA_A_P12 <- NA 
+#dayfile$FG_P12 <- NA 
+#dayfile$A_P12 <- NA 
+#dayfile$PA_P12 <- NA 
+#dayfile$CHAL_P12 <- NA 
+#dayfile$CAL_P12 <- NA 
+#dayfile$TOT_P14 <- NA 
+#dayfile$PA_A_P14 <- NA 
+#dayfile$FG_P14 <- NA
+#dayfile$A_P14 <- NA
+#dayfile$PA_P14 <- NA
+#dayfile$CHAL_P14 <- NA
+#dayfile$CAL_P14 <- NA 
+#dayfile$TOT_P15 <- NA
+#dayfile$PA_A_P15 <- NA
+#dayfile$FG_P15 <- NA
+#dayfile$A_P15 <- NA 
+#dayfile$PA_P15 <- NA
+#dayfile$CHAL_P15 <- NA
+#dayfile$CAL_P15 <- NA
 
 
 #LOCATIONS CODING
@@ -341,14 +341,14 @@ dayfile$PHASE <- as.factor(mastercode[day,'PHASE']) # tidal phase (spring/neap)
 
 
 #MEAL TIMES CODING # commented out where no data collected yet
-#dayfile$SMEAL12 <- smealcode(pen = 'P12') # salmon feeding times cage 12 code
-#dayfile$SMEAL14 <- smealcode(pen = 'P14') # salmon feeding times cage 14 code
-#dayfile$SMEAL15 <- smealcode(pen = 'P15') # salmon feeding times cage 14 code
+dayfile$SMEAL12 <- smealcode(pen = 'P12') # salmon feeding times cage 12 code
+dayfile$SMEAL14 <- smealcode(pen = 'P14') # salmon feeding times cage 14 code
+dayfile$SMEAL15 <- smealcode(pen = 'P15') # salmon feeding times cage 14 code
 
 # temporary NAs where no salmon meal data collected yet
-dayfile$SMEAL12 <- NA
-dayfile$SMEAL14 <- NA
-dayfile$SMEAL15 <- NA
+#dayfile$SMEAL12 <- NA
+#dayfile$SMEAL14 <- NA
+#dayfile$SMEAL15 <- NA
 
 #ENVIRONMENTAL DATA
 
@@ -461,6 +461,13 @@ rm(all)
 #FINISH CODE
 write.csv(dayfile, file = sub(".csv", "_coded.csv", dayfile.loc, ignore.case = FALSE, fixed = T)) #write output to file
 write.csv(hides, file = sub(".csv", "_hides.csv", dayfile.loc, ignore.case = FALSE, fixed = T)) #write output to file
+
+
+
+
+
+
+
 
 # script to recode feeding stations retrospectively------------------------------------------------------------------------------
 
@@ -825,5 +832,12 @@ turn.angles <- function(){
   theta <<- theta
   
 }
+
+
+
+
+
+
+
 
 
