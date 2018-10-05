@@ -109,9 +109,9 @@ library(tidyr)
 
 
 #ENTER YOUR VARIABLES HERE
-workingdir = "H:/Data processing/2018 Lumpfish Husbandry/6a. Coded Day CSV" # change to location of data
-dayfile.loc = "R1_LBF18S100152_day_coded.csv" # change to file to be analysed
-masterfileloc = "H:/Data processing/AcousticTagFile_2018v4.xlsx" # change to location of AcousticTagFile.xlsx
+workingdir = "G:/Data/2018 Lumpfish Husbandry/Data processing/6a. Coded Day CSV" # change to location of data
+dayfile.loc = "R1_LBF18S100170_day_coded.csv" # change to file to be analysed
+masterfileloc = "G:/Data/2018 Lumpfish Husbandry/AcousticTagFile_2018v6.xlsx" # change to location of AcousticTagFile.xlsx
 
 workingdir = "H:/Data processing/2016 Conditioning study B/Filtered Data/Recoded Fish CSV/Unconditioned" # change to location of data
 dayfile.loc = "run_1LLF16S1007045_fish_coded.csv" # change to file to be analysed
@@ -119,15 +119,18 @@ masterfileloc = "H:/Data processing/AcousticTagFile_2016.xlsx" # change to locat
 
 
 #new dayfile classes
-dayfile.classes = c('NULL', 'numeric', 'factor', 'factor', 'POSIXct', 'double', 'double', 
-                    'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'factor',
-                    'factor', 'factor', 'factor', 'factor', 'factor', 'factor', 'factor',
+dayfile.classes = c('NULL', 'numeric', 'NULL', # Period
+                    'factor', # Pen number
+                    'POSIXct', 'double', 'double', 'double', # EchoTime and coordinates
+                    'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', # calculated swimming parameters
+                    'factor', 'factor', 'factor', 'factor', 'factor', # biofouling, visibility, moon
+                    'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 
+                    'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', # sea lice numbers
+                    'factor', 'factor', 'factor', 'factor', 'factor', 'factor', 'factor', # Locations
+                    'factor', 'factor', 'factor', # Sun, tide stage and phase
+                    'factor', 'factor', 'factor', # salmon feeding times
                     'double', 'double', 'double', 'double', 'double', 'double', 'double',
-                    'double', 'double', 'double', 'double', 'double', 'double', 'double',
-                    'factor', 'factor', 'factor', 'factor', 'factor', 'factor', 'factor', 
-                    'factor', 'factor', 'factor', 'factor', 'factor', 'factor', 'factor', 'factor', 'factor',
-                    'factor', 'factor', 'double', 'double', 'double', 'double', 'double', 
-                    'double', 'double', 'double', 'double', 'double', 'double', 'double'
+                    'double', 'double', 'double', 'double', 'double' # Environmental probes
 )
 
 #half-coded dayfile classes
@@ -558,7 +561,7 @@ round(bstab/sum(bstab)*100, 2)
 start <- as.POSIXct('05/28/18 16:30:00', format = '%m/%d/%y %H:%M:%S', tz = 'GMT')
 interval <- 60
 end <- start + as.difftime(67, units = 'days')
-timeseq <- seq(from = start, by = interval*30, to = end)
+timeseq <- as.character(seq(from = start, by = interval*30, to = end))
 write.csv(timeseq, 'timesequence.csv')
 
 
