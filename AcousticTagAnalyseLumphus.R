@@ -3849,6 +3849,8 @@ turnplot <- function(){
 
 bplot <- function(period, step = 100){
   
+
+  
   daytemp <- subset(dayfile, Period == period)
   start <- step-step
   end <- step
@@ -3865,40 +3867,61 @@ bplot <- function(period, step = 100){
     par(new=F)
     par(mar = c(4, 4, 4, 4))# + 0.1)
     fishpal <- rainbow_hcl(20, c=100, l=63, start=-360, end=-32, alpha = 0.2)
-    fish.id <- subset(dayfile, Period == period)
+    #fish.id <- subset(dayfile, Period == period)
     
     # position plot
     
-    if(fish.id[1,3] == '7')
+    #if(fish.id[1,2] == '12')
+    if(sect[1,2] == '12')
     {
       
-      plot(sect$PosX, sect$PosY, xlab = 'X (m)', ylab = 'Y (m)', pch = 20, cex = 1, xlim = c(10, 45), ylim = c(10, 45), type = 'l', col = '#26b426') # tight plot
-      rect(locations.lookup['7EW', 'xmin'], locations.lookup['7EW', 'ymin'], locations.lookup['7EW', 'xmax'], locations.lookup['7EW', 'ymax'], lty = 2) # 7EW edge
-      rect(locations.lookup['7ES', 'xmin'], locations.lookup['7ES', 'ymin'], locations.lookup['7ES', 'xmax'], locations.lookup['7ES', 'ymax'], lty = 2) # 7ES edge
-      rect(locations.lookup['7EE', 'xmin'], locations.lookup['7EE', 'ymin'], locations.lookup['7EE', 'xmax'], locations.lookup['7EE', 'ymax'], lty = 2) # 7EE edge
-      rect(locations.lookup['7EN', 'xmin'], locations.lookup['7EN', 'ymin'], locations.lookup['7EN', 'xmax'], locations.lookup['7EN', 'ymax'], lty = 2) # 7EN edge
-      rect(locations.lookup['7WHSE', 'xmin'], locations.lookup['7WHSE', 'ymin'], locations.lookup['7WHSE', 'xmax'], locations.lookup['7WHSE', 'ymax'], lty = 3, col = rgb(1, 0.6, 0, 0.4)) # 7WHSE
-      rect(locations.lookup['7WHNW', 'xmin'], locations.lookup['7WHNW', 'ymin'], locations.lookup['7WHNW', 'xmax'], locations.lookup['7WHNW', 'ymax'], lty = 3, col = rgb(1, 0.6, 0, 0.4)) # 7WHNW
-      rect(locations.lookup['7FBSE', 'xmin'], locations.lookup['7FBSE', 'ymin'], locations.lookup['7FBSE', 'xmax'], locations.lookup['7FBSE', 'ymax'], lty = 3, col = rgb(1, 1, 0.1, 0.4)) # 7FBSE
-      rect(locations.lookup['7FBNW', 'xmin'], locations.lookup['7FBNW', 'ymin'], locations.lookup['7FBNW', 'xmax'], locations.lookup['7FBNW', 'ymax'], lty = 3, col = rgb(1, 1, 0.1, 0.4)) # 7FBNW
-      rect(locations.lookup['7EW', 'xmin'], locations.lookup['7ES', 'ymin'], locations.lookup['7EE', 'xmax'], locations.lookup['7EN', 'ymax'], lwd = 2) # cage limits
-  
-      text(10, 45, adj = c(0, 1), label = paste0('Salmon feeding: ', sect[1,'SMEAL8'], '\nBiofouling: ', sect[1, 'BIOF8'], '\nSun: ', sect[1,'SUN'], '\nTide: ', sect[1, 'TID']), cex = 1) 
-      text(45, 45, adj = c(1, 1), label = paste0(sect[1, 'EchoTime'], ' to ', sect[nrow(sect), 'EchoTime'], '\n', start, ' - ', end))
+      plot(sect$PosX, sect$PosY, xlab = 'X (m)', ylab = 'Y (m)', pch = 20, cex = 1, xlim = c(35, 70), ylim = c(35, 70), type = 'l', col = '#26b426') # tight plot
+      plot.pen(12)
+      #rect(locations.lookup['12EW', 'xmin'], locations.lookup['12EW', 'ymin'], locations.lookup['12EW', 'xmax'], locations.lookup['12EW', 'ymax'], lty = 2) # 12EW edge
+      #rect(locations.lookup['12ES', 'xmin'], locations.lookup['12ES', 'ymin'], locations.lookup['12ES', 'xmax'], locations.lookup['12ES', 'ymax'], lty = 2) # 12ES edge
+      #rect(locations.lookup['12EE', 'xmin'], locations.lookup['12EE', 'ymin'], locations.lookup['12EE', 'xmax'], locations.lookup['12EE', 'ymax'], lty = 2) # 12EE edge
+      #rect(locations.lookup['12EN', 'xmin'], locations.lookup['12EN', 'ymin'], locations.lookup['12EN', 'xmax'], locations.lookup['12EN', 'ymax'], lty = 2) # 12EN edge
+      #rect(locations.lookup['12HET', 'xmin'], locations.lookup['12HET', 'ymin'], locations.lookup['12HET', 'xmax'], locations.lookup['12HET', 'ymax'], lty = 3, col = rgb(1, 0.6, 0, 0.4)) # 12HET
+      #rect(locations.lookup['12HWT', 'xmin'], locations.lookup['12HWT', 'ymin'], locations.lookup['12HWT', 'xmax'], locations.lookup['12HWT', 'ymax'], lty = 3, col = rgb(1, 0.6, 0, 0.4)) # 12HWT
+      #rect(locations.lookup['12FS', 'xmin'], locations.lookup['12FS', 'ymin'], locations.lookup['12FS', 'xmax'], locations.lookup['12FS', 'ymax'], lty = 3, col = rgb(1, 1, 0.1, 0.4)) # 12FS
+      #rect(locations.lookup['12EW', 'xmin'], locations.lookup['12ES', 'ymin'], locations.lookup['12EE', 'xmax'], locations.lookup['12EN', 'ymax'], lwd = 2) # cage limits
+      
+      text(64, 70, adj = c(0, 1), label = paste0('Salmon feeding: ', sect[1,'SMEAL8'], '\nBiofouling: ', sect[1, 'BIOF8'], '\nSun: ', sect[1,'SUN'], '\nTide: ', sect[1, 'TID']), cex = 1) 
+      text(70, 38, adj = c(1, 1), label = paste0(sect[1, 'EchoTime'], ' to ', sect[nrow(sect), 'EchoTime'], '\n', start, ' - ', end))
       
     }else{
       
+      if(sect[1,2] == '14') {
+      
       plot(sect$PosX, sect$PosY, xlab = 'X (m)', ylab = 'Y (m)', pch = 20, cex = 1, xlim = c(37, 72), ylim = c(10, 45), type = 'l', col = '#26b426') # tight plot
-      rect(locations.lookup['8EW', 'xmin'], locations.lookup['8EW', 'ymin'], locations.lookup['8EW', 'xmax'], locations.lookup['8EW', 'ymax'], lty = 2) # 7EW edge
-      rect(locations.lookup['8ES', 'xmin'], locations.lookup['8ES', 'ymin'], locations.lookup['8ES', 'xmax'], locations.lookup['8ES', 'ymax'], lty = 2) # 7ES edge
-      rect(locations.lookup['8EE', 'xmin'], locations.lookup['8EE', 'ymin'], locations.lookup['8EE', 'xmax'], locations.lookup['8EE', 'ymax'], lty = 2) # 7EE edge
-      rect(locations.lookup['8EN', 'xmin'], locations.lookup['8EN', 'ymin'], locations.lookup['8EN', 'xmax'], locations.lookup['8EN', 'ymax'], lty = 2) # 7EN edge
-      rect(locations.lookup['8WHSW', 'xmin'], locations.lookup['8WHSW', 'ymin'], locations.lookup['8WHSW', 'xmax'], locations.lookup['8WHSW', 'ymax'], lty = 3, col = rgb(1, 0.6, 0, 0.4)) # 7WHSE
-      rect(locations.lookup['8WHNE', 'xmin'], locations.lookup['8WHNE', 'ymin'], locations.lookup['8WHNE', 'xmax'], locations.lookup['8WHNE', 'ymax'], lty = 3, col = rgb(1, 0.6, 0, 0.4)) # 7WHNW
-      rect(locations.lookup['8EW', 'xmin'], locations.lookup['8ES', 'ymin'], locations.lookup['8EE', 'xmax'], locations.lookup['8EN', 'ymax'], lwd = 2) # cage limits
+      plot.pen(14)
+      #rect(locations.lookup['14EW', 'xmin'], locations.lookup['14EW', 'ymin'], locations.lookup['14EW', 'xmax'], locations.lookup['14EW', 'ymax'], lty = 2) # 14EW edge
+      #rect(locations.lookup['14ES', 'xmin'], locations.lookup['14ES', 'ymin'], locations.lookup['14ES', 'xmax'], locations.lookup['14ES', 'ymax'], lty = 2) # 14ES edge
+      #rect(locations.lookup['14EE', 'xmin'], locations.lookup['14EE', 'ymin'], locations.lookup['14EE', 'xmax'], locations.lookup['14EE', 'ymax'], lty = 2) # 14EE edge
+      #rect(locations.lookup['14EN', 'xmin'], locations.lookup['14EN', 'ymin'], locations.lookup['14EN', 'xmax'], locations.lookup['14EN', 'ymax'], lty = 2) # 14EN edge
+      #rect(locations.lookup['14HET', 'xmin'], locations.lookup['14HET', 'ymin'], locations.lookup['14HET', 'xmax'], locations.lookup['14HET', 'ymax'], lty = 3, col = rgb(1, 0.6, 0, 0.4)) # 14HET
+      #rect(locations.lookup['14HWT', 'xmin'], locations.lookup['14HWT', 'ymin'], locations.lookup['14HWT', 'xmax'], locations.lookup['14HWT', 'ymax'], lty = 3, col = rgb(1, 0.6, 0, 0.4)) # 14HWT
+      #rect(locations.lookup['14FS', 'xmin'], locations.lookup['14FS', 'ymin'], locations.lookup['14FS', 'xmax'], locations.lookup['14FS', 'ymax'], lty = 3, col = rgb(1, 1, 0.1, 0.4)) # 14FS
+      #rect(locations.lookup['14EW', 'xmin'], locations.lookup['14ES', 'ymin'], locations.lookup['14EE', 'xmax'], locations.lookup['14EN', 'ymax'], lwd = 2) # cage limits
       
       text(37, 45, adj = c(0, 1), label = paste0('Salmon feeding: ', sect[1,'SMEAL8'], '\nBiofouling: ', sect[1, 'BIOF8'], '\nSun: ', sect[1,'SUN'], '\nTide: ', sect[1, 'TID']), cex = 1) 
       text(73, 45, adj = c(1, 1), label = paste0(sect[1, 'EchoTime'], ' to ', sect[nrow(sect), 'EchoTime'], '\n', start, ' - ', end))
+      
+      } else {
+        
+        plot(sect$PosX, sect$PosY, xlab = 'X (m)', ylab = 'Y (m)', pch = 20, cex = 1, xlim = c(37, 72), ylim = c(10, 45), type = 'l', col = '#26b426') # tight plot
+        plot.pen(15)
+        
+        #rect(locations.lookup['15EW', 'xmin'], locations.lookup['15EW', 'ymin'], locations.lookup['15EW', 'xmax'], locations.lookup['15EW', 'ymax'], lty = 2) # 15EW edge
+        #rect(locations.lookup['15ES', 'xmin'], locations.lookup['15ES', 'ymin'], locations.lookup['15ES', 'xmax'], locations.lookup['15ES', 'ymax'], lty = 2) # 15ES edge
+        #rect(locations.lookup['15EE', 'xmin'], locations.lookup['15EE', 'ymin'], locations.lookup['15EE', 'xmax'], locations.lookup['15EE', 'ymax'], lty = 2) # 15EE edge
+        #rect(locations.lookup['15EN', 'xmin'], locations.lookup['15EN', 'ymin'], locations.lookup['15EN', 'xmax'], locations.lookup['15EN', 'ymax'], lty = 2) # 15EN edge
+        #rect(locations.lookup['15HET', 'xmin'], locations.lookup['15HET', 'ymin'], locations.lookup['15HET', 'xmax'], locations.lookup['15HET', 'ymax'], lty = 3, col = rgb(1, 0.6, 0, 0.4)) # 15HET
+        #rect(locations.lookup['15HWT', 'xmin'], locations.lookup['15HWT', 'ymin'], locations.lookup['15HWT', 'xmax'], locations.lookup['15HWT', 'ymax'], lty = 3, col = rgb(1, 0.6, 0, 0.4)) # 15HWT
+        #rect(locations.lookup['15FS', 'xmin'], locations.lookup['15FS', 'ymin'], locations.lookup['15FS', 'xmax'], locations.lookup['15FS', 'ymax'], lty = 3, col = rgb(1, 1, 0.1, 0.4)) # 15FS
+        #rect(locations.lookup['15EW', 'xmin'], locations.lookup['15ES', 'ymin'], locations.lookup['15EE', 'xmax'], locations.lookup['15EN', 'ymax'], lwd = 2) # cage limits
+        
+      }
       
     }
     
@@ -3922,24 +3945,23 @@ bplot <- function(period, step = 100){
     #mtext(text = 'x10 rolling average of turn', side = 4, line = 2.5)
     
     par(new = T)
-    #plot(sect$EchoTime, sect$HEAD, xlab = 'Time', type = 'l', lwd = 2, col = 'lightblue', ylab = '', yaxt = 'n', ylim = c(0, 360)) # plot turn
+    plot(sect$EchoTime, sect$HEAD, xlab = 'Time', type = 'l', lwd = 2, col = 'lightblue', ylab = '', yaxt = 'n', ylim = c(0, 360)) # plot turn
     axis(2, ylim = c(0, 360), line = 2, at = c(0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330, 360), labels = c('0', '30', '60', '90', '120', '150', '180', '210', '240', '270', '300', '330', '360'))
     mtext(2, text = 'Turn/heading (degrees)', line = 4.5)
     
     par(new = T)
-    plot(sect$EchoTime, sect$MSEC, col = 'green', axes = F, xlab = '', ylab = '', type = 'l', lwd = 2, ylim = c(0, 0.8))
+    plot(sect$EchoTime, sect$MSEC, col = 'red', axes = F, xlab = '', ylab = '', type = 'l', lwd = 2, ylim = c(0, 0.8))
     axis(4, ylim = c(0, 1), line = 2, at = c(0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8), labels = c('0', '0.1', '0.2', '0.3', '0.4', '0.5', '0.6', '0.7', '0.8'))
     #mtext(text = 'velocity (m/sec)', side = 4, line = 3.5)
-    legend('topleft', legend = c('Turn', 'Velocity', 'Heading'), lty = 1, lwd = 2, col = c('lightgreen', 'red', 'lightblue'), horiz = T)
-    vellag <- filter(sect$MSEC, f5, sides=1) # filter turn
-    lines(sect$EchoTime, vellag, col = 'darkgreen') # add moving average to plot
+    #vellag <- filter(sect$MSEC, f5, sides=1) # filter turn
+    #lines(sect$EchoTime, vellag, col = 'darkgreen') # add moving average to plot
     
-    par(new = T)
-    plot(sect$EchoTime, sect$BLSEC, col = 'red', axes = F, xlab = '', ylab = '', type = 'l', lwd = 2, ylim = c(0, 6))
-    axis(4, ylim = c(0, 6), at = c(0, 1, 2, 3, 4, 5, 6), labels = c('0', '1', '2', '3', '4', '5', '6'))
+    #par(new = T)
+    #plot(sect$EchoTime, sect$BLSEC, col = 'red', axes = F, xlab = '', ylab = '', type = 'l', lwd = 2, ylim = c(0, 6))
+    #axis(4, ylim = c(0, 6), at = c(0, 1, 2, 3, 4, 5, 6), labels = c('0', '1', '2', '3', '4', '5', '6'))
     #mtext(text = 'velocity (BL/sec)', side = 4, line = 2.5)
-    vellag <- filter(sect$BLSEC, f5, sides=1) # filter turn
-    lines(sect$EchoTime, vellag, col = 'pink') # add moving average to plot
+    #vellag <- filter(sect$BLSEC, f5, sides=1) # filter turn
+    #lines(sect$EchoTime, vellag, col = 'pink') # add moving average to plot
     
     legend('topleft', legend = c('Turn', 'Velocity', 'Heading'), lty = 1, lwd = 2, col = c('lightgreen', 'red', 'lightblue'), horiz = T)
 
@@ -3952,6 +3974,7 @@ bplot <- function(period, step = 100){
     
   }
   par(mfrow=c(1,1))
+
 }
 
 
@@ -4285,32 +4308,44 @@ kudcalc3d <- function(save = T){
 
 plot.pen <- function(pen){
   
-  if (pen == 7){
+  if (pen == 12){
     
-    rect(locations.lookup['7EW', 'xmin'], locations.lookup['7EW', 'ymin'], locations.lookup['7EW', 'xmax'], locations.lookup['7EW', 'ymax'], lty = 2) # 7EW edge
-    rect(locations.lookup['7ES', 'xmin'], locations.lookup['7ES', 'ymin'], locations.lookup['7ES', 'xmax'], locations.lookup['7ES', 'ymax'], lty = 2) # 7ES edge
-    rect(locations.lookup['7EE', 'xmin'], locations.lookup['7EE', 'ymin'], locations.lookup['7EE', 'xmax'], locations.lookup['7EE', 'ymax'], lty = 2) # 7EE edge
-    rect(locations.lookup['7EN', 'xmin'], locations.lookup['7EN', 'ymin'], locations.lookup['7EN', 'xmax'], locations.lookup['7EN', 'ymax'], lty = 2) # 7EN edge
-    rect(locations.lookup['7WHSE', 'xmin'], locations.lookup['7WHSE', 'ymin'], locations.lookup['7WHSE', 'xmax'], locations.lookup['7WHSE', 'ymax'], lty = 3, col = rgb(1, 0.6, 0, 0.4)) # 7WHSE
-    rect(locations.lookup['7WHNW', 'xmin'], locations.lookup['7WHNW', 'ymin'], locations.lookup['7WHNW', 'xmax'], locations.lookup['7WHNW', 'ymax'], lty = 3, col = rgb(1, 0.6, 0, 0.4)) # 7WHNW
-    rect(locations.lookup['7FBSE', 'xmin'], locations.lookup['7FBSE', 'ymin'], locations.lookup['7FBSE', 'xmax'], locations.lookup['7FBSE', 'ymax'], lty = 3, col = rgb(1, 1, 0.1, 0.4)) # 7FBSE
-    rect(locations.lookup['7FBNW', 'xmin'], locations.lookup['7FBNW', 'ymin'], locations.lookup['7FBNW', 'xmax'], locations.lookup['7FBNW', 'ymax'], lty = 3, col = rgb(1, 1, 0.1, 0.4)) # 7FBNW
-    rect(locations.lookup['7EW', 'xmin'], locations.lookup['7ES', 'ymin'], locations.lookup['7EE', 'xmax'], locations.lookup['7EN', 'ymax'], lwd = 2) # cage limits
+    rect(locations.lookup['12EW', 'xmin'], locations.lookup['12EW', 'ymin'], locations.lookup['12EW', 'xmax'], locations.lookup['12EW', 'ymax'], lty = 2) # 12EW edge
+    rect(locations.lookup['12ES', 'xmin'], locations.lookup['12ES', 'ymin'], locations.lookup['12ES', 'xmax'], locations.lookup['12ES', 'ymax'], lty = 2) # 12ES edge
+    rect(locations.lookup['12EE', 'xmin'], locations.lookup['12EE', 'ymin'], locations.lookup['12EE', 'xmax'], locations.lookup['12EE', 'ymax'], lty = 2) # 12EE edge
+    rect(locations.lookup['12EN', 'xmin'], locations.lookup['12EN', 'ymin'], locations.lookup['12EN', 'xmax'], locations.lookup['12EN', 'ymax'], lty = 2) # 12EN edge
+    rect(locations.lookup['12HET', 'xmin'], locations.lookup['12HET', 'ymin'], locations.lookup['12HET', 'xmax'], locations.lookup['12HET', 'ymax'], lty = 3, col = rgb(1, 0.6, 0, 0.4)) # 12HET
+    rect(locations.lookup['12HWT', 'xmin'], locations.lookup['12HWT', 'ymin'], locations.lookup['12HWT', 'xmax'], locations.lookup['12HWT', 'ymax'], lty = 3, col = rgb(1, 0.6, 0, 0.4)) # 12HWT
+    rect(locations.lookup['12FS', 'xmin'], locations.lookup['12FS', 'ymin'], locations.lookup['12FS', 'xmax'], locations.lookup['12FS', 'ymax'], lty = 3, col = rgb(1, 1, 0.1, 0.4)) # 12FS
+    rect(locations.lookup['12EW', 'xmin'], locations.lookup['12ES', 'ymin'], locations.lookup['12EE', 'xmax'], locations.lookup['12EN', 'ymax'], lwd = 2) # cage limits
     
   } else {
     
-    rect(locations.lookup['8EW', 'xmin'], locations.lookup['8EW', 'ymin'], locations.lookup['8EW', 'xmax'], locations.lookup['8EW', 'ymax'], lty = 2) # 7EW edge
-    rect(locations.lookup['8ES', 'xmin'], locations.lookup['8ES', 'ymin'], locations.lookup['8ES', 'xmax'], locations.lookup['8ES', 'ymax'], lty = 2) # 7ES edge
-    rect(locations.lookup['8EE', 'xmin'], locations.lookup['8EE', 'ymin'], locations.lookup['8EE', 'xmax'], locations.lookup['8EE', 'ymax'], lty = 2) # 7EE edge
-    rect(locations.lookup['8EN', 'xmin'], locations.lookup['8EN', 'ymin'], locations.lookup['8EN', 'xmax'], locations.lookup['8EN', 'ymax'], lty = 2) # 7EN edge
-    rect(locations.lookup['8WHSW', 'xmin'], locations.lookup['8WHSW', 'ymin'], locations.lookup['8WHSW', 'xmax'], locations.lookup['8WHSW', 'ymax'], lty = 3, col = rgb(1, 0.6, 0, 0.4)) # 7WHSE
-    rect(locations.lookup['8WHNE', 'xmin'], locations.lookup['8WHNE', 'ymin'], locations.lookup['8WHNE', 'xmax'], locations.lookup['8WHNE', 'ymax'], lty = 3, col = rgb(1, 0.6, 0, 0.4)) # 7WHNW
-    rect(locations.lookup['8FBNE', 'xmin'], locations.lookup['8FBNE', 'ymin'], locations.lookup['8FBNE', 'xmax'], locations.lookup['8FBNE', 'ymax'], lty = 3, col = rgb(1, 1, 0.1, 0.4)) # 7FBNE
-    rect(locations.lookup['8FBSW', 'xmin'], locations.lookup['8FBSW', 'ymin'], locations.lookup['8FBSW', 'xmax'], locations.lookup['8FBSW', 'ymax'], lty = 3, col = rgb(1, 1, 0.1, 0.4)) # 7FBSW
-    rect(locations.lookup['8EW', 'xmin'], locations.lookup['8ES', 'ymin'], locations.lookup['8EE', 'xmax'], locations.lookup['8EN', 'ymax'], lwd = 2) # cage limits
+    if(pen == 14) {
+    
+      rect(locations.lookup['14EW', 'xmin'], locations.lookup['14EW', 'ymin'], locations.lookup['14EW', 'xmax'], locations.lookup['14EW', 'ymax'], lty = 2) # 14EW edge
+      rect(locations.lookup['14ES', 'xmin'], locations.lookup['14ES', 'ymin'], locations.lookup['14ES', 'xmax'], locations.lookup['14ES', 'ymax'], lty = 2) # 14ES edge
+      rect(locations.lookup['14EE', 'xmin'], locations.lookup['14EE', 'ymin'], locations.lookup['14EE', 'xmax'], locations.lookup['14EE', 'ymax'], lty = 2) # 14EE edge
+      rect(locations.lookup['14EN', 'xmin'], locations.lookup['14EN', 'ymin'], locations.lookup['14EN', 'xmax'], locations.lookup['14EN', 'ymax'], lty = 2) # 14EN edge
+      rect(locations.lookup['14HET', 'xmin'], locations.lookup['14HET', 'ymin'], locations.lookup['14HET', 'xmax'], locations.lookup['14HET', 'ymax'], lty = 3, col = rgb(1, 0.6, 0, 0.4)) # 14HET
+      rect(locations.lookup['14HWT', 'xmin'], locations.lookup['14HWT', 'ymin'], locations.lookup['14HWT', 'xmax'], locations.lookup['14HWT', 'ymax'], lty = 3, col = rgb(1, 0.6, 0, 0.4)) # 14HWT
+      rect(locations.lookup['14FS', 'xmin'], locations.lookup['14FS', 'ymin'], locations.lookup['14FS', 'xmax'], locations.lookup['14FS', 'ymax'], lty = 3, col = rgb(1, 1, 0.1, 0.4)) # 14FS
+      rect(locations.lookup['14EW', 'xmin'], locations.lookup['14ES', 'ymin'], locations.lookup['14EE', 'xmax'], locations.lookup['14EN', 'ymax'], lwd = 2) # cage limits
+      
+    } else {
+      
+      rect(locations.lookup['15EW', 'xmin'], locations.lookup['15EW', 'ymin'], locations.lookup['15EW', 'xmax'], locations.lookup['15EW', 'ymax'], lty = 2) # 15EW edge
+      rect(locations.lookup['15ES', 'xmin'], locations.lookup['15ES', 'ymin'], locations.lookup['15ES', 'xmax'], locations.lookup['15ES', 'ymax'], lty = 2) # 15ES edge
+      rect(locations.lookup['15EE', 'xmin'], locations.lookup['15EE', 'ymin'], locations.lookup['15EE', 'xmax'], locations.lookup['15EE', 'ymax'], lty = 2) # 15EE edge
+      rect(locations.lookup['15EN', 'xmin'], locations.lookup['15EN', 'ymin'], locations.lookup['15EN', 'xmax'], locations.lookup['15EN', 'ymax'], lty = 2) # 15EN edge
+      rect(locations.lookup['15HET', 'xmin'], locations.lookup['15HET', 'ymin'], locations.lookup['15HET', 'xmax'], locations.lookup['15HET', 'ymax'], lty = 3, col = rgb(1, 0.6, 0, 0.4)) # 15HET
+      rect(locations.lookup['15HWT', 'xmin'], locations.lookup['15HWT', 'ymin'], locations.lookup['15HWT', 'xmax'], locations.lookup['15HWT', 'ymax'], lty = 3, col = rgb(1, 0.6, 0, 0.4)) # 15HWT
+      rect(locations.lookup['15FS', 'xmin'], locations.lookup['15FS', 'ymin'], locations.lookup['15FS', 'xmax'], locations.lookup['15FS', 'ymax'], lty = 3, col = rgb(1, 1, 0.1, 0.4)) # 15FS
+      rect(locations.lookup['15EW', 'xmin'], locations.lookup['15ES', 'ymin'], locations.lookup['15EE', 'xmax'], locations.lookup['15EN', 'ymax'], lwd = 2) # cage limits
+      
+    }
     
   }  
-  
   
 }
 
