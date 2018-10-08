@@ -110,7 +110,7 @@ library(tidyr)
 
 #ENTER YOUR VARIABLES HERE
 workingdir = "G:/Data/2018 Lumpfish Husbandry/Data processing/6a. Coded Day CSV" # change to location of data
-dayfile.loc = "R1_LBF18S100170_day_coded.csv" # change to file to be analysed
+dayfile.loc = "R1_LBF18S100184_2_day_coded.csv" # change to file to be analysed
 masterfileloc = "G:/Data/2018 Lumpfish Husbandry/AcousticTagFile_2018v6.xlsx" # change to location of AcousticTagFile.xlsx
 
 workingdir = "H:/Data processing/2016 Conditioning study B/Filtered Data/Recoded Fish CSV/Unconditioned" # change to location of data
@@ -124,13 +124,13 @@ dayfile.classes = c('NULL', 'numeric', 'NULL', # Period
                     'POSIXct', 'double', 'double', 'double', # EchoTime and coordinates
                     'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', # calculated swimming parameters
                     'factor', 'factor', 'factor', 'factor', 'factor', # biofouling, visibility, moon
-                    'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 
-                    'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', # sea lice numbers
+                    'factor', 'factor', 'factor', 'factor', 'factor', 'factor', 'factor', 'factor', 'factor', 'factor', 'factor', 
+                    'factor', 'factor', 'factor', 'factor', 'factor', 'factor', 'factor', 'factor', 'factor', 'factor', # sea lice numbers
                     'factor', 'factor', 'factor', 'factor', 'factor', 'factor', 'factor', # Locations
                     'factor', 'factor', 'factor', # Sun, tide stage and phase
                     'factor', 'factor', 'factor', # salmon feeding times
-                    'double', 'double', 'double', 'double', 'double', 'double', 'double',
-                    'double', 'double', 'double', 'double', 'double' # Environmental probes
+                    'factor', 'factor', 'factor', 'factor', 'factor', 'factor', 'factor',
+                    'factor', 'factor', 'factor', 'factor', 'factor' # Environmental probes
 )
 
 #half-coded dayfile classes
@@ -175,6 +175,7 @@ rownames(locations.lookup) <- locations.lookup$Code
 # LOAD DAYFILE
 setwd(workingdir)                                                                                                    
 dayfile <- read.csv(dayfile.loc, header = TRUE, sep = ",", colClasses = dayfile.classes)
+dayfile[,c(seq(20, 40, 1), seq(54,65, 1))] <- apply(dayfile[,c(seq(20, 40, 1), seq(54,65, 1))], 2, function(x) as.numeric(as.character(x))) # convert factors to numbers
                                                                           
 #)) #read data into table
 
@@ -2126,6 +2127,7 @@ fish.3depth <- function(period1, period2, period3)
   legend('bottom', as.character(c(period1, period2, period3)), col = c('#26b426', '#d80000', '#038ef0'), pch = 20, bty = 'n', pt.cex = 1.5, horiz = TRUE, y.intersp = 0)
 }
 
+
 # 13. draws a plot of fish location
 
 fish.plot <- function(period)
@@ -2134,39 +2136,49 @@ fish.plot <- function(period)
   fish.id <- subset(dayfile, Period == period)
   par(mfrow=c(1,1))
   
-  if(fish.id[1,3] == '7')
+  if(fish.id[1,3] == '12')
   {
     
-    # plot(fish.id$PosX, fish.id$PosY, xlab = 'X', ylab = 'Y', pch = 20, cex = 0.8, xlim = c(0, 40), ylim = c(0, 45), type = 'p', col = rgb(0, 0.6, 0, 0.2)) # wider plot
-    plot(fish.id$PosX, fish.id$PosY, xlab = 'X (m)', ylab = 'Y (m)', pch = 20, cex = 1, xlim = c(10, 45), ylim = c(10, 45), type = 'l', col = fishpal[20]) # tight plot
-    rect(locations.lookup['7EW', 'xmin'], locations.lookup['7EW', 'ymin'], locations.lookup['7EW', 'xmax'], locations.lookup['7EW', 'ymax'], lty = 2) # 7EW edge
-    rect(locations.lookup['7ES', 'xmin'], locations.lookup['7ES', 'ymin'], locations.lookup['7ES', 'xmax'], locations.lookup['7ES', 'ymax'], lty = 2) # 7ES edge
-    rect(locations.lookup['7EE', 'xmin'], locations.lookup['7EE', 'ymin'], locations.lookup['7EE', 'xmax'], locations.lookup['7EE', 'ymax'], lty = 2) # 7EE edge
-    rect(locations.lookup['7EN', 'xmin'], locations.lookup['7EN', 'ymin'], locations.lookup['7EN', 'xmax'], locations.lookup['7EN', 'ymax'], lty = 2) # 7EN edge
-    rect(locations.lookup['7WHSE', 'xmin'], locations.lookup['7WHSE', 'ymin'], locations.lookup['7WHSE', 'xmax'], locations.lookup['7WHSE', 'ymax'], lty = 3, col = rgb(1, 0.6, 0, 0.4)) # 7WHSE
-    rect(locations.lookup['7WHNW', 'xmin'], locations.lookup['7WHNW', 'ymin'], locations.lookup['7WHNW', 'xmax'], locations.lookup['7WHNW', 'ymax'], lty = 3, col = rgb(1, 0.6, 0, 0.4)) # 7WHNW
-    rect(locations.lookup['7FBSE', 'xmin'], locations.lookup['7FBSE', 'ymin'], locations.lookup['7FBSE', 'xmax'], locations.lookup['7FBSE', 'ymax'], lty = 3, col = rgb(1, 1, 0.1, 0.4)) # 7FBSE
-    rect(locations.lookup['7FBNW', 'xmin'], locations.lookup['7FBNW', 'ymin'], locations.lookup['7FBNW', 'xmax'], locations.lookup['7FBNW', 'ymax'], lty = 3, col = rgb(1, 1, 0.1, 0.4)) # 7FBNW
-    rect(locations.lookup['7EW', 'xmin'], locations.lookup['7ES', 'ymin'], locations.lookup['7EE', 'xmax'], locations.lookup['7EN', 'ymax'], lwd = 2) # cage limits
-    #legend(1, 10, as.character(period), col = '#26b426', pch = 20, bty = 'n', pt.cex = 1.5, horiz = TRUE)
-    
+    plot(fish.id$PosX, fish.id$PosY, xlab = 'X (m)', ylab = 'Y (m)', pch = 20, cex = 1, xlim = c(35, 70), ylim = c(35, 70), type = 'l', col = fishpal[20]) # tight plot
+    rect(locations.lookup['12EW', 'xmin'], locations.lookup['12EW', 'ymin'], locations.lookup['12EW', 'xmax'], locations.lookup['12EW', 'ymax'], lty = 2) # 12EW edge
+    rect(locations.lookup['12ES', 'xmin'], locations.lookup['12ES', 'ymin'], locations.lookup['12ES', 'xmax'], locations.lookup['12ES', 'ymax'], lty = 2) # 12ES edge
+    rect(locations.lookup['12EE', 'xmin'], locations.lookup['12EE', 'ymin'], locations.lookup['12EE', 'xmax'], locations.lookup['12EE', 'ymax'], lty = 2) # 12EE edge
+    rect(locations.lookup['12EN', 'xmin'], locations.lookup['12EN', 'ymin'], locations.lookup['12EN', 'xmax'], locations.lookup['12EN', 'ymax'], lty = 2) # 12EN edge
+    rect(locations.lookup['12HET', 'xmin'], locations.lookup['12HET', 'ymin'], locations.lookup['12HET', 'xmax'], locations.lookup['12HET', 'ymax'], lty = 3, col = rgb(1, 0.6, 0, 0.4)) # 12HET
+    rect(locations.lookup['12HWT', 'xmin'], locations.lookup['12HWT', 'ymin'], locations.lookup['12HWT', 'xmax'], locations.lookup['12HWT', 'ymax'], lty = 3, col = rgb(1, 0.6, 0, 0.4)) # 12HWT
+    rect(locations.lookup['12FS', 'xmin'], locations.lookup['12FS', 'ymin'], locations.lookup['12FS', 'xmax'], locations.lookup['12FS', 'ymax'], lty = 3, col = rgb(1, 1, 0.1, 0.4)) # 12FS
+    rect(locations.lookup['12EW', 'xmin'], locations.lookup['12ES', 'ymin'], locations.lookup['12EE', 'xmax'], locations.lookup['12EN', 'ymax'], lwd = 2) # cage limits
+
   }else{
     
-    #plot(fish.id$PosX, fish.id$PosY, xlab = 'X', ylab = 'Y', pch = 20, cex = 0.8, xlim = c(25, 70), ylim = c(0, 45), type = 'p', col = rgb(0, 0.6, 0, 0.2)) # wider plot
-    plot(fish.id$PosX, fish.id$PosY, xlab = 'X (m)', ylab = 'Y (m)', pch = 20, cex = 1, xlim = c(37, 72), ylim = c(10, 45), type = 'l', col = fishpal[20]) # tight plot
-    rect(locations.lookup['8EW', 'xmin'], locations.lookup['8EW', 'ymin'], locations.lookup['8EW', 'xmax'], locations.lookup['8EW', 'ymax'], lty = 2) # 7EW edge
-    rect(locations.lookup['8ES', 'xmin'], locations.lookup['8ES', 'ymin'], locations.lookup['8ES', 'xmax'], locations.lookup['8ES', 'ymax'], lty = 2) # 7ES edge
-    rect(locations.lookup['8EE', 'xmin'], locations.lookup['8EE', 'ymin'], locations.lookup['8EE', 'xmax'], locations.lookup['8EE', 'ymax'], lty = 2) # 7EE edge
-    rect(locations.lookup['8EN', 'xmin'], locations.lookup['8EN', 'ymin'], locations.lookup['8EN', 'xmax'], locations.lookup['8EN', 'ymax'], lty = 2) # 7EN edge
-    rect(locations.lookup['8WHSW', 'xmin'], locations.lookup['8WHSW', 'ymin'], locations.lookup['8WHSW', 'xmax'], locations.lookup['8WHSW', 'ymax'], lty = 3, col = rgb(1, 0.6, 0, 0.4)) # 7WHSE
-    rect(locations.lookup['8WHNE', 'xmin'], locations.lookup['8WHNE', 'ymin'], locations.lookup['8WHNE', 'xmax'], locations.lookup['8WHNE', 'ymax'], lty = 3, col = rgb(1, 0.6, 0, 0.4)) # 7WHNW
-    rect(locations.lookup['8FBNE', 'xmin'], locations.lookup['8FBNE', 'ymin'], locations.lookup['8FBNE', 'xmax'], locations.lookup['8FBNE', 'ymax'], lty = 3, col = rgb(1, 1, 0.1, 0.4)) # 7FBNE
-    rect(locations.lookup['8FBSW', 'xmin'], locations.lookup['8FBSW', 'ymin'], locations.lookup['8FBSW', 'xmax'], locations.lookup['8FBSW', 'ymax'], lty = 3, col = rgb(1, 1, 0.1, 0.4)) # 7FBSW
-    rect(locations.lookup['8EW', 'xmin'], locations.lookup['8ES', 'ymin'], locations.lookup['8EE', 'xmax'], locations.lookup['8EN', 'ymax'], lwd = 2) # cage limits
-    #legend(25, 10, as.character(period), col = '#26b426', pch = 20, bty = 'n', pt.cex = 1.5, horiz = TRUE)
+    if(fish.id[1,3] == '14'){
+      
+      plot(fish.id$PosX, fish.id$PosY, xlab = 'X (m)', ylab = 'Y (m)', pch = 20, cex = 1, xlim = c(10, 45), ylim = c(35, 70), type = 'l', col = fishpal[20]) # tight plot
+      rect(locations.lookup['14EW', 'xmin'], locations.lookup['14EW', 'ymin'], locations.lookup['14EW', 'xmax'], locations.lookup['14EW', 'ymax'], lty = 2) # 14EW edge
+      rect(locations.lookup['14ES', 'xmin'], locations.lookup['14ES', 'ymin'], locations.lookup['14ES', 'xmax'], locations.lookup['14ES', 'ymax'], lty = 2) # 14ES edge
+      rect(locations.lookup['14EE', 'xmin'], locations.lookup['14EE', 'ymin'], locations.lookup['14EE', 'xmax'], locations.lookup['14EE', 'ymax'], lty = 2) # 14EE edge
+      rect(locations.lookup['14EN', 'xmin'], locations.lookup['14EN', 'ymin'], locations.lookup['14EN', 'xmax'], locations.lookup['14EN', 'ymax'], lty = 2) # 14EN edge
+      rect(locations.lookup['14HET', 'xmin'], locations.lookup['14HET', 'ymin'], locations.lookup['14HET', 'xmax'], locations.lookup['14HET', 'ymax'], lty = 3, col = rgb(1, 0.6, 0, 0.4)) # 14HET
+      rect(locations.lookup['14HWT', 'xmin'], locations.lookup['14HWT', 'ymin'], locations.lookup['14HWT', 'xmax'], locations.lookup['14HWT', 'ymax'], lty = 3, col = rgb(1, 0.6, 0, 0.4)) # 14HWT
+      rect(locations.lookup['14FS', 'xmin'], locations.lookup['14FS', 'ymin'], locations.lookup['14FS', 'xmax'], locations.lookup['14FS', 'ymax'], lty = 3, col = rgb(1, 1, 0.1, 0.4)) # 14FS
+      rect(locations.lookup['14EW', 'xmin'], locations.lookup['14ES', 'ymin'], locations.lookup['14EE', 'xmax'], locations.lookup['14EN', 'ymax'], lwd = 2) # cage limits
+      
+    } else {
     
+      plot(fish.id$PosX, fish.id$PosY, xlab = 'X (m)', ylab = 'Y (m)', pch = 20, cex = 1, xlim = c(10, 45), ylim = c(10, 45), type = 'l', col = fishpal[20]) # tight plot
+      rect(locations.lookup['15EW', 'xmin'], locations.lookup['15EW', 'ymin'], locations.lookup['15EW', 'xmax'], locations.lookup['15EW', 'ymax'], lty = 2) # 15EW edge
+      rect(locations.lookup['15ES', 'xmin'], locations.lookup['15ES', 'ymin'], locations.lookup['15ES', 'xmax'], locations.lookup['15ES', 'ymax'], lty = 2) # 15ES edge
+      rect(locations.lookup['15EE', 'xmin'], locations.lookup['15EE', 'ymin'], locations.lookup['15EE', 'xmax'], locations.lookup['15EE', 'ymax'], lty = 2) # 15EE edge
+      rect(locations.lookup['15EN', 'xmin'], locations.lookup['15EN', 'ymin'], locations.lookup['15EN', 'xmax'], locations.lookup['15EN', 'ymax'], lty = 2) # 15EN edge
+      rect(locations.lookup['15HET', 'xmin'], locations.lookup['15HET', 'ymin'], locations.lookup['15HET', 'xmax'], locations.lookup['15HET', 'ymax'], lty = 3, col = rgb(1, 0.6, 0, 0.4)) # 15HET
+      rect(locations.lookup['15HWT', 'xmin'], locations.lookup['15HWT', 'ymin'], locations.lookup['15HWT', 'xmax'], locations.lookup['15HWT', 'ymax'], lty = 3, col = rgb(1, 0.6, 0, 0.4)) # 15HWT
+      rect(locations.lookup['15FS', 'xmin'], locations.lookup['15FS', 'ymin'], locations.lookup['15FS', 'xmax'], locations.lookup['15FS', 'ymax'], lty = 3, col = rgb(1, 1, 0.1, 0.4)) # 15FS
+      rect(locations.lookup['15EW', 'xmin'], locations.lookup['15ES', 'ymin'], locations.lookup['15EE', 'xmax'], locations.lookup['15EN', 'ymax'], lwd = 2) # cage limits
+      
+    }
   }
 }
+
 
 # 14. Draws a plot of fish locations for 3 fish
 
@@ -3583,9 +3595,9 @@ hdep <<- hdep
 }
 
 
-# 33. Load all data into single data frame
+# 33. Load all data into single data frame. Specify which pen to load with 'pen' parameter or 'all' to load all data.
 
-load.all <- function(){
+load.all <- function(pen){
 
 files <- list.files(path = workingdir, pattern = '*.csv', all.files = FALSE, recursive = FALSE)
   
@@ -3594,11 +3606,23 @@ dayfile <- data.frame()
 for(i in 1:length(files)){
 
   daytemp <- read.csv(files[[i]], header = TRUE, sep = ",", colClasses = dayfile.classes)
+  
+  if(pen == 'all'){
+    
+    daytemp <- daytemp
+    
+  } else {
+    
+    daytemp <- daytemp[daytemp$PEN == pen,]
+    
+  }
 
   dayfile <- rbind(dayfile, daytemp)
 
 }
 
+# convert factors to numbers
+dayfile[,c(seq(20, 40, 1), seq(54,65, 1))] <- apply(dayfile[,c(seq(20, 40, 1), seq(54,65, 1))], 2, function(x) as.numeric(as.character(x)))
 
 #SORT BY TIME AND TAG
 dayfile <- dayfile[order(dayfile$EchoTime, na.last = FALSE, decreasing = FALSE, method = c("shell")),] # sort by time
