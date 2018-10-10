@@ -76,7 +76,7 @@
 library(hexbin)
 library(scatterplot3d)
 library(rgl)
-Sys.setenv(JAVA_HOME='C:/Program Files/Java/jre7')
+#Sys.setenv(JAVA_HOME='C:/Program Files/Java/jre7')
 library(rJava)
 library(XLConnectJars)
 library(XLConnect) 
@@ -171,7 +171,7 @@ hidefile.classes = c('NULL', 'numeric', 'factor', 'factor', 'POSIXct', 'double',
 # LOAD FILES-------------------------------------------------------------------------------------------------------------------
 
 #LOAD LOCATIONS CODING DATA
-locations.lookup <- read.xlsx(masterfileloc, sheetIndex = 11, startRow = 1, endRow = 55, colIndex = seq(1, 7)) # read in codes from Locations Coding spreadsheet
+locations.lookup <- read.xlsx(masterfileloc, sheetIndex = 11, startRow = 1, endRow = 61, colIndex = seq(1, 7)) # read in codes from Locations Coding spreadsheet
 
 #locations.lookup <- readWorksheetFromFile(masterfileloc, sheet = 12, startRow = 1, endCol = 7) # read in codes from Locations Coding spreadsheet
 rownames(locations.lookup) <- locations.lookup$Code
@@ -3865,7 +3865,7 @@ bplot <- function(period, step = 100){
     
     sect <- daytemp[start:end,] # subset dayfile
     
-    #par(mfrow=c(2,2))
+    par(mfrow=c(2,2))
     layout(matrix(c(1,2,3,3), 2, 2,byrow = T))
     par(new=F)
     par(mar = c(4, 4, 4, 4))# + 0.1)
@@ -3888,7 +3888,7 @@ bplot <- function(period, step = 100){
       
       if(sect[1,2] == '14') {
       
-      plot(sect$PosX, sect$PosY, xlab = 'X (m)', ylab = 'Y (m)', pch = 20, cex = 1, xlim = c(37, 72), ylim = c(10, 45), type = 'l', col = '#26b426') # tight plot
+      plot(sect$PosX, sect$PosY, xlab = 'X (m)', ylab = 'Y (m)', pch = 20, cex = 1, xlim = c(10, 45), ylim = c(35, 70), type = 'l', col = '#26b426') # tight plot
       plot.pen(14)
 
       text(37, 45, adj = c(0, 1), label = paste0('Salmon feeding: ', sect[1,'SMEAL8'], '\nBiofouling: ', sect[1, 'BIOF8'], '\nSun: ', sect[1,'SUN'], '\nTide: ', sect[1, 'TID']), cex = 1) 
@@ -3896,7 +3896,7 @@ bplot <- function(period, step = 100){
       
       } else {
         
-        plot(sect$PosX, sect$PosY, xlab = 'X (m)', ylab = 'Y (m)', pch = 20, cex = 1, xlim = c(37, 72), ylim = c(10, 45), type = 'l', col = '#26b426') # tight plot
+        plot(sect$PosX, sect$PosY, xlab = 'X (m)', ylab = 'Y (m)', pch = 20, cex = 1, xlim = c(10, 45), ylim = c(10, 45), type = 'l', col = '#26b426') # tight plot
         plot.pen(15)
         
       }
@@ -4288,37 +4288,70 @@ plot.pen <- function(pen){
   
   if (pen == 12){
     
+    #plot(1, 1, xlab = 'X (m)', ylab = 'Y (m)', pch = 20, cex = 1, xlim = c(35, 70), ylim = c(35, 70), type = 'l', col = 'black') 
     rect(locations.lookup['12EW', 'xmin'], locations.lookup['12EW', 'ymin'], locations.lookup['12EW', 'xmax'], locations.lookup['12EW', 'ymax'], lty = 2) # 12EW edge
     rect(locations.lookup['12ES', 'xmin'], locations.lookup['12ES', 'ymin'], locations.lookup['12ES', 'xmax'], locations.lookup['12ES', 'ymax'], lty = 2) # 12ES edge
     rect(locations.lookup['12EE', 'xmin'], locations.lookup['12EE', 'ymin'], locations.lookup['12EE', 'xmax'], locations.lookup['12EE', 'ymax'], lty = 2) # 12EE edge
     rect(locations.lookup['12EN', 'xmin'], locations.lookup['12EN', 'ymin'], locations.lookup['12EN', 'xmax'], locations.lookup['12EN', 'ymax'], lty = 2) # 12EN edge
-    rect(locations.lookup['12HET', 'xmin'], locations.lookup['12HET', 'ymin'], locations.lookup['12HET', 'xmax'], locations.lookup['12HET', 'ymax'], lty = 3, col = rgb(1, 0.6, 0, 0.4)) # 12HET
-    rect(locations.lookup['12HWT', 'xmin'], locations.lookup['12HWT', 'ymin'], locations.lookup['12HWT', 'xmax'], locations.lookup['12HWT', 'ymax'], lty = 3, col = rgb(1, 0.6, 0, 0.4)) # 12HWT
-    rect(locations.lookup['12FS', 'xmin'], locations.lookup['12FS', 'ymin'], locations.lookup['12FS', 'xmax'], locations.lookup['12FS', 'ymax'], lty = 3, col = rgb(1, 1, 0.1, 0.4)) # 12FS
+    rect(locations.lookup['12HET', 'xmin'], locations.lookup['12HET', 'ymin'], locations.lookup['12HET', 'xmax'], locations.lookup['12HET', 'ymax'], lty = 3, col = rgb(56, 185, 255, 100, maxColorValue = 255)) # 12HET
+    rect(locations.lookup['12HEB', 'xmin'], locations.lookup['12HEB', 'ymin'], locations.lookup['12HEB', 'xmax'], locations.lookup['12HEB', 'ymax'], lty = 3, col = rgb(56, 72, 255, 100, maxColorValue = 255)) # 12HEB
+    segments(locations.lookup['12HET', 'xmin'], locations.lookup['12HET', 'ymin'], locations.lookup['12HEB', 'xmin'], locations.lookup['12HEB', 'ymin'], lty = 3) # 12HEB
+    segments(locations.lookup['12HET', 'xmax'], locations.lookup['12HET', 'ymin'], locations.lookup['12HEB', 'xmax'], locations.lookup['12HEB', 'ymin'], lty = 3) # 12HEB
+    segments(locations.lookup['12HET', 'xmax'], locations.lookup['12HET', 'ymax'], locations.lookup['12HEB', 'xmax'], locations.lookup['12HEB', 'ymax'], lty = 3) # 12HEB
+    segments(locations.lookup['12HET', 'xmin'], locations.lookup['12HET', 'ymax'], locations.lookup['12HEB', 'xmin'], locations.lookup['12HEB', 'ymax'], lty = 3) # 12HEB
+    rect(locations.lookup['12HWT', 'xmin'], locations.lookup['12HWT', 'ymin'], locations.lookup['12HWT', 'xmax'], locations.lookup['12HWT', 'ymax'], lty = 3, col = rgb(56, 185, 255, 100, maxColorValue = 255)) # 12HWT
+    rect(locations.lookup['12HWB', 'xmin'], locations.lookup['12HWB', 'ymin'], locations.lookup['12HWB', 'xmax'], locations.lookup['12HWB', 'ymax'], lty = 3, col = rgb(56, 72, 255, 100, maxColorValue = 255)) # 12HWT
+    segments(locations.lookup['12HWT', 'xmin'], locations.lookup['12HWT', 'ymin'], locations.lookup['12HWB', 'xmin'], locations.lookup['12HWB', 'ymin'], lty = 3) # 12HWB
+    segments(locations.lookup['12HWT', 'xmax'], locations.lookup['12HWT', 'ymin'], locations.lookup['12HWB', 'xmax'], locations.lookup['12HWB', 'ymin'], lty = 3) # 12HWB
+    segments(locations.lookup['12HWT', 'xmax'], locations.lookup['12HWT', 'ymax'], locations.lookup['12HWB', 'xmax'], locations.lookup['12HWB', 'ymax'], lty = 3) # 12HWB
+    segments(locations.lookup['12HWT', 'xmin'], locations.lookup['12HWT', 'ymax'], locations.lookup['12HWB', 'xmin'], locations.lookup['12HWB', 'ymax'], lty = 3) # 12HWB
+    rect(locations.lookup['FS12', 'xmin'], locations.lookup['FS12', 'ymin'], locations.lookup['FS12', 'xmax'], locations.lookup['FS12', 'ymax'], lty = 3, col = rgb(255, 130, 5, 100, maxColorValue = 255)) # FS12
     rect(locations.lookup['12EW', 'xmin'], locations.lookup['12ES', 'ymin'], locations.lookup['12EE', 'xmax'], locations.lookup['12EN', 'ymax'], lwd = 2) # cage limits
     
   } else {
     
     if(pen == 14) {
     
+      #plot(1, 1, xlab = 'X (m)', ylab = 'Y (m)', pch = 20, cex = 1, xlim = c(10, 45), ylim = c(35, 70), type = 'l', col = 'black') 
       rect(locations.lookup['14EW', 'xmin'], locations.lookup['14EW', 'ymin'], locations.lookup['14EW', 'xmax'], locations.lookup['14EW', 'ymax'], lty = 2) # 14EW edge
       rect(locations.lookup['14ES', 'xmin'], locations.lookup['14ES', 'ymin'], locations.lookup['14ES', 'xmax'], locations.lookup['14ES', 'ymax'], lty = 2) # 14ES edge
       rect(locations.lookup['14EE', 'xmin'], locations.lookup['14EE', 'ymin'], locations.lookup['14EE', 'xmax'], locations.lookup['14EE', 'ymax'], lty = 2) # 14EE edge
       rect(locations.lookup['14EN', 'xmin'], locations.lookup['14EN', 'ymin'], locations.lookup['14EN', 'xmax'], locations.lookup['14EN', 'ymax'], lty = 2) # 14EN edge
-      rect(locations.lookup['14HET', 'xmin'], locations.lookup['14HET', 'ymin'], locations.lookup['14HET', 'xmax'], locations.lookup['14HET', 'ymax'], lty = 3, col = rgb(1, 0.6, 0, 0.4)) # 14HET
-      rect(locations.lookup['14HWT', 'xmin'], locations.lookup['14HWT', 'ymin'], locations.lookup['14HWT', 'xmax'], locations.lookup['14HWT', 'ymax'], lty = 3, col = rgb(1, 0.6, 0, 0.4)) # 14HWT
-      rect(locations.lookup['14FS', 'xmin'], locations.lookup['14FS', 'ymin'], locations.lookup['14FS', 'xmax'], locations.lookup['14FS', 'ymax'], lty = 3, col = rgb(1, 1, 0.1, 0.4)) # 14FS
+      rect(locations.lookup['14HET', 'xmin'], locations.lookup['14HET', 'ymin'], locations.lookup['14HET', 'xmax'], locations.lookup['14HET', 'ymax'], lty = 3, col = rgb(56, 185, 255, 100, maxColorValue = 255)) # 14HET
+      rect(locations.lookup['14HEB', 'xmin'], locations.lookup['14HEB', 'ymin'], locations.lookup['14HEB', 'xmax'], locations.lookup['14HEB', 'ymax'], lty = 3, col = rgb(56, 72, 255, 100, maxColorValue = 255)) # 14HEB
+      segments(locations.lookup['14HET', 'xmin'], locations.lookup['14HET', 'ymin'], locations.lookup['14HEB', 'xmin'], locations.lookup['14HEB', 'ymin'], lty = 3) # 14HEB
+      segments(locations.lookup['14HET', 'xmax'], locations.lookup['14HET', 'ymin'], locations.lookup['14HEB', 'xmax'], locations.lookup['14HEB', 'ymin'], lty = 3) # 14HEB
+      segments(locations.lookup['14HET', 'xmax'], locations.lookup['14HET', 'ymax'], locations.lookup['14HEB', 'xmax'], locations.lookup['14HEB', 'ymax'], lty = 3) # 14HEB
+      segments(locations.lookup['14HET', 'xmin'], locations.lookup['14HET', 'ymax'], locations.lookup['14HEB', 'xmin'], locations.lookup['14HEB', 'ymax'], lty = 3) # 14HEB
+      rect(locations.lookup['14HWT', 'xmin'], locations.lookup['14HWT', 'ymin'], locations.lookup['14HWT', 'xmax'], locations.lookup['14HWT', 'ymax'], lty = 3, col = rgb(56, 185, 255, 100, maxColorValue = 255)) # 14HWT
+      rect(locations.lookup['14HWB', 'xmin'], locations.lookup['14HWB', 'ymin'], locations.lookup['14HWB', 'xmax'], locations.lookup['14HWB', 'ymax'], lty = 3, col = rgb(56, 72, 255, 100, maxColorValue = 255)) # 14HWT
+      segments(locations.lookup['14HWT', 'xmin'], locations.lookup['14HWT', 'ymin'], locations.lookup['14HWB', 'xmin'], locations.lookup['14HWB', 'ymin'], lty = 3) # 14HWB
+      segments(locations.lookup['14HWT', 'xmax'], locations.lookup['14HWT', 'ymin'], locations.lookup['14HWB', 'xmax'], locations.lookup['14HWB', 'ymin'], lty = 3) # 14HWB
+      segments(locations.lookup['14HWT', 'xmax'], locations.lookup['14HWT', 'ymax'], locations.lookup['14HWB', 'xmax'], locations.lookup['14HWB', 'ymax'], lty = 3) # 14HWB
+      segments(locations.lookup['14HWT', 'xmin'], locations.lookup['14HWT', 'ymax'], locations.lookup['14HWB', 'xmin'], locations.lookup['14HWB', 'ymax'], lty = 3) # 14HWB
+      rect(locations.lookup['FS14', 'xmin'], locations.lookup['FS14', 'ymin'], locations.lookup['FS14', 'xmax'], locations.lookup['FS14', 'ymax'], lty = 3, col = rgb(255, 130, 5, 100, maxColorValue = 255)) # FS14
       rect(locations.lookup['14EW', 'xmin'], locations.lookup['14ES', 'ymin'], locations.lookup['14EE', 'xmax'], locations.lookup['14EN', 'ymax'], lwd = 2) # cage limits
       
     } else {
       
+      #plot(1, 1, xlab = 'X (m)', ylab = 'Y (m)', pch = 20, cex = 1, xlim = c(10, 45), ylim = c(10, 45), type = 'l', col = 'black') 
       rect(locations.lookup['15EW', 'xmin'], locations.lookup['15EW', 'ymin'], locations.lookup['15EW', 'xmax'], locations.lookup['15EW', 'ymax'], lty = 2) # 15EW edge
       rect(locations.lookup['15ES', 'xmin'], locations.lookup['15ES', 'ymin'], locations.lookup['15ES', 'xmax'], locations.lookup['15ES', 'ymax'], lty = 2) # 15ES edge
       rect(locations.lookup['15EE', 'xmin'], locations.lookup['15EE', 'ymin'], locations.lookup['15EE', 'xmax'], locations.lookup['15EE', 'ymax'], lty = 2) # 15EE edge
       rect(locations.lookup['15EN', 'xmin'], locations.lookup['15EN', 'ymin'], locations.lookup['15EN', 'xmax'], locations.lookup['15EN', 'ymax'], lty = 2) # 15EN edge
-      rect(locations.lookup['15HET', 'xmin'], locations.lookup['15HET', 'ymin'], locations.lookup['15HET', 'xmax'], locations.lookup['15HET', 'ymax'], lty = 3, col = rgb(1, 0.6, 0, 0.4)) # 15HET
-      rect(locations.lookup['15HWT', 'xmin'], locations.lookup['15HWT', 'ymin'], locations.lookup['15HWT', 'xmax'], locations.lookup['15HWT', 'ymax'], lty = 3, col = rgb(1, 0.6, 0, 0.4)) # 15HWT
-      rect(locations.lookup['15FS', 'xmin'], locations.lookup['15FS', 'ymin'], locations.lookup['15FS', 'xmax'], locations.lookup['15FS', 'ymax'], lty = 3, col = rgb(1, 1, 0.1, 0.4)) # 15FS
+      rect(locations.lookup['15HET', 'xmin'], locations.lookup['15HET', 'ymin'], locations.lookup['15HET', 'xmax'], locations.lookup['15HET', 'ymax'], lty = 3, col = rgb(56, 185, 255, 100, maxColorValue = 255)) # 15HET
+      rect(locations.lookup['15HEB', 'xmin'], locations.lookup['15HEB', 'ymin'], locations.lookup['15HEB', 'xmax'], locations.lookup['15HEB', 'ymax'], lty = 3, col = rgb(56, 72, 255, 100, maxColorValue = 255)) # 15HEB
+      segments(locations.lookup['15HET', 'xmin'], locations.lookup['15HET', 'ymin'], locations.lookup['15HEB', 'xmin'], locations.lookup['15HEB', 'ymin'], lty = 3) # 15HEB
+      segments(locations.lookup['15HET', 'xmax'], locations.lookup['15HET', 'ymin'], locations.lookup['15HEB', 'xmax'], locations.lookup['15HEB', 'ymin'], lty = 3) # 15HEB
+      segments(locations.lookup['15HET', 'xmax'], locations.lookup['15HET', 'ymax'], locations.lookup['15HEB', 'xmax'], locations.lookup['15HEB', 'ymax'], lty = 3) # 15HEB
+      segments(locations.lookup['15HET', 'xmin'], locations.lookup['15HET', 'ymax'], locations.lookup['15HEB', 'xmin'], locations.lookup['15HEB', 'ymax'], lty = 3) # 15HEB
+      rect(locations.lookup['15HWT', 'xmin'], locations.lookup['15HWT', 'ymin'], locations.lookup['15HWT', 'xmax'], locations.lookup['15HWT', 'ymax'], lty = 3, col = rgb(56, 185, 255, 100, maxColorValue = 255)) # 15HWT
+      rect(locations.lookup['15HWB', 'xmin'], locations.lookup['15HWB', 'ymin'], locations.lookup['15HWB', 'xmax'], locations.lookup['15HWB', 'ymax'], lty = 3, col = rgb(56, 72, 255, 100, maxColorValue = 255)) # 15HWT
+      segments(locations.lookup['15HWT', 'xmin'], locations.lookup['15HWT', 'ymin'], locations.lookup['15HWB', 'xmin'], locations.lookup['15HWB', 'ymin'], lty = 3) # 15HWB
+      segments(locations.lookup['15HWT', 'xmax'], locations.lookup['15HWT', 'ymin'], locations.lookup['15HWB', 'xmax'], locations.lookup['15HWB', 'ymin'], lty = 3) # 15HWB
+      segments(locations.lookup['15HWT', 'xmax'], locations.lookup['15HWT', 'ymax'], locations.lookup['15HWB', 'xmax'], locations.lookup['15HWB', 'ymax'], lty = 3) # 15HWB
+      segments(locations.lookup['15HWT', 'xmin'], locations.lookup['15HWT', 'ymax'], locations.lookup['15HWB', 'xmin'], locations.lookup['15HWB', 'ymax'], lty = 3) # 15HWB
+      rect(locations.lookup['FS15', 'xmin'], locations.lookup['FS15', 'ymin'], locations.lookup['FS15', 'xmax'], locations.lookup['FS15', 'ymax'], lty = 3, col = rgb(255, 130, 5, 100, maxColorValue = 255)) # FS15
       rect(locations.lookup['15EW', 'xmin'], locations.lookup['15ES', 'ymin'], locations.lookup['15EE', 'xmax'], locations.lookup['15EN', 'ymax'], lwd = 2) # cage limits
       
     }
