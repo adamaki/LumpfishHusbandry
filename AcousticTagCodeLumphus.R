@@ -14,9 +14,9 @@ library(tidyr)
 
 #ENTER YOUR VARIABLES HERE
 workingdir <- ifelse(Sys.info()['user'] == 'Laptop', "G:/Data/2018 Lumpfish Husbandry/Data processing/5. Day CSV", 'C:/Macpath') # change to location of data
-dayfile.loc <- "R1_LBF18S100207_day.csv" # change to file to be analysed
+dayfile.loc <- "R1_LBF18S100192_day.csv" # change to file to be analysed
 masterfileloc <- "G:/Data/2018 Lumpfish Husbandry/AcousticTagFile_2018v6.xlsx" # change to location of AcousticTagFile.xlsx
-day <- '207' # day of the year
+day <- '192' # day of the year
 bottom.threshold <- 15 # threshold for fish at bottom of cage coding (depth in metres)
 water.height <- 35
 rot.ang <- 14.24 # grid rotation angle in radians
