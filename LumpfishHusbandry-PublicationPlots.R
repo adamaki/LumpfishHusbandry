@@ -23,7 +23,7 @@ library(reshape2)
 library(cowplot)
 library(data.table)
 
-
+setwd('G:/Data/2018 Lumpfish Husbandry')
 
 # LOAD ENVIRONMENTAL PROBE READINGS
 
@@ -66,9 +66,6 @@ probes <- cbind(probe.DOT2, probe.sal2, probe.DOT4, probe.sal4, probe.DOT7, prob
 probes <- probes[,c(1, 2, 3, 5, 7, 8, 10, 12, 13, 15, 17, 18, 20)]
 colnames(probes) <- c('Time', 'do.2m', 'temp.2m', 'sal.2m', 'do.4m', 'temp.4m', 'sal.4m', 'do.7m', 'temp.7m', 'sal.7m', 'do.10m', 'temp.10m', 'sal.10m')
 
-# subset for study start and end dates
-#probes <- subset(probes, do.time.1m > '2015-06-05 00:00:00' & do.time.1m < '2015-08-20 00:00:00')
-
 # calculate rolling 6h-means for data
 probes$rolldo2m <- c(rep(NA,11), rollapply(probes$do.2m, width = 12, FUN = mean, na.rm = T, align = 'right'))
 probes$rolldo4m <- c(rep(NA,11), rollapply(probes$do.4m, width = 12, FUN = mean, na.rm = T, align = 'right'))
@@ -85,14 +82,30 @@ probes$rolls4m <- c(rep(NA,11), rollapply(probes$sal.4m, width = 12, FUN = mean,
 probes$rolls7m <- c(rep(NA,11), rollapply(probes$sal.7m, width = 12, FUN = mean, na.rm = T, align = 'right'))
 probes$rolls10m <- c(rep(NA,11), rollapply(probes$sal.10m, width = 12, FUN = mean, na.rm = T, align = 'right'))
 
+probes$meando <- rowMeans(probes[,c(14, 15, 16, 17)], na.rm = T)
+probes$meantemp <- rowMeans(probes[,c(18, 19, 20, 21)], na.rm = T)
+probes$meansal <- rowMeans(probes[,c(22, 23, 24, 25)], na.rm = T)
+
+# subset for study start and end dates
+probes <- subset(probes, Time > '2018-06-01 00:59:00' & Time < '2018-08-21 00:59:00')
+
+
+# code to add experiment day number to probe data
+
+exp.dates <- unique(as.Date(probes$Time))
+exp.start <- 1
+exp.length <- 64
+exp.days <- seq(exp.start, exp.start+exp.length-1, 1)
+names(exp.days) <- exp.dates
+probes$day <- as.numeric(exp.days[as.character(as.Date(probes$Time))])
 
 
 # 1a. temperature
 
 ggplot(probes) +  
-  scale_x_datetime('Date', limits = as.POSIXct(range(probes$Time))) + 
-  scale_y_continuous(expression(paste('Temperature (', ~degree,'C)', sep='')), limits = c(10,18)) +
-  theme_classic() + theme(text = element_text(family = 'Times New Roman', size = 18), legend.position = c(0.90, 0.2)) +
+  scale_x_datetime('Date', limits = as.POSIXct(range(probes$Time)), expand = c(0,0)) + 
+  scale_y_continuous(expression(paste('Temperature (', ~degree,'C)', sep='')), limits = c(10,18), expand = c(0,0)) +
+  theme_classic() + theme(text = element_text(family = 'Times New Roman', size = 14), legend.position = c(0.90, 0.2)) +
   #geom_line(aes(as.POSIXct(probes$do.time.1m), probes$do.1m), linetype = 'dashed') +
   geom_line(aes(as.POSIXct(probes$Time), probes$rollt2m, colour = ' 2m', linetype = ' 2m')) + #, size = 0.7, color = 'gray', linetype = 'longdash') +
   geom_line(aes(as.POSIXct(probes$Time), probes$rollt4m, colour = ' 4m', linetype = ' 4m')) + #, size = 0.7, color = 'gray', linetype = 'solid') + 
@@ -100,7 +113,8 @@ ggplot(probes) +
   geom_line(aes(as.POSIXct(probes$Time), probes$rollt10m, colour = '10m', linetype = '10m')) + #, size = 0.7, color = 'black', linetype = 'solid') +
   scale_colour_manual(name = '', values = c(' 2m' = 'gray', ' 4m' = 'gray', ' 7m' = 'black', '10m' = 'black')) +
   scale_linetype_manual(name = '', values = c(' 2m' = 'longdash', ' 4m' = 'solid', ' 7m' = 'longdash', '10m' = 'solid')) +
-  annotation_custom(grobTree(textGrob('(a)', x = 0.05, y = 0.95, gp = gpar(fontsize = 18, fontfamily = 'Times New Roman'))))
+  theme(axis.text.x = element_text(size = 14), axis.text.y = element_text(size = 14), legend.text = element_text(size = 14)) #+
+  #annotation_custom(grobTree(textGrob('(a)', x = 0.05, y = 0.95, gp = gpar(fontsize = 18, fontfamily = 'Times New Roman'))))
 
 # 1b. salinity
 
@@ -122,17 +136,18 @@ ggplot(probes) +
 # 1c. DO
 
 ggplot(probes) +  
-  scale_x_datetime('Date', limits = as.POSIXct(range(probes$do.time.1m))) + 
-  scale_y_continuous('Dissolved oxygen (mg/L)', limits = c(0,15)) +
-  theme_classic() + theme(text = element_text(family = 'Times New Roman', size = 18), legend.position = c(0.90, 0.2)) +
+  scale_x_datetime('Date', limits = as.POSIXct(range(probes$Time)), expand = c(0,0)) + 
+  scale_y_continuous('Dissolved oxygen (mg/L)', limits = c(5,15), expand = c(0,0)) +
+  theme_classic() + theme(text = element_text(family = 'Times New Roman', size = 14), legend.position = c(0.90, 0.2)) +
   #geom_line(aes(as.POSIXct(probes$do.time.1m), probes$do.1m), linetype = 'dashed') +
-  geom_line(aes(as.POSIXct(probes$do.time.1m), probes$rolldo1m, colour = ' 1m', linetype = ' 1m')) + #, size = 0.7, color = 'gray', linetype = 'longdash') +
-  geom_line(aes(as.POSIXct(probes$do.time.4m), probes$rolldo4m, colour = ' 4m', linetype = ' 4m')) + #, size = 0.7, color = 'gray', linetype = 'solid') + 
-  geom_line(aes(as.POSIXct(probes$do.time.8m), probes$rolldo8m, colour = ' 8m', linetype = ' 8m')) + #, size = 0.7, color = 'black', linetype = 'longdash') +
-  geom_line(aes(as.POSIXct(probes$do.time.12m), probes$rolldo12m, colour = '12m', linetype = '12m')) + #, size = 0.7, color = 'black', linetype = 'solid') +
-  scale_colour_manual(name = '', values = c(' 1m' = 'gray', ' 4m' = 'gray', ' 8m' = 'black', '12m' = 'black')) +
-  scale_linetype_manual(name = '', values = c(' 1m' = 'longdash', ' 4m' = 'solid', ' 8m' = 'longdash', '12m' = 'solid')) +
-  annotation_custom(grobTree(textGrob('(c)', x = 0.05, y = 0.95, gp = gpar(fontsize = 18, fontfamily = 'Times New Roman'))))
+  geom_line(aes(as.POSIXct(probes$Time), probes$rolldo2m, colour = ' 2m', linetype = ' 2m')) + #, size = 0.7, color = 'gray', linetype = 'longdash') +
+  geom_line(aes(as.POSIXct(probes$Time), probes$rolldo4m, colour = ' 4m', linetype = ' 4m')) + #, size = 0.7, color = 'gray', linetype = 'solid') + 
+  geom_line(aes(as.POSIXct(probes$Time), probes$rolldo7m, colour = ' 7m', linetype = ' 7m')) + #, size = 0.7, color = 'black', linetype = 'longdash') +
+  geom_line(aes(as.POSIXct(probes$Time), probes$rolldo10m, colour = '10m', linetype = '10m')) + #, size = 0.7, color = 'black', linetype = 'solid') +
+  scale_colour_manual(name = '', values = c(' 2m' = 'gray', ' 4m' = 'gray', ' 7m' = 'black', '10m' = 'black')) +
+  scale_linetype_manual(name = '', values = c(' 2m' = 'longdash', ' 4m' = 'solid', ' 7m' = 'longdash', '10m' = 'solid')) +
+  theme(axis.text.x = element_text(size = 14), axis.text.y = element_text(size = 14), legend.text = element_text(size = 14)) #+
+  #annotation_custom(grobTree(textGrob('(c)', x = 0.05, y = 0.95, gp = gpar(fontsize = 18, fontfamily = 'Times New Roman'))))
 
 
 
