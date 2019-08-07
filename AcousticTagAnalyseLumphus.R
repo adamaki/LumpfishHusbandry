@@ -59,6 +59,9 @@
 # 45. batch.bsprop() = calculate proportions of behaviour states for each dayfile in working directory
 # 50a. bsf(static, cruise, save) = calculate behaviour state frequencies (static, cruise, burst) for pens 7 and 8. static = upper limit of static state, cruise = upper limit of cruise state, save = save plot and data file(T/F)
 # 50b. bsf2(save) = calculate behaviour state frequencies (Rr, Rf, Ra, Ep, Ef, Ea) for pens 7 and 8. save = save plot and data file(T/F)
+# 51. add.daynum(startday = 1) = Add day number column to dayfile. Specify start day if required.
+# 52. save.dayfiles() = Save dataset as dayfiles. Working directory must be location of dataset to save. Creates new folder called 'saved'
+
 
 # NOTES -------------------------------------------------------------------------------------------------------------
 
@@ -106,14 +109,16 @@ library(Rwave)
 library(WaveletComp)
 library(dplyr)
 library(tidyr)
+library(data.table)
 
 
 
 #ENTER YOUR VARIABLES HERE
 #workingdir = "G:/Data/2018 Lumpfish Husbandry/Data processing/6a. Coded Day CSV" # change to location of data
-workingdir <- ifelse(Sys.info()['user'] == 'Laptop', "G:/Data/2018 Lumpfish Husbandry/Data processing/6a. Coded Day CSV", '/Volumes/My Book/Lumpfish Husbandry') # change to location of data
+workingdir <- ifelse(Sys.info()['user'] == 'Laptop', "G:/Data/2018 Lumpfish Husbandry/Data processing/6a. Coded Day CSV/substudies/3. Hides deep", '/Volumes/My Book/Lumpfish Husbandry') # change to location of data
+setwd(workingdir)  
 
-dayfile.loc = "R1_LBF18S100152_day_coded.csv" # change to file to be analysed
+dayfile.loc = "R1_LBF18S100197_1_day_coded.csv" # change to file to be analysed
 masterfileloc = "G:/Data/2018 Lumpfish Husbandry/AcousticTagFile_2018v6.xlsx" # change to location of AcousticTagFile.xlsx
 masterfileloc <- ifelse(Sys.info()['user'] == 'Laptop', "G:/Data/2018 Lumpfish Husbandry/AcousticTagFile_2018v6.xlsx", '/Volumes/My Book/Lumpfish Husbandry/Results/AcousticTagFile_2018v6.xlsx') # change to location of data
 
@@ -124,7 +129,7 @@ masterfileloc = "H:/Data processing/AcousticTagFile_2016.xlsx" # change to locat
 
 
 #new dayfile classes
-dayfile.classes = c('NULL', 'numeric', 'NULL', # Period
+dayfile.classes = c('NULL', 'numeric', 'numeric', # Period
                     'factor', # Pen number
                     'POSIXct', 'double', 'double', 'double', # EchoTime and coordinates
                     'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', # calculated swimming parameters
@@ -164,9 +169,10 @@ dayfile.classes = c('NULL', 'NULL', 'NULL', 'NULL', 'character', 'character', 'N
                                  'NULL')
 
 
-workingdir = "H:/Data processing/2016 Conditioning Study B/6a. Coded Day CSV/hides" # change to location of data
+workingdir = "G:/Data/2018 Lumpfish Husbandry/Data processing/6a. Coded Day CSV/hides" # change to location of data
 hidefile.loc = "run_1LLF16S100258_day_hides.csv" # change to file to be analysed
-hidefile.classes = c('NULL', 'numeric', 'factor', 'factor', 'POSIXct', 'double', 'double', 'double')
+hidefile.classes = c('NULL', 'factor', 'NULL', 'factor', 'POSIXct', 'double', 'double', 'double')
+
 
 # LOAD FILES-------------------------------------------------------------------------------------------------------------------
 
@@ -176,6 +182,9 @@ locations.lookup <- read.xlsx(masterfileloc, sheetIndex = 11, startRow = 1, endR
 #locations.lookup <- readWorksheetFromFile(masterfileloc, sheet = 12, startRow = 1, endCol = 7) # read in codes from Locations Coding spreadsheet
 rownames(locations.lookup) <- locations.lookup$Code
 
+# Load fish IDs
+fishids <- xlsx::read.xlsx(masterfileloc, sheetIndex = 3, startRow = 19, endRow = 103, colIndex = 8)
+fishids <- as.vector(fishids$Period)
 
 # LOAD DAYFILE
 setwd(workingdir)                                                                                                    
@@ -192,6 +201,7 @@ dayfile <- dayfile[order(dayfile$Period, na.last = FALSE, decreasing = FALSE, me
 #LOAD HIDEFILE
 setwd(workingdir)                                                                                                    
 hidefile <- read.csv(hidefile.loc, header = TRUE, sep = ",", colClasses = hidefile.classes) 
+load.all.hides()
 
 # Temporary code to convert uncoded data into correct formats-------------------------------------
  
@@ -1106,6 +1116,18 @@ reconstruct(fish.wav, lwd = c(1,2), legend.coords = "bottomleft", plot.waves = F
 wt.avg(fish.wav, 'sum')
 
 
+# code for removing dead fish from data-------------------------------------
+
+livefish <- c(8051, 8667, 8723, 7239, 7771)
+
+deadfish <- subset(fishids, !(fishids %in% livefish)) # create vector of dead fish
+
+multi.batch.remove(deadfish, '213', 1)
+
+
+
+
+
 #--------------------------------------------------------------------------------------------------------------------------------------------
 
 #STATS
@@ -1198,6 +1220,74 @@ cohen.d(statdf$log_BLSEC_trans, statdf$SUN)
 # significant effect sizes
 # small >0.2, medium >0.5, large >0.8
 
+
+
+# Calculation of detection rates for methods paper
+
+dayfile$date <- as.Date(dayfile$EchoTime)
+dayfile <- dayfile %>% filter(Period %in% c(7351, 7071, 8499, 8387, 7939, 8919, 8023, 8947, 8107, 8219, 7463, 7435, 7211, 8751, 8555,
+                                            7099, 8415, 8275, 7967, 8583, 8611, 8779, 7659, 8667, 7799, 8723, 7239, 7855, 8331, 7771,
+                                            8527, 8303, 8247, 8471, 8443, 8639, 7995, 7547, 8135, 7127, 7519, 7743, 8807, 7715, 8975,
+                                            7911, 8359, 7687, 7603, 8863, 7407, 7827, 8191, 7323, 8835, 8695, 7155, 8163, 8079, 7043))
+
+lhag <- select(dayfile, Period, PEN, date) %>% 
+  count(Period, date, name = 'dpings') %>% 
+  mutate(ppings = round((60/(Period/1000))*1440)) %>% # calculate No. of pings in one day based on PRI
+  mutate(pdiff = ppings-dpings) %>%
+  mutate(pcdet = (dpings/ppings)*100) %>% 
+  filter(date != '2018-06-01') %>% # run to here for plot of each tag
+  group_by(date) %>% 
+  summarise(mean = mean(pcdet), sd = sd(pcdet)) %>%
+  mutate(day = seq(1, 30, 1)) %>%
+  filter(day != 13 & day != 14)
+
+write.csv(lhag, 'G:/Data/2018 Lumpfish Husbandry/Data processing/6a. Coded Day CSV/30days/DetectionRates.csv')
+
+ggplot(lhag) + 
+  geom_line(aes(x = day, y = mean)) +
+  geom_point(aes(x = day, y = mean)) +
+  scale_y_continuous(limits = c(0, 100), breaks = seq(10, 100, 10), name = 'Detection rate (%)') +
+  scale_x_continuous(limits = c(0, 31), breaks = seq(0, 30, 5), name = 'Experiment day') +
+  geom_errorbar(aes(x = day, ymin = mean-sd, ymax = mean+sd))
+
+# plot of daily detection rates for each tag
+ggplot(lhag) +
+  geom_line(aes(x = date, y = pcdet, group = Period)) +
+  scale_y_continuous(limits = c(0, 100), breaks = seq(10, 100, 10), name = 'Detection rate (%)') +
+  facet_wrap(~Period)
+
+# plot detection rates for all trials
+wlag$trial <- 'wrasse vs. lumpfish'
+wfag$trial <- 'wild vs. farmed wrasse'
+paag$trial <- 'hatchery acclimated'
+pbag$trial <- 'hatchery & pen acclimated'
+lhag$trial <- 'lumpfish husbandry'
+wlag$studynum <- '(a) Trial 1'
+wfag$studynum <- '(b) Trial 2'
+paag$studynum <- '(c) Trial 3'
+pbag$studynum <- '(d) Trial 4'
+lhag$studynum <- '(e) Trial 5'
+
+detrates <- bind_rows(wlag, wfag, paag, pbag, lhag)
+
+dratesplot <- ggplot(detrates) + 
+  geom_line(aes(x = day, y = mean, group = trial)) +
+  geom_point(aes(x = day, y = mean, group = trial)) +
+  #geom_errorbar(data = lhag, aes(x = day, ymin = mean-sd, ymax = mean+sd)) +
+  scale_y_continuous(limits = c(0, 100), breaks = seq(10, 100, 10), name = 'Detection rate (%)', expand = c(0, 0)) +
+  scale_x_continuous(limits = c(0, 31), breaks = seq(0, 30, 5), name = 'Experiment day', expand = c(0, 0))
+
+# facet plot detection rates for all trials
+dratesplotf <- ggplot(detrates) + 
+  geom_line(aes(x = day, y = mean, group = studynum)) +
+  geom_point(aes(x = day, y = mean, group = studynum)) +
+  geom_errorbar(aes(x = day, ymin = mean-sd, ymax = mean+sd, group = studynum)) +
+  scale_y_continuous(limits = c(0, 105), breaks = seq(0, 100, 10), name = 'Detection rate (%)', expand = c(0, 0)) +
+  scale_x_continuous(limits = c(0, 31), breaks = seq(0, 30, 5), name = 'Experiment day', expand = c(0, 0)) +
+  facet_wrap(~studynum, ncol = 2, scales = 'free')
+
+model <- aov(mean~trial, detrates)
+TukeyHSD(model)
 
 # FUNCTIONS----------------------------------------------------------------------------------------------------------------------------------
 
@@ -2102,7 +2192,7 @@ fish.depth <- function(period)
 {
   fish.id <- subset(dayfile, Period == period)
   plot(fish.id$EchoTime, fish.id$PosZ, xlab = 'Time', ylab = 'Depth (m)', ylim = c(35, 0), type = 'l', col = '#26b426')
-  segments(fish.id[1,4], 15, fish.id[nrow(fish.id), 4], 15, lty = 2)
+  #segments(fish.id[1,3], 15, fish.id[nrow(fish.id), 3], 15, lty = 2)
   legend('bottomleft', as.character(period), col = '#26b426', pch = 20, bty = 'n', pt.cex = 1.5, horiz = TRUE, y.intersp = 0)
   
 }
@@ -2138,16 +2228,16 @@ fish.3depth <- function(period1, period2, period3)
 
 # 13. draws a plot of fish location
 
-fish.plot <- function(period)
+fish.plot <- function(period, alims = 't')
 {
   fishpal <- rainbow_hcl(20, c=100, l=63, start=-360, end=-32, alpha = 0.2)
   fish.id <- subset(dayfile, Period == period)
   par(mfrow=c(1,1))
   
-  if(fish.id[1,2] == '12')
+  if(fish.id[1,'PEN'] == '12')
   {
-    
-    plot(fish.id$PosX, fish.id$PosY, xlab = 'X (m)', ylab = 'Y (m)', pch = 20, cex = 1, xlim = c(35, 70), ylim = c(35, 70), type = 'l', col = fishpal[20]) # tight plot
+    if(alims == 't'){plot(fish.id$PosX, fish.id$PosY, xlab = 'X (m)', ylab = 'Y (m)', pch = 20, cex = 1, xlim = c(35, 70), ylim = c(35, 70), type = 'l', col = fishpal[20])}
+    if(alims == 'w'){plot(fish.id$PosX, fish.id$PosY, xlab = 'X (m)', ylab = 'Y (m)', pch = 20, cex = 1, type = 'l', col = fishpal[20])}
     rect(locations.lookup['12EW', 'xmin'], locations.lookup['12EW', 'ymin'], locations.lookup['12EW', 'xmax'], locations.lookup['12EW', 'ymax'], lty = 2) # 12EW edge
     rect(locations.lookup['12ES', 'xmin'], locations.lookup['12ES', 'ymin'], locations.lookup['12ES', 'xmax'], locations.lookup['12ES', 'ymax'], lty = 2) # 12ES edge
     rect(locations.lookup['12EE', 'xmin'], locations.lookup['12EE', 'ymin'], locations.lookup['12EE', 'xmax'], locations.lookup['12EE', 'ymax'], lty = 2) # 12EE edge
@@ -2157,11 +2247,12 @@ fish.plot <- function(period)
     rect(locations.lookup['12FS', 'xmin'], locations.lookup['12FS', 'ymin'], locations.lookup['12FS', 'xmax'], locations.lookup['12FS', 'ymax'], lty = 3, col = rgb(1, 1, 0.1, 0.4)) # 12FS
     rect(locations.lookup['12EW', 'xmin'], locations.lookup['12ES', 'ymin'], locations.lookup['12EE', 'xmax'], locations.lookup['12EN', 'ymax'], lwd = 2) # cage limits
 
-  }else{
+  }
     
-    if(fish.id[1,2] == '14'){
+    if(fish.id[1,'PEN'] == '14'){
       
-      plot(fish.id$PosX, fish.id$PosY, xlab = 'X (m)', ylab = 'Y (m)', pch = 20, cex = 1, xlim = c(10, 45), ylim = c(35, 70), type = 'l', col = fishpal[20]) # tight plot
+      if(alims == 't'){plot(fish.id$PosX, fish.id$PosY, xlab = 'X (m)', ylab = 'Y (m)', pch = 20, cex = 1, xlim = c(10, 45), ylim = c(35, 70), type = 'l', col = fishpal[20])}
+      if(alims == 'w'){plot(fish.id$PosX, fish.id$PosY, xlab = 'X (m)', ylab = 'Y (m)', pch = 20, cex = 1, type = 'l', col = fishpal[20])}
       rect(locations.lookup['14EW', 'xmin'], locations.lookup['14EW', 'ymin'], locations.lookup['14EW', 'xmax'], locations.lookup['14EW', 'ymax'], lty = 2) # 14EW edge
       rect(locations.lookup['14ES', 'xmin'], locations.lookup['14ES', 'ymin'], locations.lookup['14ES', 'xmax'], locations.lookup['14ES', 'ymax'], lty = 2) # 14ES edge
       rect(locations.lookup['14EE', 'xmin'], locations.lookup['14EE', 'ymin'], locations.lookup['14EE', 'xmax'], locations.lookup['14EE', 'ymax'], lty = 2) # 14EE edge
@@ -2171,9 +2262,12 @@ fish.plot <- function(period)
       rect(locations.lookup['14FS', 'xmin'], locations.lookup['14FS', 'ymin'], locations.lookup['14FS', 'xmax'], locations.lookup['14FS', 'ymax'], lty = 3, col = rgb(1, 1, 0.1, 0.4)) # 14FS
       rect(locations.lookup['14EW', 'xmin'], locations.lookup['14ES', 'ymin'], locations.lookup['14EE', 'xmax'], locations.lookup['14EN', 'ymax'], lwd = 2) # cage limits
       
-    } else {
+    }
+  
+  if(fish.id[1,'PEN'] == '15'){
     
-      plot(fish.id$PosX, fish.id$PosY, xlab = 'X (m)', ylab = 'Y (m)', pch = 20, cex = 1, xlim = c(10, 45), ylim = c(10, 45), type = 'l', col = fishpal[20]) # tight plot
+      if(alims == 't'){plot(fish.id$PosX, fish.id$PosY, xlab = 'X (m)', ylab = 'Y (m)', pch = 20, cex = 1, xlim = c(10, 45), ylim = c(10, 45), type = 'l', col = fishpal[20])}
+      if(alims == 'w'){plot(fish.id$PosX, fish.id$PosY, xlab = 'X (m)', ylab = 'Y (m)', pch = 20, cex = 1, xlim = c(10, 45), ylim = c(10, 45), type = 'l', col = fishpal[20])}
       rect(locations.lookup['15EW', 'xmin'], locations.lookup['15EW', 'ymin'], locations.lookup['15EW', 'xmax'], locations.lookup['15EW', 'ymax'], lty = 2) # 15EW edge
       rect(locations.lookup['15ES', 'xmin'], locations.lookup['15ES', 'ymin'], locations.lookup['15ES', 'xmax'], locations.lookup['15ES', 'ymax'], lty = 2) # 15ES edge
       rect(locations.lookup['15EE', 'xmin'], locations.lookup['15EE', 'ymin'], locations.lookup['15EE', 'xmax'], locations.lookup['15EE', 'ymax'], lty = 2) # 15EE edge
@@ -2182,9 +2276,9 @@ fish.plot <- function(period)
       rect(locations.lookup['15HWT', 'xmin'], locations.lookup['15HWT', 'ymin'], locations.lookup['15HWT', 'xmax'], locations.lookup['15HWT', 'ymax'], lty = 3, col = rgb(1, 0.6, 0, 0.4)) # 15HWT
       rect(locations.lookup['15FS', 'xmin'], locations.lookup['15FS', 'ymin'], locations.lookup['15FS', 'xmax'], locations.lookup['15FS', 'ymax'], lty = 3, col = rgb(1, 1, 0.1, 0.4)) # 15FS
       rect(locations.lookup['15EW', 'xmin'], locations.lookup['15ES', 'ymin'], locations.lookup['15EE', 'xmax'], locations.lookup['15EN', 'ymax'], lwd = 2) # cage limits
-      
-    }
+    
   }
+
 }
 
 
@@ -3047,29 +3141,21 @@ plot.bytime <- function(period, units = 'd')
   remove(timepoints)
 }
 
-# 25. Removes single fish id from specified day files
+# 25a. Removes single fish id from specified day files
 
 batch.remove <- function(period, start.day, no.days){
   
   
   files <- list.files(path = workingdir, pattern = '*.csv', all.files = FALSE, recursive = FALSE)
-  day1 <- grep(paste0('^..............', start.day, '_day_coded.csv'), files)
+  #day1 <- grep(paste0('^..............', start.day, '_day_coded.csv'), files)
+  day1 <- str_which(files, paste0(start.day, '_day_coded.csv$'))
+  
   end.day <- day1+(no.days-1)
   # dayfile.loc <- files[[grep(paste0('^..............', start.day, '_day_coded.csv'), files)]]
   
   for (i in day1:end.day) {
-    dayfile <- read.csv(files[[i]], header = TRUE, sep = ",", colClasses = c('NULL', 'numeric', 'factor', 'factor', 'POSIXct', 'double', 'double', 
-                                                                             'double', 'double', 'double', 'double', 'double', 'double', 'factor',
-                                                                             'factor', 'factor', 'factor', 'factor', 'factor', 'factor', 'factor',
-                                                                             'double', 'double', 'double', 'double', 'double', 'double', 'double',
-                                                                             'double', 'double', 'double', 'double', 'double', 'double', 'double',
-                                                                             'factor', 'factor', 'factor', 'factor', 'factor', 'factor', 'factor', 
-                                                                             'factor', 'factor', 'factor', 'factor', 'factor', 'factor', 'factor', 
-                                                                             'factor', 'factor', 'double', 'double', 'double', 'double', 'double', 
-                                                                             'double', 'double', 'double', 'double', 'double', 'double', 'double'
-                                                                             
-    )) #read data into table
-    
+    dayfile <- read.csv(files[[i]], header = TRUE, sep = ",", colClasses = dayfile.classes) 
+  
     dayfile <- dayfile[!(dayfile$Period == period),] # remove dead fish
     write.csv(dayfile, file = files[[i]]) #write output to file
     
@@ -3077,6 +3163,35 @@ batch.remove <- function(period, start.day, no.days){
   
 }
 
+
+# 25b. Removes multiple fish id from specified day files (pass vector of fish ids to period variable)
+
+multi.batch.remove <- function(period, start.day, no.days){
+  
+  
+  files <- list.files(path = workingdir, pattern = '*.csv', all.files = FALSE, recursive = FALSE)
+  #day1 <- grep(paste0('^..............', start.day, '_day_coded.csv'), files)
+  day1 <- str_which(files, paste0(start.day, '_day_coded.csv$'))
+  
+  end.day <- day1+(no.days-1)
+  # dayfile.loc <- files[[grep(paste0('^..............', start.day, '_day_coded.csv'), files)]]
+  
+  for (i in day1:end.day) {
+    #dayfile <- read.csv(files[[i]], header = TRUE, sep = ",", colClasses = dayfile.classes) 
+    dayfile <- fread(files[[i]])
+    dayfile$EchoTime <- as.POSIXct(dayfile$EchoTime)
+    dayfile$PEN <- as.factor(dayfile$PEN)
+    dayfile$V1 <- NULL
+    
+    for (j in 1:length(period)){
+    dayfile <- dayfile[!(dayfile$Period == period[j]),] # remove dead fish
+    }
+    
+    write.csv(dayfile, file = files[[i]]) #write output to file
+    
+  } 
+  
+}
 
 
 # 26. proportion coverage 3D (not sure this is working properly!)
@@ -3167,9 +3282,9 @@ ma.filter <- function(period, smooth = 20, thresh = 5){
   
   repeat{
     
-    fish.id$PosX.ma <- filter(fish.id$PosX, filt, sides = 1)
-    fish.id$PosY.ma <- filter(fish.id$PosY, filt, sides = 1)
-    fish.id$PosZ.ma <- filter(fish.id$PosZ, filt, sides = 1)
+    fish.id$PosX.ma <- stats::filter(fish.id$PosX, filt, sides = 1)
+    fish.id$PosY.ma <- stats::filter(fish.id$PosY, filt, sides = 1)
+    fish.id$PosZ.ma <- stats::filter(fish.id$PosZ, filt, sides = 1)
     fish.id$PosX.ma <- as.numeric(fish.id$PosX.ma)
     fish.id$PosY.ma <- as.numeric(fish.id$PosY.ma)
     fish.id$PosZ.ma <- as.numeric(fish.id$PosZ.ma)
@@ -3614,7 +3729,7 @@ hdep <<- hdep
 }
 
 
-# 33. Load all data into single data frame. Specify which pen to load with 'pen' parameter or 'all' to load all data.
+# 33a. Load all data into single data frame. Specify which pen to load with 'pen' parameter or 'all' to load all data.
 
 load.all <- function(pen){
 
@@ -3624,7 +3739,8 @@ dayfile <- data.frame()
 
 for(i in 1:length(files)){
 
-  daytemp <- read.csv(files[[i]], header = TRUE, sep = ",", colClasses = dayfile.classes)
+  #daytemp <- read.csv(files[[i]], header = TRUE, sep = ",", colClasses = dayfile.classes)
+  daytemp <- fread(files[[i]]) #, colClasses = dayfile.classes)
   
   if(pen == 'all'){
     
@@ -3641,13 +3757,35 @@ for(i in 1:length(files)){
 }
 
 # convert factors to numbers
-dayfile[,c(seq(20, 40, 1), seq(54,65, 1))] <- apply(dayfile[,c(seq(20, 40, 1), seq(54,65, 1))], 2, function(x) as.numeric(as.character(x)))
+#dayfile[,c(seq(20, 40, 1), seq(54,65, 1))] <- apply(dayfile[,c(seq(20, 40, 1), seq(54,65, 1))], 2, function(x) as.numeric(as.character(x)))
+
+dayfile$EchoTime <- as.POSIXct(dayfile$EchoTime)
+dayfile$PEN <- as.factor(dayfile$PEN)
+dayfile$V1 <- NULL
 
 #SORT BY TIME AND TAG
-dayfile <- dayfile[order(dayfile$EchoTime, na.last = FALSE, decreasing = FALSE, method = c("shell")),] # sort by time
-dayfile <- dayfile[order(dayfile$Period, na.last = FALSE, decreasing = FALSE, method = c("shell")),] # sort by tag
+dayfile <- arrange(dayfile, Period, EchoTime)
 
 dayfile <<- dayfile
+
+}
+
+# 33b. Load all hide data
+
+load.all.hides <- function(){
+  
+  files <- list.files(path = workingdir, pattern = '*.csv', all.files = FALSE, recursive = FALSE)
+  
+  hidefile <- data.frame()
+  
+  for(i in 1:length(files)){
+    
+    hidetemp <- read.csv(files[[i]], header = TRUE, sep = ",", colClasses = hidefile.classes)
+    
+    hidefile <- rbind(hidefile, hidetemp)
+    
+    hidefile <<- hidefile
+  }
 
 }
 
@@ -3881,7 +4019,7 @@ bplot <- function(period, step = 100){
       plot(sect$PosX, sect$PosY, xlab = 'X (m)', ylab = 'Y (m)', pch = 20, cex = 1, xlim = c(35, 70), ylim = c(35, 70), type = 'l', col = '#26b426') # tight plot
       plot.pen(12)
 
-      text(64, 70, adj = c(0, 1), label = paste0('Salmon feeding: ', sect[1,'SMEAL8'], '\nBiofouling: ', sect[1, 'BIOF8'], '\nSun: ', sect[1,'SUN'], '\nTide: ', sect[1, 'TID']), cex = 1) 
+      text(64, 70, adj = c(0, 1), label = paste0('Salmon feeding: ', sect[1,'SMEAL12'], '\nBiofouling: ', sect[1, 'BIOF12'], '\nSun: ', sect[1,'SUN'], '\nTide: ', sect[1, 'TID']), cex = 1) 
       text(70, 38, adj = c(1, 1), label = paste0(sect[1, 'EchoTime'], ' to ', sect[nrow(sect), 'EchoTime'], '\n', start, ' - ', end))
       
     }else{
@@ -3891,14 +4029,14 @@ bplot <- function(period, step = 100){
       plot(sect$PosX, sect$PosY, xlab = 'X (m)', ylab = 'Y (m)', pch = 20, cex = 1, xlim = c(10, 45), ylim = c(35, 70), type = 'l', col = '#26b426') # tight plot
       plot.pen(14)
 
-      text(39, 70, adj = c(0, 1), label = paste0('Salmon feeding: ', sect[1,'SMEAL8'], '\nBiofouling: ', sect[1, 'BIOF8'], '\nSun: ', sect[1,'SUN'], '\nTide: ', sect[1, 'TID']), cex = 1) 
+      text(39, 70, adj = c(0, 1), label = paste0('Salmon feeding: ', sect[1,'SMEAL14'], '\nBiofouling: ', sect[1, 'BIOF14'], '\nSun: ', sect[1,'SUN'], '\nTide: ', sect[1, 'TID']), cex = 1) 
       text(45, 38, adj = c(1, 1), label = paste0(sect[1, 'EchoTime'], ' to ', sect[nrow(sect), 'EchoTime'], '\n', start, ' - ', end))
       
       } else {
         
         plot(sect$PosX, sect$PosY, xlab = 'X (m)', ylab = 'Y (m)', pch = 20, cex = 1, xlim = c(10, 45), ylim = c(10, 45), type = 'l', col = '#26b426') # tight plot
         plot.pen(15)
-        text(37, 45, adj = c(0, 1), label = paste0('Salmon feeding: ', sect[1,'SMEAL8'], '\nBiofouling: ', sect[1, 'BIOF8'], '\nSun: ', sect[1,'SUN'], '\nTide: ', sect[1, 'TID']), cex = 1) 
+        text(37, 45, adj = c(0, 1), label = paste0('Salmon feeding: ', sect[1,'SMEAL15'], '\nBiofouling: ', sect[1, 'BIOF15'], '\nSun: ', sect[1,'SUN'], '\nTide: ', sect[1, 'TID']), cex = 1) 
         text(45, 13, adj = c(1, 1), label = paste0(sect[1, 'EchoTime'], ' to ', sect[nrow(sect), 'EchoTime'], '\n', start, ' - ', end))
         
         
@@ -4534,6 +4672,43 @@ bsf2 <- function(save = T){
   #  save_plot(sub('day_coded.csv', '_bsfplot.png', dayfile.loc), bsfplot, ncol = 2.5, nrow = 2.5, base_aspect_ratio = 1.1, base_height = 4)  
   #  write.csv(bstab, file = sub("day_coded.csv", "_bsftable.csv", dayfile.loc))  
   #}
+  
+}
+
+# 51. Add day number column to dayfile ----------------------------------------------
+
+add.daynum <- function(startday = 1){
+  
+ dayfile$day <- as.integer(as.factor(as.Date(dayfile$EchoTime)))
+ dayfile$day <- dayfile$day + (startday-1)
+ dayfile <<- dayfile
+ 
+}
+
+
+# 52. Save dataset as dayfiles---------------------------------------------------------
+
+save.dayfiles <- function(){
+  
+  readline(prompt = 'Make sure the dataset and file list are in chronological order!')
+  
+ files <-  list.files(path = workingdir, pattern = '*.csv', all.files = FALSE, recursive = FALSE)
+ days <- unique(dayfile$day)
+  if(length(files) != length(days)){
+    stop('Number of days in dayfile is not equal to the number of dayfiles in working directory.\n  Change the working directory to the location of the dataset you want to resave.')
+  }
+  
+ dir.create(paste0(getwd(), '/saved'))
+ setwd(paste0(getwd(), '/saved'))
+ 
+ for(i in 1:length(files)){
+   
+   daysub <- subset(dayfile, day == days[i])
+   fwrite(daysub, files[i], dateTimeAs = 'write.csv')
+   
+ }
+ 
+ setwd(workingdir)
   
 }
 
