@@ -3,6 +3,8 @@
 
 
 library(tidyverse)
+library(dplyr)
+library(ggplot2)
 
 
 setwd('G:/Data/2018 Lumpfish Husbandry/Data processing/6a. Coded Day CSV')
@@ -44,9 +46,42 @@ dayfile <- full_join(dayfile, wdata, by = c('EchoTime' = 'time')) %>%
 
 
 group_by(dayfile, solarIrradiance_wperm2) %>%
-  summarize(depth_mean = mean(PosZ))
+  filter(SUN == 'D') %>%
+  summarize(depth_mean = mean(PosZ)) %>%
+  ggplot() + geom_point(aes(solarIrradiance_wperm2, depth_mean))
+
+# behaviour/weather correlations
+
+library(devtools)
+devtools::source_gist("524eade46135f6348140", filename = "ggplot_smooth_func.R")
+
+#dayfile[sample(nrow(dayfile), 10000),] %>%
+wplot <- sample_frac(dayfile, 0.01) %>% # samples random fraction of dataset
+  filter(SUN == 'D') %>%
+  ggplot(aes(precipRate_mm, PosZ)) + 
+  geom_point() +
+  stat_smooth_func(geom="text",method="lm",hjust=0,parse=TRUE, colour = 'red') +
+  geom_smooth(method="lm",se=T)
+  
+wplot + facet_wrap(vars(Period))
 
 
+# Pincipal components analysis (PCA)--------------------------------------------
+library(devtools)
+library(scales)
+install_github("vqv/ggbiplot")
+library(ggbiplot)
+
+wpca <- prcomp(sample_frac(na.omit(RahoyWeather[,c('temp_C', "precipRate_mm", "solarIrradiance_wperm2", "humidity_percent", "windSpeed_kph")]), 0.1), center = T, scale. = T)
+dsamp <- sample_frac(dayfile, 0.001) %>% 
+  filter(Period != '15919' & Period != '15863' & Period != '15695' & Period != '15471') %>%
+  filter(Period != '7351', Period != '7099') %>%
+  filter(precipRate_mm < 3) %>%
+  filter(BLSEC <2)
+wpca <- prcomp(na.omit(dsamp[,c('PosZ', "pressure_hPa", 'temp_C')]), center = T, scale. = T)
+
+
+ggbiplot(wpca, choices = c(1, 2), alpha = 0.1, groups = dsamp$Period, ellipse = T, varname.size = 5) + theme_minimal()
 
 
 
