@@ -19,6 +19,7 @@
 # 10a. batch.coverage() = calculates fish coverage of pens 7 and 8 over multiple days
 # 10b. hmean.batch.coverage() = caculates hourly mean fish coverage of pens 7 and 8 over multiple days
 # 10c. hmean.day.coverage() = caculates hourly mean fish coverage of pens 12, 14 and 15 over multiple days for loaded dayfile
+# 10d. hmean.perfish.coverage() = calculated hourly mean fish coverage per fish over multiple days for loaded dayfile
 # 11a. fish.depth(period) = draws a plot of fish depth for the fish id specified
 # 11b. fish.act(period) = draws a plot of fish activity for the fish id specified
 # 12. fish.3depth(period1, period2, period3) = draws a plot of depths of 3 fish
@@ -1407,15 +1408,15 @@ batch.locations <- function()
 daily.locations <- function()
 {
   #files <- list.files(path = workingdir, pattern = '*.csv', all.files = FALSE, recursive = FALSE)
-  locations.P12 <- data.frame(c('0', '0', '0', '0', '0', '0', '0', '0', '0'))
+  locations.P12 <- data.frame(c('0', '0', '0', '0', '0', '0', '0'))
   colnames(locations.P12) <- 'ID'
-  rownames(locations.P12) <- c('P12_<15m', 'P12_>15m', 'P12_outer', 'P12_edge', 'P12_hidecorner', 'P12_emptycorner', 'P12_centre', 'P12_hides', 'P12_feedblock')
-  locations.P14 <- data.frame(c('0', '0', '0', '0', '0', '0', '0', '0', '0'))
+  rownames(locations.P12) <- c('P12_<15m', 'P12_outer', 'P12_edge', 'P12_corner', 'P12_centre', 'P12_hides', 'P12_feedblock')
+  locations.P14 <- data.frame(c('0', '0', '0', '0', '0', '0', '0'))
   colnames(locations.P14) <- 'ID'
-  rownames(locations.P14) <- c('P14_<15m', 'P14_>15m', 'P14_outer', 'P14_edge', 'P14_hidecorner', 'P14_emptycorner', 'P14_centre', 'P14_hides', 'P14_feedblock')
-  locations.P15 <- data.frame(c('0', '0', '0', '0', '0', '0', '0', '0', '0'))
+  rownames(locations.P14) <- c('P14_<15m', 'P14_outer', 'P14_edge', 'P14_corner', 'P14_centre', 'P14_hides', 'P14_feedblock')
+  locations.P15 <- data.frame(c('0', '0', '0', '0', '0', '0', '0'))
   colnames(locations.P15) <- 'ID'
-  rownames(locations.P15) <- c('P15_<15m', 'P15_>15m', 'P15_outer', 'P15_edge', 'P15_hidecorner', 'P15_emptycorner', 'P15_centre', 'P15_hides', 'P15_feedblock')
+  rownames(locations.P15) <- c('P15_<15m', 'P15_outer', 'P15_edge', 'P15_corner', 'P15_centre', 'P15_hides', 'P15_feedblock')
   
   for (i in 1:length(unique(dayfile$day)))
   {
@@ -1427,6 +1428,77 @@ daily.locations <- function()
     #dayfile <- dayfile[order(dayfile$EchoTime, na.last = FALSE, decreasing = FALSE, method = c("shell")),] # sort by time
     #dayfile <- dayfile[order(dayfile$Period, na.last = FALSE, decreasing = FALSE, method = c("shell")),] # sort by tag
     
+    
+    # pen 12 location summary
+    pen12 <- filter(daysub, PEN == '12' & SEC >= 0)
+    dayfile.bot <- subset(pen12, BOT == 'B')
+    #dayfile.top <- subset(pen12, BOT == 'Z' & PEN == '12' & SEC >= 0)
+    dayfile.cor <- subset(pen12, BIGC == '12CNW' | BIGC == '12CSE' | BIGC == '12CSW' | BIGC == '12CNE')
+    dayfile.out <- subset(pen12, OUT == '12OE' | OUT == '12OS' | OUT == '12ON' | OUT == '12OW')
+    dayfile.edg <- subset(pen12, EDG == '12EN' & HID == '' | EDG == '12EW' & HID == ''| EDG == '12ES'& HID == ''| EDG == '12EE' & HID == '')
+    #dayfile.mtc <- subset(pen12, BIGC == '12CSW' & PEN == '12' & SEC >= 0 | BIGC == '12CNE' & PEN == '12' & SEC >= 0)
+    dayfile.cen <- subset(pen12, CEN == '12MH'  & HID == '' | CEN == '12MM'  & HID == '' | CEN == '12ML' & HID == '')
+    dayfile.hid <- subset(pen12, HID == 'P12HE' | HID == 'P12HW')
+    dayfile.fdb <- subset(pen12, FS == 'FS12')
+    #locations.P12[,as.character(i)] <- c(sum(dayfile.bot$SEC, na.rm = T)/3600, sum(dayfile.top$SEC, na.rm = T)/3600, sum(dayfile.out$SEC, na.rm = T)/3600, sum(dayfile.edg$SEC, na.rm = T)/3600, sum(dayfile.hidc$SEC, na.rm = T)/3600, sum(dayfile.mtc$SEC, na.rm = T)/3600, sum(dayfile.cen$SEC, na.rm = T)/3600, sum(dayfile.hid$SEC, na.rm = T)/3600, sum(dayfile.fdb$SEC, na.rm = T)/3600)
+    locations.P12[,as.character(i)] <- c(sum(dayfile.bot$SEC, na.rm = T)/3600, sum(dayfile.out$SEC, na.rm = T)/3600, sum(dayfile.edg$SEC, na.rm = T)/3600, sum(dayfile.cor$SEC, na.rm = T)/3600, sum(dayfile.cen$SEC, na.rm = T)/3600, sum(dayfile.hid$SEC, na.rm = T)/3600, sum(dayfile.fdb$SEC, na.rm = T)/3600)
+    
+    # pen 14 location summary
+    pen14 <- filter(daysub, PEN == '14' & SEC >= 0)
+    dayfile.bot <- subset(pen14, BOT == 'B')
+    #dayfile.top <- subset(pen14, BOT == 'Z' & PEN == '14' & SEC >= 0)
+    dayfile.cor <- subset(pen14, BIGC == '14CNW' | BIGC == '14CSE' | BIGC == '14CSW' | BIGC == '14CNE')
+    dayfile.out <- subset(pen14, OUT == '14OE' | OUT == '14OS' | OUT == '14ON' | OUT == '14OW')
+    dayfile.edg <- subset(pen14, EDG == '14EN' & HID == '' | EDG == '14EW' & HID == ''| EDG == '14ES'& HID == ''| EDG == '14EE' & HID == '')
+    #dayfile.mtc <- subset(pen14, BIGC == '14CSW' & PEN == '14' & SEC >= 0 | BIGC == '14CNE' & PEN == '14' & SEC >= 0)
+    dayfile.cen <- subset(pen14, CEN == '14MH'  & HID == '' | CEN == '14MM'  & HID == '' | CEN == '14ML' & HID == '')
+    dayfile.hid <- subset(pen14, HID == 'P14HE' | HID == 'P14HW')
+    dayfile.fdb <- subset(pen14, FS == 'FS14')
+    #locations.P14[,as.character(i)] <- c(sum(dayfile.bot$SEC, na.rm = T)/3600, sum(dayfile.top$SEC, na.rm = T)/3600, sum(dayfile.out$SEC, na.rm = T)/3600, sum(dayfile.edg$SEC, na.rm = T)/3600, sum(dayfile.hidc$SEC, na.rm = T)/3600, sum(dayfile.mtc$SEC, na.rm = T)/3600, sum(dayfile.cen$SEC, na.rm = T)/3600, sum(dayfile.hid$SEC, na.rm = T)/3600, sum(dayfile.fdb$SEC, na.rm = T)/3600)
+    locations.P14[,as.character(i)] <- c(sum(dayfile.bot$SEC, na.rm = T)/3600, sum(dayfile.out$SEC, na.rm = T)/3600, sum(dayfile.edg$SEC, na.rm = T)/3600, sum(dayfile.cor$SEC, na.rm = T)/3600, sum(dayfile.cen$SEC, na.rm = T)/3600, sum(dayfile.hid$SEC, na.rm = T)/3600, sum(dayfile.fdb$SEC, na.rm = T)/3600)
+    
+    # pen 15 location summary
+    pen15 <- filter(daysub, PEN == '15' & SEC >= 0)
+    dayfile.bot <- subset(pen15, BOT == 'B')
+    #dayfile.top <- subset(pen15, BOT == 'Z' & PEN == '15' & SEC >= 0)
+    dayfile.cor <- subset(pen15, BIGC == '15CNW' | BIGC == '15CSE' | BIGC == '15CSW' | BIGC == '15CNE')
+    dayfile.out <- subset(pen15, OUT == '15OE' | OUT == '15OS' | OUT == '15ON' | OUT == '15OW')
+    dayfile.edg <- subset(pen15, EDG == '15EN' & HID == '' | EDG == '15EW' & HID == ''| EDG == '15ES'& HID == ''| EDG == '15EE' & HID == '')
+    #dayfile.mtc <- subset(pen15, BIGC == '15CSW' & PEN == '15' & SEC >= 0 | BIGC == '15CNE' & PEN == '15' & SEC >= 0)
+    dayfile.cen <- subset(pen15, CEN == '15MH'  & HID == '' | CEN == '15MM'  & HID == '' | CEN == '15ML' & HID == '')
+    dayfile.hid <- subset(pen15, HID == 'P15HE' | HID == 'P15HW')
+    dayfile.fdb <- subset(pen15, FS == 'FS15')
+    #locations.P15[,as.character(i)] <- c(sum(dayfile.bot$SEC, na.rm = T)/3600, sum(dayfile.top$SEC, na.rm = T)/3600, sum(dayfile.out$SEC, na.rm = T)/3600, sum(dayfile.edg$SEC, na.rm = T)/3600, sum(dayfile.hidc$SEC, na.rm = T)/3600, sum(dayfile.mtc$SEC, na.rm = T)/3600, sum(dayfile.cen$SEC, na.rm = T)/3600, sum(dayfile.hid$SEC, na.rm = T)/3600, sum(dayfile.fdb$SEC, na.rm = T)/3600)
+    locations.P15[,as.character(i)] <- c(sum(dayfile.bot$SEC, na.rm = T)/3600, sum(dayfile.out$SEC, na.rm = T)/3600, sum(dayfile.edg$SEC, na.rm = T)/3600, sum(dayfile.cor$SEC, na.rm = T)/3600, sum(dayfile.cen$SEC, na.rm = T)/3600, sum(dayfile.hid$SEC, na.rm = T)/3600, sum(dayfile.fdb$SEC, na.rm = T)/3600)
+    
+  }
+  location.sum <- rbind(locations.P12, locations.P14, locations.P15)  
+  location.sum$ID <- NULL
+  location.sum  
+  
+  #loadWorkbook('LocationsOutput.xlsx', create = TRUE)
+  #writeWorksheetToFile('LocationsOutput.xlsx', location.sum, 'Sheet 1')
+  
+  write.xlsx(location.sum, 'LocationsOutput.xlsx')
+}
+
+
+# 2c. Location summary by fish for loaded dataset
+fish.locations <- function()
+{
+  locations.P12 <- data.frame(c('0', '0', '0', '0', '0', '0', '0', '0', '0'))
+  colnames(locations.P12) <- 'ID'
+  rownames(locations.P12) <- c('P12_<15m', 'P12_>15m', 'P12_outer', 'P12_edge', 'P12_hidecorner', 'P12_emptycorner', 'P12_centre', 'P12_hides', 'P12_feedblock')
+  locations.P14 <- data.frame(c('0', '0', '0', '0', '0', '0', '0', '0', '0'))
+  colnames(locations.P14) <- 'ID'
+  rownames(locations.P14) <- c('P14_<15m', 'P14_>15m', 'P14_outer', 'P14_edge', 'P14_hidecorner', 'P14_emptycorner', 'P14_centre', 'P14_hides', 'P14_feedblock')
+  locations.P15 <- data.frame(c('0', '0', '0', '0', '0', '0', '0', '0', '0'))
+  colnames(locations.P15) <- 'ID'
+  rownames(locations.P15) <- c('P15_<15m', 'P15_>15m', 'P15_outer', 'P15_edge', 'P15_hidecorner', 'P15_emptycorner', 'P15_centre', 'P15_hides', 'P15_feedblock')
+  
+  for (i in 1:length(unique(dayfile$Period)))
+  {
+    daysub <- subset(dayfile, Period == unique(dayfile$Period)[[i]])
     
     # pen 12 location summary
     dayfile.bot <- subset(daysub, BOT == 'B' & PEN == '12' & SEC >= 0)
@@ -1469,10 +1541,7 @@ daily.locations <- function()
   location.sum$ID <- NULL
   location.sum  
   
-  #loadWorkbook('LocationsOutput.xlsx', create = TRUE)
-  #writeWorksheetToFile('LocationsOutput.xlsx', location.sum, 'Sheet 1')
-  
-  write.xlsx(location.sum, 'LocationsOutput.xlsx')
+  write.xlsx(location.sum, 'LocationsOutputByFish.xlsx')
 }
 
 
@@ -1594,52 +1663,44 @@ batch.depth <- function(){
 
 batch.totdepth <- function(){
   
-  sumfunc <- function(x){ c(min = min(x), max = max(x), range = max(x)-min(x), mean = mean(x), median = median(x), std = sd(x)) }
+  #sumfunc <- function(x){ c(min = min(x), max = max(x), range = max(x)-min(x), mean = mean(x), median = median(x), std = sd(x)) }
   
-  files <- list.files(path = workingdir, pattern = '*.csv', all.files = FALSE, recursive = FALSE)
-  depth.P7 <- data.frame(c('P7_dawn_mean', 'P7_dawn_se', 'P7_day_mean', 'P7_day_se', 'P7_dusk_mean', 'P7_dusk_se', 'P7_night_mean', 'P7_night_se'))
-  colnames(depth.P7) <- 'ID'
-  rownames(depth.P7) <- c('P7_dawn_mean', 'P7_dawn_se', 'P7_day_mean', 'P7_day_se', 'P7_dusk_mean', 'P7_dusk_se', 'P7_night_mean', 'P7_night_se')
-  depth.P8 <- data.frame(c('P8_dawn_mean', 'P8_dawn_se', 'P8_day_mean', 'P8_day_se', 'P8_dusk_mean', 'P8_dusk_se', 'P8_night_mean', 'P8_night_se'))
-  colnames(depth.P8) <- 'ID'
-  rownames(depth.P8) <- c('P8_dawn_mean', 'P8_dawn_se', 'P8_day_mean', 'P8_day_se', 'P8_dusk_mean', 'P8_dusk_se', 'P8_night_mean', 'P8_night_se')
+  depth.P12 <- data.frame(c('P12_dawn_mean', 'P12_dawn_se', 'P12_day_mean', 'P12_day_se', 'P12_dusk_mean', 'P12_dusk_se', 'P12_night_mean', 'P12_night_se'))
+  colnames(depth.P12) <- 'ID'
+  rownames(depth.P12) <- c('P12_dawn_mean', 'P12_dawn_se', 'P12_day_mean', 'P12_day_se', 'P12_dusk_mean', 'P12_dusk_se', 'P12_night_mean', 'P12_night_se')
+  depth.P14 <- data.frame(c('P14_dawn_mean', 'P14_dawn_se', 'P14_day_mean', 'P14_day_se', 'P14_dusk_mean', 'P14_dusk_se', 'P14_night_mean', 'P14_night_se'))
+  colnames(depth.P14) <- 'ID'
+  rownames(depth.P14) <- c('P14_dawn_mean', 'P14_dawn_se', 'P14_day_mean', 'P14_day_se', 'P14_dusk_mean', 'P14_dusk_se', 'P14_night_mean', 'P14_night_se')
+  depth.P15 <- data.frame(c('P15_dawn_mean', 'P15_dawn_se', 'P15_day_mean', 'P15_day_se', 'P15_dusk_mean', 'P15_dusk_se', 'P15_night_mean', 'P15_night_se'))
+  colnames(depth.P15) <- 'ID'
+  rownames(depth.P15) <- c('P15_dawn_mean', 'P15_dawn_se', 'P15_day_mean', 'P15_day_se', 'P15_dusk_mean', 'P15_dusk_se', 'P15_night_mean', 'P15_night_se')
   
-  for (i in 1:length(files))
+  for (i in 1:length(unique(dayfile$day)))
   {
-    dayfile.loc <- files[[i]]
-    dayfile <- read.csv(dayfile.loc, header = TRUE, sep = ",", colClasses = c
-                        (
-                        'NULL', 'factor', 'factor', 'factor', 'POSIXct', 'double', 'double', 
-                        'double', 'double', 'double', 'double', 'double', 'double', 'factor',
-                        'factor', 'factor', 'factor', 'factor', 'factor', 'factor', 'factor',
-                        'double', 'double', 'double', 'double', 'double', 'double', 'double',
-                        'double', 'double', 'double', 'double', 'double', 'double', 'double',
-                        'factor', 'factor', 'factor', 'factor', 'factor', 'factor', 'factor', 
-                        'factor', 'factor', 'factor', 'factor', 'factor', 'factor', 'factor', 
-                        'factor', 'factor', 'double', 'double', 'double', 'double', 'double', 
-                        'double', 'double', 'double', 'double', 'double', 'double', 'double' 
-                        )) #read data into table
+    daysub <- subset(dayfile, day == unique(dayfile$day)[[i]])
     
+    depth.dawn <- subset(daysub, SUN == 'W' & PEN == '12')
+    depth.day <- subset(daysub, SUN == 'D' & PEN == '12')
+    depth.dusk <- subset(daysub, SUN == 'K' & PEN == '12')
+    depth.night <- subset(daysub, SUN == 'N' & PEN == '12')
+    depth.P12[,as.character(i)] <- c(mean(depth.dawn$PosZ), sd(depth.dawn$PosZ)/sqrt(length(depth.dawn)), mean(depth.day$PosZ), sd(depth.day$PosZ)/sqrt(length(depth.day)), mean(depth.dusk$PosZ), sd(depth.dusk$PosZ)/sqrt(length(depth.dusk)), mean(depth.night$PosZ), sd(depth.night$PosZ)/sqrt(length(depth.night)))
     
-    depth.dawn <- subset(dayfile, SUN == 'W' & PEN == '7')
-    depth.day <- subset(dayfile, SUN == 'D' & PEN == '7')
-    depth.dusk <- subset(dayfile, SUN == 'K' & PEN == '7')
-    depth.night <- subset(dayfile, SUN == 'N' & PEN == '7')
-    depth.P7[,as.character(i)] <- c(mean(depth.dawn$PosZ), sd(depth.dawn$PosZ)/sqrt(length(depth.dawn)), mean(depth.day$PosZ), sd(depth.day$PosZ)/sqrt(length(depth.day)), mean(depth.dusk$PosZ), sd(depth.dusk$PosZ)/sqrt(length(depth.dusk)), mean(depth.night$PosZ), sd(depth.night$PosZ)/sqrt(length(depth.night)))
+    depth.dawn <- subset(daysub, SUN == 'W' & PEN == '14')
+    depth.day <- subset(daysub, SUN == 'D' & PEN == '14')
+    depth.dusk <- subset(daysub, SUN == 'K' & PEN == '14')
+    depth.night <- subset(daysub, SUN == 'N' & PEN == '14')
+    depth.P14[,as.character(i)] <- c(mean(depth.dawn$PosZ), sd(depth.dawn$PosZ)/sqrt(length(depth.dawn)), mean(depth.day$PosZ), sd(depth.day$PosZ)/sqrt(length(depth.day)), mean(depth.dusk$PosZ), sd(depth.dusk$PosZ)/sqrt(length(depth.dusk)), mean(depth.night$PosZ), sd(depth.night$PosZ)/sqrt(length(depth.night)))
     
-    depth.dawn <- subset(dayfile, SUN == 'W' & PEN == '8')
-    depth.day <- subset(dayfile, SUN == 'D' & PEN == '8')
-    depth.dusk <- subset(dayfile, SUN == 'K' & PEN == '8')
-    depth.night <- subset(dayfile, SUN == 'N' & PEN == '8')
-    depth.P8[,as.character(i)] <- c(mean(depth.dawn$PosZ), sd(depth.dawn$PosZ)/sqrt(length(depth.dawn)), mean(depth.day$PosZ), sd(depth.day$PosZ)/sqrt(length(depth.day)), mean(depth.dusk$PosZ), sd(depth.dusk$PosZ)/sqrt(length(depth.dusk)), mean(depth.night$PosZ), sd(depth.night$PosZ)/sqrt(length(depth.night)))
-  }
+    depth.dawn <- subset(daysub, SUN == 'W' & PEN == '15')
+    depth.day <- subset(daysub, SUN == 'D' & PEN == '15')
+    depth.dusk <- subset(daysub, SUN == 'K' & PEN == '15')
+    depth.night <- subset(daysub, SUN == 'N' & PEN == '15')
+    depth.P15[,as.character(i)] <- c(mean(depth.dawn$PosZ), sd(depth.dawn$PosZ)/sqrt(length(depth.dawn)), mean(depth.day$PosZ), sd(depth.day$PosZ)/sqrt(length(depth.day)), mean(depth.dusk$PosZ), sd(depth.dusk$PosZ)/sqrt(length(depth.dusk)), mean(depth.night$PosZ), sd(depth.night$PosZ)/sqrt(length(depth.night)))
+    }
   
-  depths.sum <- rbind(depth.P7, depth.P8)  
-  #depths.sum$ID <- NULL
+  depths.sum <- rbind(depth.P12, depth.P14, depth.P15)  
   depths.sum    
-  #loadWorkbook('DepthTotOutput.xlsx', create = TRUE)
-  #writeWorksheetToFile('DepthTotOutput.xlsx', depths.sum, 'Sheet 1')
-  
+
   write.xlsx(depths.sum, 'DepthTotOutput.xlsx')
 }
 
@@ -1650,35 +1711,25 @@ batch.activity <- function(){
   
   sumfunc <- function(x){ c(min = min(x), max = max(x), range = max(x)-min(x), mean = mean(x), median = median(x), std = sd(x)) }
   
-  files <- list.files(path = workingdir, pattern = '*.csv', all.files = FALSE, recursive = FALSE)
-  activity.P7 <- data.frame(c('P7_dawn_mean', 'P7_dawn_stdev', 'P7_day_mean', 'P7_day_stdev', 'P7_dusk_mean', 'P7_dusk_stdev', 'P7_night_mean', 'P7_night_stdev'))
-  colnames(activity.P7) <- 'ID'
-  rownames(activity.P7) <- c('P7_dawn_mean', 'P7_dawn_stdev', 'P7_day_mean', 'P7_day_stdev', 'P7_dusk_mean', 'P7_dusk_stdev', 'P7_night_mean', 'P7_night_stdev')
-  activity.P8 <- data.frame(c('P8_dawn_mean', 'P8_dawn_stdev', 'P8_day_mean', 'P8_day_stdev', 'P8_dusk_mean', 'P8_dusk_stdev', 'P8_night_mean', 'P8_night_stdev'))
-  colnames(activity.P8) <- 'ID'
-  rownames(activity.P8) <- c('P8_dawn_mean', 'P8_dawn_stdev', 'P8_day_mean', 'P8_day_stdev', 'P8_dusk_mean', 'P8_dusk_stdev', 'P8_night_mean', 'P8_night_stdev')
+  activity.P12 <- data.frame(c('P12_dawn_mean', 'P12_dawn_stdev', 'P12_day_mean', 'P12_day_stdev', 'P12_dusk_mean', 'P12_dusk_stdev', 'P12_night_mean', 'P12_night_stdev'))
+  colnames(activity.P12) <- 'ID'
+  rownames(activity.P12) <- c('P12_dawn_mean', 'P12_dawn_stdev', 'P12_day_mean', 'P12_day_stdev', 'P12_dusk_mean', 'P12_dusk_stdev', 'P12_night_mean', 'P12_night_stdev')
+  activity.P14 <- data.frame(c('P14_dawn_mean', 'P14_dawn_stdev', 'P14_day_mean', 'P14_day_stdev', 'P14_dusk_mean', 'P14_dusk_stdev', 'P14_night_mean', 'P14_night_stdev'))
+  colnames(activity.P14) <- 'ID'
+  rownames(activity.P14) <- c('P14_dawn_mean', 'P14_dawn_stdev', 'P14_day_mean', 'P14_day_stdev', 'P14_dusk_mean', 'P14_dusk_stdev', 'P14_night_mean', 'P14_night_stdev')
+  activity.P15 <- data.frame(c('P15_dawn_mean', 'P15_dawn_stdev', 'P15_day_mean', 'P15_day_stdev', 'P15_dusk_mean', 'P15_dusk_stdev', 'P15_night_mean', 'P15_night_stdev'))
+  colnames(activity.P15) <- 'ID'
+  rownames(activity.P15) <- c('P15_dawn_mean', 'P15_dawn_stdev', 'P15_day_mean', 'P15_day_stdev', 'P15_dusk_mean', 'P15_dusk_stdev', 'P15_night_mean', 'P15_night_stdev')
   
-  for (i in 1:length(files))
+  for (i in 1:length(unique(dayfile$day)))
   {
-    dayfile.loc <- files[[i]]
-    dayfile <- read.csv(dayfile.loc, header = TRUE, sep = ",", colClasses = c
-                        (
-                        'NULL', 'factor', 'factor', 'factor', 'POSIXct', 'double', 'double', 
-                        'double', 'double', 'double', 'double', 'double', 'double', 'factor',
-                        'factor', 'factor', 'factor', 'factor', 'factor', 'factor', 'factor',
-                        'double', 'double', 'double', 'double', 'double', 'double', 'double',
-                        'double', 'double', 'double', 'double', 'double', 'double', 'double',
-                        'factor', 'factor', 'factor', 'factor', 'factor', 'factor', 'factor', 
-                        'factor', 'factor', 'factor', 'factor', 'factor', 'factor', 'factor', 
-                        'factor', 'factor', 'double', 'double', 'double', 'double', 'double', 
-                        'double', 'double', 'double', 'double', 'double', 'double', 'double' 
-                        )) #read data into table
+    daysub <- subset(dayfile, day == unique(dayfile$day)[[i]])
     
     
-    activity.dawn <- subset(dayfile, SUN == 'W' & PEN == '7')
-    activity.day <- subset(dayfile, SUN == 'D' & PEN == '7')
-    activity.dusk <- subset(dayfile, SUN == 'K' & PEN == '7')
-    activity.night <- subset(dayfile, SUN == 'N' & PEN == '7')
+    activity.dawn <- subset(daysub, SUN == 'W' & PEN == '12')
+    activity.day <- subset(daysub, SUN == 'D' & PEN == '12')
+    activity.dusk <- subset(daysub, SUN == 'K' & PEN == '12')
+    activity.night <- subset(daysub, SUN == 'N' & PEN == '12')
     dawn.sum <- cbind(Period = unique(activity.dawn$Period), do.call(rbind, tapply(activity.dawn$BLSEC, activity.dawn$Period, sumfunc)))
     day.sum <- cbind(Period = unique(activity.day$Period), do.call(rbind, tapply(activity.day$BLSEC, activity.day$Period, sumfunc)))
     dusk.sum <- cbind(Period = unique(activity.dusk$Period), do.call(rbind, tapply(activity.dusk$BLSEC, activity.dusk$Period, sumfunc)))
@@ -1687,12 +1738,12 @@ batch.activity <- function(){
     day.sum[is.na(day.sum)] <- 0
     dusk.sum[is.na(dusk.sum)] <- 0
     night.sum[is.na(night.sum)] <- 0
-    activity.P7[,as.character(i)] <- c(mean(dawn.sum[,'mean']), mean(dawn.sum[,'std']), mean(day.sum[,'mean']), mean(day.sum[,'std']), mean(dusk.sum[,'mean']), mean(dusk.sum[,'std']), mean(night.sum[,'mean']), mean(night.sum[,'std']))
+    activity.P12[,as.character(i)] <- c(mean(dawn.sum[,'mean']), mean(dawn.sum[,'std']), mean(day.sum[,'mean']), mean(day.sum[,'std']), mean(dusk.sum[,'mean']), mean(dusk.sum[,'std']), mean(night.sum[,'mean']), mean(night.sum[,'std']))
     
-    activity.dawn <- subset(dayfile, SUN == 'W' & PEN == '8')
-    activity.day <- subset(dayfile, SUN == 'D' & PEN == '8')
-    activity.dusk <- subset(dayfile, SUN == 'K' & PEN == '8')
-    activity.night <- subset(dayfile, SUN == 'N' & PEN == '8')
+    activity.dawn <- subset(daysub, SUN == 'W' & PEN == '14')
+    activity.day <- subset(daysub, SUN == 'D' & PEN == '14')
+    activity.dusk <- subset(daysub, SUN == 'K' & PEN == '14')
+    activity.night <- subset(daysub, SUN == 'N' & PEN == '14')
     dawn.sum <- cbind(Period = unique(activity.dawn$Period), do.call(rbind, tapply(activity.dawn$BLSEC, activity.dawn$Period, sumfunc)))
     day.sum <- cbind(Period = unique(activity.day$Period), do.call(rbind, tapply(activity.day$BLSEC, activity.day$Period, sumfunc)))
     dusk.sum <- cbind(Period = unique(activity.dusk$Period), do.call(rbind, tapply(activity.dusk$BLSEC, activity.dusk$Period, sumfunc)))
@@ -1701,15 +1752,26 @@ batch.activity <- function(){
     day.sum[is.na(day.sum)] <- 0
     dusk.sum[is.na(dusk.sum)] <- 0
     night.sum[is.na(night.sum)] <- 0
-    activity.P8[,as.character(i)] <- c(mean(dawn.sum[,'mean']), mean(dawn.sum[,'std']), mean(day.sum[,'mean']), mean(day.sum[,'std']), mean(dusk.sum[,'mean']), mean(dusk.sum[,'std']), mean(night.sum[,'mean']), mean(night.sum[,'std']))
+    activity.P14[,as.character(i)] <- c(mean(dawn.sum[,'mean']), mean(dawn.sum[,'std']), mean(day.sum[,'mean']), mean(day.sum[,'std']), mean(dusk.sum[,'mean']), mean(dusk.sum[,'std']), mean(night.sum[,'mean']), mean(night.sum[,'std']))
+    
+    activity.dawn <- subset(daysub, SUN == 'W' & PEN == '15')
+    activity.day <- subset(daysub, SUN == 'D' & PEN == '15')
+    activity.dusk <- subset(daysub, SUN == 'K' & PEN == '15')
+    activity.night <- subset(daysub, SUN == 'N' & PEN == '15')
+    dawn.sum <- cbind(Period = unique(activity.dawn$Period), do.call(rbind, tapply(activity.dawn$BLSEC, activity.dawn$Period, sumfunc)))
+    day.sum <- cbind(Period = unique(activity.day$Period), do.call(rbind, tapply(activity.day$BLSEC, activity.day$Period, sumfunc)))
+    dusk.sum <- cbind(Period = unique(activity.dusk$Period), do.call(rbind, tapply(activity.dusk$BLSEC, activity.dusk$Period, sumfunc)))
+    night.sum <- cbind(Period = unique(activity.night$Period), do.call(rbind, tapply(activity.night$BLSEC, activity.night$Period, sumfunc)))
+    dawn.sum[is.na(dawn.sum)] <- 0
+    day.sum[is.na(day.sum)] <- 0
+    dusk.sum[is.na(dusk.sum)] <- 0
+    night.sum[is.na(night.sum)] <- 0
+    activity.P15[,as.character(i)] <- c(mean(dawn.sum[,'mean']), mean(dawn.sum[,'std']), mean(day.sum[,'mean']), mean(day.sum[,'std']), mean(dusk.sum[,'mean']), mean(dusk.sum[,'std']), mean(night.sum[,'mean']), mean(night.sum[,'std']))
   }
   
-  activity.sum <- rbind(activity.P7, activity.P8)  
-  #depths.sum$ID <- NULL
-  activity.sum    
-  #loadWorkbook('ActivityOutput.xlsx', create = TRUE)
-  #writeWorksheetToFile('ActivityOutput.xlsx', activity.sum, 'Sheet 1')
-  
+  activity.sum <- rbind(activity.P12, activity.P14, activity.P15)  
+  activity.sum
+
   write.xlsx(activity.sum, 'ActivityOutput.xlsx')
 }
 
@@ -1720,38 +1782,42 @@ batch.totactivity <- function(){
   
   sumfunc <- function(x){ c(min = min(x), max = max(x), range = max(x)-min(x), mean = mean(x), median = median(x), std = sd(x)) }
   
-  files <- list.files(path = workingdir, pattern = '*.csv', all.files = FALSE, recursive = FALSE)
-  activity.P7 <- data.frame(c('P7_dawn_mean', 'P7_dawn_se', 'P7_day_mean', 'P7_day_se', 'P7_dusk_mean', 'P7_dusk_se', 'P7_night_mean', 'P7_night_se'))
-  colnames(activity.P7) <- 'ID'
-  rownames(activity.P7) <- c('P7_dawn_mean', 'P7_dawn_se', 'P7_day_mean', 'P7_day_se', 'P7_dusk_mean', 'P7_dusk_se', 'P7_night_mean', 'P7_night_se')
-  activity.P8 <- data.frame(c('P8_dawn_mean', 'P8_dawn_se', 'P8_day_mean', 'P8_day_se', 'P8_dusk_mean', 'P8_dusk_se', 'P8_night_mean', 'P8_night_se'))
-  colnames(activity.P8) <- 'ID'
-  rownames(activity.P8) <- c('P8_dawn_mean', 'P8_dawn_se', 'P8_day_mean', 'P8_day_se', 'P8_dusk_mean', 'P8_dusk_se', 'P8_night_mean', 'P8_night_se')
+  activity.P12 <- data.frame(c('P12_dawn_mean', 'P12_dawn_se', 'P12_day_mean', 'P12_day_se', 'P12_dusk_mean', 'P12_dusk_se', 'P12_night_mean', 'P12_night_se'))
+  colnames(activity.P12) <- 'ID'
+  rownames(activity.P12) <- c('P12_dawn_mean', 'P12_dawn_se', 'P12_day_mean', 'P12_day_se', 'P12_dusk_mean', 'P12_dusk_se', 'P12_night_mean', 'P12_night_se')
+  activity.P14 <- data.frame(c('P14_dawn_mean', 'P14_dawn_se', 'P14_day_mean', 'P14_day_se', 'P14_dusk_mean', 'P14_dusk_se', 'P14_night_mean', 'P14_night_se'))
+  colnames(activity.P14) <- 'ID'
+  rownames(activity.P14) <- c('P14_dawn_mean', 'P14_dawn_se', 'P14_day_mean', 'P14_day_se', 'P14_dusk_mean', 'P14_dusk_se', 'P14_night_mean', 'P14_night_se')
+  activity.P15 <- data.frame(c('P15_dawn_mean', 'P15_dawn_se', 'P15_day_mean', 'P15_day_se', 'P15_dusk_mean', 'P15_dusk_se', 'P15_night_mean', 'P15_night_se'))
+  colnames(activity.P15) <- 'ID'
+  rownames(activity.P15) <- c('P15_dawn_mean', 'P15_dawn_se', 'P15_day_mean', 'P15_day_se', 'P15_dusk_mean', 'P15_dusk_se', 'P15_night_mean', 'P15_night_se')
   
-  for (i in 1:length(files))
+  for (i in 1:length(unique(dayfile$day)))
   {
-    dayfile.loc <- files[[i]]
-    dayfile <- read.csv(dayfile.loc, header = TRUE, sep = ",", colClasses = dayfile.classes) 
+    daysub <- subset(dayfile, day == unique(dayfile$day)[[i]])
     
-    activity.dawn <- subset(dayfile, SUN == 'W' & PEN == '7')
-    activity.day <- subset(dayfile, SUN == 'D' & PEN == '7')
-    activity.dusk <- subset(dayfile, SUN == 'K' & PEN == '7')
-    activity.night <- subset(dayfile, SUN == 'N' & PEN == '7')
-    activity.P7[,as.character(i)] <- c(mean(activity.dawn$BLSEC, na.rm = T), sd(activity.dawn$BLSEC, na.rm = T)/sqrt(length(activity.dawn)), mean(activity.day$BLSEC, na.rm = T), sd(activity.day$BLSEC, na.rm = T)/sqrt(length(activity.day)), mean(activity.dusk$BLSEC, na.rm = T), sd(activity.dusk$BLSEC, na.rm = T)/sqrt(length(activity.dusk)), mean(activity.night$BLSEC, na.rm = T), sd(activity.night$BLSEC, na.rm = T)/sqrt(length(activity.night)))
+    activity.dawn <- subset(daysub, SUN == 'W' & PEN == '12')
+    activity.day <- subset(daysub, SUN == 'D' & PEN == '12')
+    activity.dusk <- subset(daysub, SUN == 'K' & PEN == '12')
+    activity.night <- subset(daysub, SUN == 'N' & PEN == '12')
+    activity.P12[,as.character(i)] <- c(mean(activity.dawn$BLSEC, na.rm = T), sd(activity.dawn$BLSEC, na.rm = T)/sqrt(length(activity.dawn)), mean(activity.day$BLSEC, na.rm = T), sd(activity.day$BLSEC, na.rm = T)/sqrt(length(activity.day)), mean(activity.dusk$BLSEC, na.rm = T), sd(activity.dusk$BLSEC, na.rm = T)/sqrt(length(activity.dusk)), mean(activity.night$BLSEC, na.rm = T), sd(activity.night$BLSEC, na.rm = T)/sqrt(length(activity.night)))
     
-    activity.dawn <- subset(dayfile, SUN == 'W' & PEN == '8')
-    activity.day <- subset(dayfile, SUN == 'D' & PEN == '8')
-    activity.dusk <- subset(dayfile, SUN == 'K' & PEN == '8')
-    activity.night <- subset(dayfile, SUN == 'N' & PEN == '8')
-    activity.P8[,as.character(i)] <- c(mean(activity.dawn$BLSEC, na.rm = T), sd(activity.dawn$BLSEC, na.rm = T)/sqrt(length(activity.dawn)), mean(activity.day$BLSEC, na.rm = T), sd(activity.day$BLSEC, na.rm = T)/sqrt(length(activity.day)), mean(activity.dusk$BLSEC, na.rm = T), sd(activity.dusk$BLSEC, na.rm = T)/sqrt(length(activity.dusk)), mean(activity.night$BLSEC, na.rm = T), sd(activity.night$BLSEC, na.rm = T)/sqrt(length(activity.night)))
+    activity.dawn <- subset(daysub, SUN == 'W' & PEN == '14')
+    activity.day <- subset(daysub, SUN == 'D' & PEN == '14')
+    activity.dusk <- subset(daysub, SUN == 'K' & PEN == '14')
+    activity.night <- subset(daysub, SUN == 'N' & PEN == '14')
+    activity.P14[,as.character(i)] <- c(mean(activity.dawn$BLSEC, na.rm = T), sd(activity.dawn$BLSEC, na.rm = T)/sqrt(length(activity.dawn)), mean(activity.day$BLSEC, na.rm = T), sd(activity.day$BLSEC, na.rm = T)/sqrt(length(activity.day)), mean(activity.dusk$BLSEC, na.rm = T), sd(activity.dusk$BLSEC, na.rm = T)/sqrt(length(activity.dusk)), mean(activity.night$BLSEC, na.rm = T), sd(activity.night$BLSEC, na.rm = T)/sqrt(length(activity.night)))
+    
+    activity.dawn <- subset(daysub, SUN == 'W' & PEN == '15')
+    activity.day <- subset(daysub, SUN == 'D' & PEN == '15')
+    activity.dusk <- subset(daysub, SUN == 'K' & PEN == '15')
+    activity.night <- subset(daysub, SUN == 'N' & PEN == '15')
+    activity.P15[,as.character(i)] <- c(mean(activity.dawn$BLSEC, na.rm = T), sd(activity.dawn$BLSEC, na.rm = T)/sqrt(length(activity.dawn)), mean(activity.day$BLSEC, na.rm = T), sd(activity.day$BLSEC, na.rm = T)/sqrt(length(activity.day)), mean(activity.dusk$BLSEC, na.rm = T), sd(activity.dusk$BLSEC, na.rm = T)/sqrt(length(activity.dusk)), mean(activity.night$BLSEC, na.rm = T), sd(activity.night$BLSEC, na.rm = T)/sqrt(length(activity.night)))
   }
   
-  activity.sum <- rbind(activity.P7, activity.P8)  
-  #depths.sum$ID <- NULL
+  activity.sum <- rbind(activity.P12, activity.P14, activity.P15)  
   activity.sum    
-  #loadWorkbook('ActivityTotOutput.xlsx', create = TRUE)
-  #writeWorksheetToFile('ActivityTotOutput.xlsx', activity.sum, 'Sheet 1')
-  
+
   write.xlsx(activity.sum, 'ActivityTotOutput.xlsx')
 }
 
@@ -2270,10 +2336,10 @@ hmean.batch.coverage <- function(xmin7 = 15, xmax7 = 39, ymin7 = 15, ymax7 = 39,
     
   }  
   
-  coverage <- rbind(coverage.P7, coverage.P8, anova.list)
-  print(coverage)
+  coverage.df <- rbind(coverage.P7, coverage.P8, anova.list)
+  print(coverage.df)
   
-  write.xlsx(coverage, 'CoverageOutput_hmean.xlsx')
+  write.xlsx(coverage.df, 'CoverageOutput_hmean.xlsx')
 }
 
 # basic pen coverage function to run inside other coverage functions
@@ -2294,7 +2360,9 @@ coverage <- function(df, xmin, xmax, ymin, ymax, boxsize){
     eg <- expand.grid(t.y,t.x)
     grid.cov[cbind(eg$Var1,eg$Var2)] <- as.vector(t)  
     
-    grid.cov <<- grid.cov
+    return(grid.cov)
+    
+    #grid.cov <<- grid.cov
 }
 
 
@@ -2345,7 +2413,7 @@ hmean.day.coverage <- function(xmin12 = 40.5, xmax12 = 64.5, ymin12 = 40.5, ymax
           
           if (nrow(hoursub) > 1){
             
-            coverage(df = hoursub, xmin = xmin12, xmax = xmax12, ymin = ymin12, ymax = ymax12, boxsize = boxsize) # run coverage function to calculate pen coverage
+            grid.cov <- coverage(df = hoursub, xmin = xmin12, xmax = xmax12, ymin = ymin12, ymax = ymax12, boxsize = boxsize) # run coverage function to calculate pen coverage
             
             proportion.P12 <- c(proportion.P12, length(which(grid.cov > 0))/length(grid.cov))
             
@@ -2384,7 +2452,7 @@ hmean.day.coverage <- function(xmin12 = 40.5, xmax12 = 64.5, ymin12 = 40.5, ymax
           
           if (nrow(hoursub) > 1){
             
-            coverage(df = hoursub, xmin = xmin14, xmax = xmax14, ymin = ymin14, ymax = ymax14, boxsize = boxsize) # run coverage function to calculate pen coverage
+            grid.cov <- coverage(df = hoursub, xmin = xmin14, xmax = xmax14, ymin = ymin14, ymax = ymax14, boxsize = boxsize) # run coverage function to calculate pen coverage
 
             proportion.P14 <- c(proportion.P14, length(which(grid.cov > 0))/length(grid.cov))
             
@@ -2423,7 +2491,7 @@ hmean.day.coverage <- function(xmin12 = 40.5, xmax12 = 64.5, ymin12 = 40.5, ymax
           
           if (nrow(hoursub) > 1){
             
-            coverage(df = hoursub, xmin = xmin15, xmax = xmax15, ymin = ymin15, ymax = ymax15, boxsize = boxsize) # run coverage function to calculate pen coverage
+            grid.cov <- coverage(df = hoursub, xmin = xmin15, xmax = xmax15, ymin = ymin15, ymax = ymax15, boxsize = boxsize) # run coverage function to calculate pen coverage
             
             proportion.P15 <- c(proportion.P15, length(which(grid.cov > 0))/length(grid.cov))
             
@@ -2468,7 +2536,7 @@ hmean.day.coverage <- function(xmin12 = 40.5, xmax12 = 64.5, ymin12 = 40.5, ymax
         
         if (nrow(hoursub) > 1){
           
-          coverage(df = hoursub, xmin = xmin12, xmax = xmax12, ymin = ymin12, ymax = ymax12, boxsize = boxsize) # run coverage function to calculate pen coverage
+          grid.cov <- coverage(df = hoursub, xmin = xmin12, xmax = xmax12, ymin = ymin12, ymax = ymax12, boxsize = boxsize) # run coverage function to calculate pen coverage
 
           proportion.P12 <- c(proportion.P12, length(which(grid.cov > 0))/length(grid.cov))
           
@@ -2508,7 +2576,7 @@ hmean.day.coverage <- function(xmin12 = 40.5, xmax12 = 64.5, ymin12 = 40.5, ymax
         
         if (nrow(hoursub) > 1){
           
-          coverage(df = hoursub, xmin = xmin14, xmax = xmax14, ymin = ymin14, ymax = ymax14, boxsize = boxsize) # run coverage function to calculate pen coverage
+          grid.cov <- coverage(df = hoursub, xmin = xmin14, xmax = xmax14, ymin = ymin14, ymax = ymax14, boxsize = boxsize) # run coverage function to calculate pen coverage
 
           proportion.P14 <- c(proportion.P14, length(which(grid.cov > 0))/length(grid.cov))
           
@@ -2546,7 +2614,7 @@ hmean.day.coverage <- function(xmin12 = 40.5, xmax12 = 64.5, ymin12 = 40.5, ymax
         
         if (nrow(hoursub) > 1){
           
-          coverage(df = hoursub, xmin = xmin15, xmax = xmax15, ymin = ymin15, ymax = ymax15, boxsize = boxsize) # run coverage function to calculate pen coverage
+          grid.cov <- coverage(df = hoursub, xmin = xmin15, xmax = xmax15, ymin = ymin15, ymax = ymax15, boxsize = boxsize) # run coverage function to calculate pen coverage
           
           proportion.P15 <- c(proportion.P15, length(which(grid.cov > 0))/length(grid.cov))
           
@@ -2577,10 +2645,10 @@ hmean.day.coverage <- function(xmin12 = 40.5, xmax12 = 64.5, ymin12 = 40.5, ymax
     
   }  
   
-  coverage <- rbind(coverage.P12, coverage.P14, coverage.P15, anova.list)
-  print(coverage)
+  coverage.df <- rbind(coverage.P12, coverage.P14, coverage.P15, anova.list)
+  print(coverage.df)
   
-  write.xlsx(coverage, 'CoverageOutput_hmean.xlsx')
+  write.xlsx(coverage.df, 'CoverageOutput_hmean.xlsx')
 }
 
 
@@ -2627,7 +2695,7 @@ hmean.perfish.coverage <- function(xmin12 = 40.5, xmax12 = 64.5, ymin12 = 40.5, 
         
         if(nrow(hoursub) > 1 & mean(hoursub$PosX) > xmin12 & mean(hoursub$PosX) < xmax12 & mean(hoursub$PosY) > ymin12 & mean(hoursub$PosY) < ymax12){
           
-          coverage(df = hoursub, xmin = xmin12, xmax = xmax12, ymin = ymin12, ymax = ymax12, boxsize = boxsize) # run coverage function to calculate pen coverage
+          grid.cov <- coverage(df = hoursub, xmin = xmin12, xmax = xmax12, ymin = ymin12, ymax = ymax12, boxsize = boxsize) # run coverage function to calculate pen coverage
 
           occupied <- c(occupied, length(which(grid.cov > 0)))
           total <- c(total, length(grid.cov))
@@ -2678,7 +2746,7 @@ hmean.perfish.coverage <- function(xmin12 = 40.5, xmax12 = 64.5, ymin12 = 40.5, 
         
         if(nrow(hoursub) > 1 & mean(hoursub$PosX) > xmin14 & mean(hoursub$PosX) < xmax14 & mean(hoursub$PosY) > ymin14 & mean(hoursub$PosY) < ymax14){
           
-          coverage(df = hoursub, xmin = xmin14, xmax = xmax14, ymin = ymin14, ymax = ymax14, boxsize = boxsize) # run coverage function to calculate pen coverage
+          grid.cov <- coverage(df = hoursub, xmin = xmin14, xmax = xmax14, ymin = ymin14, ymax = ymax14, boxsize = boxsize) # run coverage function to calculate pen coverage
 
           occupied <- c(occupied, length(which(grid.cov > 0)))
           total <- c(total, length(grid.cov))
@@ -2728,7 +2796,7 @@ hmean.perfish.coverage <- function(xmin12 = 40.5, xmax12 = 64.5, ymin12 = 40.5, 
         
         if(nrow(hoursub) > 1 & mean(hoursub$PosX) > xmin15 & mean(hoursub$PosX) < xmax15 & mean(hoursub$PosY) > ymin15 & mean(hoursub$PosY) < ymax15){
           
-          coverage(df = hoursub, xmin = xmin15, xmax = xmax15, ymin = ymin15, ymax = ymax15, boxsize = boxsize) # run coverage function to calculate pen coverage
+          grid.cov <- coverage(df = hoursub, xmin = xmin15, xmax = xmax15, ymin = ymin15, ymax = ymax15, boxsize = boxsize) # run coverage function to calculate pen coverage
 
           occupied <- c(occupied, length(which(grid.cov > 0)))
           total <- c(total, length(grid.cov))
@@ -2752,11 +2820,11 @@ hmean.perfish.coverage <- function(xmin12 = 40.5, xmax12 = 64.5, ymin12 = 40.5, 
   } # end of daycut loop
 
   
-  coverage <- rbind(coverage.P12, coverage.P14, coverage.P15) 
-  coverage[,'0_mean'] <- NULL
-  coverage[,'0_sd'] <- NULL
-  write.csv(coverage, 'CoverageOutput_hmeanperfish.csv')
-  coverage <<- coverage
+  coverage.df <- rbind(coverage.P12, coverage.P14, coverage.P15) 
+  coverage.df[,'0_mean'] <- NULL
+  coverage.df[,'0_sd'] <- NULL
+  write.csv(coverage.df, 'CoverageOutput_hmeanperfish.csv')
+  coverage.df <<- coverage.df
 }
 
 
@@ -2997,50 +3065,80 @@ hexplot.all <- function(pen)
   pen.size <- 1.4
   #plot.col <- rev(heat.colors(2, alpha = 1))
   plot.col <- matlab.like(1000)  
+  pingmax <- as.integer((as.double(max(fish.id$EchoTime))-as.double(min(fish.id$EchoTime)))/300)
+  #pingmax <- 1000
   
-  if(pen == 7){  
+  if(pen == 12){  
     
-    fish.id <- subset(dayfile, PEN == 7)  
+    fish.id <- subset(dayfile, PEN == '12')  
     
     hexplot <- ggplot(fish.id, aes(fish.id$PosX, fish.id$PosY))
-    hexplot <- hexplot + geom_hex(bins = 55, alpha = 0.6) + scale_fill_gradientn(colours=plot.col, space = 'Lab', limits = c(0, 1000), na.value = plot.col[length(plot.col)], name = 'No. pings')
-    hexplot + annotate('segment', x = locations.lookup['7CSW', 'xmin'], xend = locations.lookup['7CSE', 'xmax'], y = locations.lookup['7CSW', 'ymin'], yend = locations.lookup['7CSE', 'ymin'], colour = pen.col, size = pen.size) + # pen boundary
-      annotate('segment', x = locations.lookup['7CSW', 'xmin'], xend = locations.lookup['7CNW', 'xmin'], y = locations.lookup['7CSW', 'ymin'], yend = locations.lookup['7CNW', 'ymax'], colour = pen.col, size = pen.size) +  # pen boundary
-      annotate('segment', x = locations.lookup['7CNW', 'xmin'], xend = locations.lookup['7CNE', 'xmax'], y = locations.lookup['7CNW', 'ymax'], yend = locations.lookup['7CNE', 'ymax'], colour = pen.col, size = pen.size) + # pen boundary
-      annotate('segment', x = locations.lookup['7CNE', 'xmax'], xend = locations.lookup['7CSE', 'xmax'], y = locations.lookup['7CNE', 'ymax'], yend = locations.lookup['7CSE', 'ymin'], colour = pen.col, size = pen.size) + # pen boundary
-      annotate('segment', x = locations.lookup['7CSW', 'xmin'], xend = locations.lookup['7CSE', 'xmax'], y = locations.lookup['7CSW', 'ymax'], yend = locations.lookup['7CSE', 'ymax'], colour = pen.col, linetype = 'dotted', size = pen.size) + # pen location boundary
-      annotate('segment', x = locations.lookup['7CSW', 'xmax'], xend = locations.lookup['7CNW', 'xmax'], y = locations.lookup['7CSW', 'ymin'], yend = locations.lookup['7CNW', 'ymax'], colour = pen.col, linetype = 'dotted', size = pen.size) + # pen location boundary
-      annotate('segment', x = locations.lookup['7CNW', 'xmin'], xend = locations.lookup['7CNE', 'xmax'], y = locations.lookup['7CNW', 'ymin'], yend = locations.lookup['7CNE', 'ymin'], colour = pen.col, linetype = 'dotted', size = pen.size) + # pen location boundary
-      annotate('segment', x = locations.lookup['7CNE', 'xmin'], xend = locations.lookup['7CSE', 'xmin'], y = locations.lookup['7CNE', 'ymax'], yend = locations.lookup['7CSE', 'ymin'], colour = pen.col, linetype = 'dotted', size = pen.size) + # pen location boundary
-      annotate('curve', x = locations.lookup['7WHNW', 'xmin']+1, xend = locations.lookup['7WHNW', 'xmax']-1, y = locations.lookup['7WHNW', 'ymin']+1, yend = locations.lookup['7WHNW', 'ymax']-1, colour = pen.col, size = pen.size, curvature = 1) + # hide boundary
-      annotate('curve', x = locations.lookup['7WHNW', 'xmin']+1, xend = locations.lookup['7WHNW', 'xmax']-1, y = locations.lookup['7WHNW', 'ymin']+1, yend = locations.lookup['7WHNW', 'ymax']-1, colour = pen.col, size = pen.size, curvature = -1) + # hide boundary
-      annotate('curve', x = locations.lookup['7WHSE', 'xmin']+1, xend = locations.lookup['7WHSE', 'xmax']-1, y = locations.lookup['7WHSE', 'ymin']+1, yend = locations.lookup['7WHSE', 'ymax']-1, colour = pen.col, size = pen.size, curvature = 1) + # hide boundary
-      annotate('curve', x = locations.lookup['7WHSE', 'xmin']+1, xend = locations.lookup['7WHSE', 'xmax']-1, y = locations.lookup['7WHSE', 'ymin']+1, yend = locations.lookup['7WHSE', 'ymax']-1, colour = pen.col, size = pen.size, curvature = -1) + # hide boundary
+    hexplot <- hexplot + geom_hex(bins = 55, alpha = 0.6) + scale_fill_gradientn(colours=plot.col, space = 'Lab', limits = c(0, pingmax), na.value = plot.col[length(plot.col)], name = 'No. pings')
+    hexplot <- hexplot +
+      annotate('segment', x = locations.lookup['12CSW', 'xmin'], xend = locations.lookup['12CSE', 'xmax'], y = locations.lookup['12CSW', 'ymin'], yend = locations.lookup['12CSE', 'ymin'], colour = pen.col, size = pen.size) + # pen boundary
+      annotate('segment', x = locations.lookup['12CSW', 'xmin'], xend = locations.lookup['12CNW', 'xmin'], y = locations.lookup['12CSW', 'ymin'], yend = locations.lookup['12CNW', 'ymax'], colour = pen.col, size = pen.size) +  # pen boundary
+      annotate('segment', x = locations.lookup['12CNW', 'xmin'], xend = locations.lookup['12CNE', 'xmax'], y = locations.lookup['12CNW', 'ymax'], yend = locations.lookup['12CNE', 'ymax'], colour = pen.col, size = pen.size) + # pen boundary
+      annotate('segment', x = locations.lookup['12CNE', 'xmax'], xend = locations.lookup['12CSE', 'xmax'], y = locations.lookup['12CNE', 'ymax'], yend = locations.lookup['12CSE', 'ymin'], colour = pen.col, size = pen.size) + # pen boundary
+      annotate('segment', x = locations.lookup['12CSW', 'xmin'], xend = locations.lookup['12CSE', 'xmax'], y = locations.lookup['12CSW', 'ymax'], yend = locations.lookup['12CSE', 'ymax'], colour = pen.col, linetype = 'dotted', size = pen.size) + # pen location boundary
+      annotate('segment', x = locations.lookup['12CSW', 'xmax'], xend = locations.lookup['12CNW', 'xmax'], y = locations.lookup['12CSW', 'ymin'], yend = locations.lookup['12CNW', 'ymax'], colour = pen.col, linetype = 'dotted', size = pen.size) + # pen location boundary
+      annotate('segment', x = locations.lookup['12CNW', 'xmin'], xend = locations.lookup['12CNE', 'xmax'], y = locations.lookup['12CNW', 'ymin'], yend = locations.lookup['12CNE', 'ymin'], colour = pen.col, linetype = 'dotted', size = pen.size) + # pen location boundary
+      annotate('segment', x = locations.lookup['12CNE', 'xmin'], xend = locations.lookup['12CSE', 'xmin'], y = locations.lookup['12CNE', 'ymax'], yend = locations.lookup['12CSE', 'ymin'], colour = pen.col, linetype = 'dotted', size = pen.size) + # pen location boundary
+      annotate('rect', xmin = locations.lookup['12HET', 'xmin'], xmax = locations.lookup['12HET', 'xmax'], ymin = locations.lookup['12HET', 'ymin'], ymax = locations.lookup['12HET', 'ymax'], colour = pen.col, size = pen.size, alpha = 0.3) + # hide boundary
+      annotate('rect', xmin = locations.lookup['12HWT', 'xmin'], xmax = locations.lookup['12HWT', 'xmax'], ymin = locations.lookup['12HWT', 'ymin'], ymax = locations.lookup['12HWT', 'ymax'], colour = pen.col, size = pen.size, alpha = 0.3) + # hide boundary
+      annotate('rect', xmin = locations.lookup['FS12', 'xmin'], xmax = locations.lookup['FS12', 'xmax'], ymin = locations.lookup['FS12', 'ymin'], ymax = locations.lookup['FS12', 'ymax'], colour = pen.col, size = pen.size, alpha = 0.3) + # hide boundary
+      theme(panel.background = element_rect(fill = 'white', colour = 'black')) +
+      scale_x_continuous('x (m)', limits = c(35, 70)) + scale_y_continuous('y (m)', limits = c(35,70))
+    } 
+  
+  if(pen == 14){
+    
+    
+    fish.id <- subset(dayfile, PEN == 14)  
+    
+    hexplot <- ggplot(fish.id, aes(fish.id$PosX, fish.id$PosY))
+    hexplot <- hexplot + geom_hex(bins = 55, alpha = 0.6) + scale_fill_gradientn(colours=plot.col, space = 'Lab', limits = c(0, pingmax), na.value = plot.col[length(plot.col)], name = 'No. pings')
+    hexplot <- hexplot +
+      annotate('segment', x = locations.lookup['14CSW', 'xmin'], xend = locations.lookup['14CSE', 'xmax'], y = locations.lookup['14CSW', 'ymin'], yend = locations.lookup['14CSE', 'ymin'], colour = pen.col, size = pen.size) + # pen boundary
+      annotate('segment', x = locations.lookup['14CSW', 'xmin'], xend = locations.lookup['14CNW', 'xmin'], y = locations.lookup['14CSW', 'ymin'], yend = locations.lookup['14CNW', 'ymax'], colour = pen.col, size = pen.size) +  # pen boundary
+      annotate('segment', x = locations.lookup['14CNW', 'xmin'], xend = locations.lookup['14CNE', 'xmax'], y = locations.lookup['14CNW', 'ymax'], yend = locations.lookup['14CNE', 'ymax'], colour = pen.col, size = pen.size) + # pen boundary
+      annotate('segment', x = locations.lookup['14CNE', 'xmax'], xend = locations.lookup['14CSE', 'xmax'], y = locations.lookup['14CNE', 'ymax'], yend = locations.lookup['14CSE', 'ymin'], colour = pen.col, size = pen.size) + # pen boundary
+      annotate('segment', x = locations.lookup['14CSW', 'xmin'], xend = locations.lookup['14CSE', 'xmax'], y = locations.lookup['14CSW', 'ymax'], yend = locations.lookup['14CSE', 'ymax'], colour = pen.col, linetype = 'dotted', size = pen.size) + # pen location boundary
+      annotate('segment', x = locations.lookup['14CSW', 'xmax'], xend = locations.lookup['14CNW', 'xmax'], y = locations.lookup['14CSW', 'ymin'], yend = locations.lookup['14CNW', 'ymax'], colour = pen.col, linetype = 'dotted', size = pen.size) + # pen location boundary
+      annotate('segment', x = locations.lookup['14CNW', 'xmin'], xend = locations.lookup['14CNE', 'xmax'], y = locations.lookup['14CNW', 'ymin'], yend = locations.lookup['14CNE', 'ymin'], colour = pen.col, linetype = 'dotted', size = pen.size) + # pen location boundary
+      annotate('segment', x = locations.lookup['14CNE', 'xmin'], xend = locations.lookup['14CSE', 'xmin'], y = locations.lookup['14CNE', 'ymax'], yend = locations.lookup['14CSE', 'ymin'], colour = pen.col, linetype = 'dotted', size = pen.size) + # pen location boundary
+      annotate('rect', xmin = locations.lookup['14HET', 'xmin'], xmax = locations.lookup['14HET', 'xmax'], ymin = locations.lookup['14HET', 'ymin'], ymax = locations.lookup['14HET', 'ymax'], colour = pen.col, size = pen.size, alpha = 0.3) + # hide boundary
+      annotate('rect', xmin = locations.lookup['14HWT', 'xmin'], xmax = locations.lookup['14HWT', 'xmax'], ymin = locations.lookup['14HWT', 'ymin'], ymax = locations.lookup['14HWT', 'ymax'], colour = pen.col, size = pen.size, alpha = 0.3) + # hide boundary
+      annotate('rect', xmin = locations.lookup['FS14', 'xmin'], xmax = locations.lookup['FS14', 'xmax'], ymin = locations.lookup['FS14', 'ymin'], ymax = locations.lookup['FS14', 'ymax'], colour = pen.col, size = pen.size, alpha = 0.3) + # hide boundary
+      theme(panel.background = element_rect(fill = 'white', colour = 'black')) +
+      scale_x_continuous('x (m)', limits = c(10, 45)) + scale_y_continuous('y (m)', limits = c(35,70))
+    
+    }  
+  
+  if(pen == 15){
+    
+    
+    fish.id <- subset(dayfile, PEN == 15)  
+    
+    hexplot <- ggplot(fish.id, aes(fish.id$PosX, fish.id$PosY))
+    hexplot <- hexplot + geom_hex(bins = 55, alpha = 0.6) + scale_fill_gradientn(colours=plot.col, space = 'Lab', limits = c(0, pingmax), na.value = plot.col[length(plot.col)], name = 'No. pings')
+    hexplot <- hexplot +
+      annotate('segment', x = locations.lookup['15CSW', 'xmin'], xend = locations.lookup['15CSE', 'xmax'], y = locations.lookup['15CSW', 'ymin'], yend = locations.lookup['15CSE', 'ymin'], colour = pen.col, size = pen.size) + # pen boundary
+      annotate('segment', x = locations.lookup['15CSW', 'xmin'], xend = locations.lookup['15CNW', 'xmin'], y = locations.lookup['15CSW', 'ymin'], yend = locations.lookup['15CNW', 'ymax'], colour = pen.col, size = pen.size) +  # pen boundary
+      annotate('segment', x = locations.lookup['15CNW', 'xmin'], xend = locations.lookup['15CNE', 'xmax'], y = locations.lookup['15CNW', 'ymax'], yend = locations.lookup['15CNE', 'ymax'], colour = pen.col, size = pen.size) + # pen boundary
+      annotate('segment', x = locations.lookup['15CNE', 'xmax'], xend = locations.lookup['15CSE', 'xmax'], y = locations.lookup['15CNE', 'ymax'], yend = locations.lookup['15CSE', 'ymin'], colour = pen.col, size = pen.size) + # pen boundary
+      annotate('segment', x = locations.lookup['15CSW', 'xmin'], xend = locations.lookup['15CSE', 'xmax'], y = locations.lookup['15CSW', 'ymax'], yend = locations.lookup['15CSE', 'ymax'], colour = pen.col, linetype = 'dotted', size = pen.size) + # pen location boundary
+      annotate('segment', x = locations.lookup['15CSW', 'xmax'], xend = locations.lookup['15CNW', 'xmax'], y = locations.lookup['15CSW', 'ymin'], yend = locations.lookup['15CNW', 'ymax'], colour = pen.col, linetype = 'dotted', size = pen.size) + # pen location boundary
+      annotate('segment', x = locations.lookup['15CNW', 'xmin'], xend = locations.lookup['15CNE', 'xmax'], y = locations.lookup['15CNW', 'ymin'], yend = locations.lookup['15CNE', 'ymin'], colour = pen.col, linetype = 'dotted', size = pen.size) + # pen location boundary
+      annotate('segment', x = locations.lookup['15CNE', 'xmin'], xend = locations.lookup['15CSE', 'xmin'], y = locations.lookup['15CNE', 'ymax'], yend = locations.lookup['15CSE', 'ymin'], colour = pen.col, linetype = 'dotted', size = pen.size) + # pen location boundary
+      annotate('rect', xmin = locations.lookup['15HET', 'xmin'], xmax = locations.lookup['15HET', 'xmax'], ymin = locations.lookup['15HET', 'ymin'], ymax = locations.lookup['15HET', 'ymax'], colour = pen.col, size = pen.size, alpha = 0.3) + # hide boundary
+      annotate('rect', xmin = locations.lookup['15HWT', 'xmin'], xmax = locations.lookup['15HWT', 'xmax'], ymin = locations.lookup['15HWT', 'ymin'], ymax = locations.lookup['15HWT', 'ymax'], colour = pen.col, size = pen.size, alpha = 0.3) + # hide boundary
+      annotate('rect', xmin = locations.lookup['FS15', 'xmin'], xmax = locations.lookup['FS15', 'xmax'], ymin = locations.lookup['FS15', 'ymin'], ymax = locations.lookup['FS15', 'ymax'], colour = pen.col, size = pen.size, alpha = 0.3) + # hide boundary
       theme(panel.background = element_rect(fill = 'white', colour = 'black')) +
       scale_x_continuous('x (m)', limits = c(10, 45)) + scale_y_continuous('y (m)', limits = c(10,45))
     
-  } else {
-    
-    
-    fish.id <- subset(dayfile, PEN == 8)  
-    
-    hexplot <- ggplot(fish.id, aes(fish.id$PosX, fish.id$PosY))
-    hexplot <- hexplot + geom_hex(bins = 55, alpha = 0.6) + scale_fill_gradientn(colours=plot.col, space = 'Lab', limits = c(0, 1000), na.value = plot.col[length(plot.col)], name = 'No. pings') 
-    hexplot + annotate('segment', x = locations.lookup['8CSW', 'xmin'], xend = locations.lookup['8CSE', 'xmax'], y = locations.lookup['8CSW', 'ymin'], yend = locations.lookup['8CSE', 'ymin'], colour = pen.col, size = pen.size) +
-      annotate('segment', x = locations.lookup['8CSW', 'xmin'], xend = locations.lookup['8CNW', 'xmin'], y = locations.lookup['8CSW', 'ymin'], yend = locations.lookup['8CNW', 'ymax'], colour = pen.col, size = pen.size) +
-      annotate('segment', x = locations.lookup['8CNW', 'xmin'], xend = locations.lookup['8CNE', 'xmax'], y = locations.lookup['8CNW', 'ymax'], yend = locations.lookup['8CNE', 'ymax'], colour = pen.col, size = pen.size) +
-      annotate('segment', x = locations.lookup['8CNE', 'xmax'], xend = locations.lookup['8CSE', 'xmax'], y = locations.lookup['8CNE', 'ymax'], yend = locations.lookup['8CSE', 'ymin'], colour = pen.col, size = pen.size) +
-      annotate('segment', x = locations.lookup['8CSW', 'xmin'], xend = locations.lookup['8CSE', 'xmax'], y = locations.lookup['8CSW', 'ymax'], yend = locations.lookup['8CSE', 'ymax'], colour = pen.col, linetype = 'dotted', size = pen.size) +
-      annotate('segment', x = locations.lookup['8CSW', 'xmax'], xend = locations.lookup['8CNW', 'xmax'], y = locations.lookup['8CSW', 'ymin'], yend = locations.lookup['8CNW', 'ymax'], colour = pen.col, linetype = 'dotted', size = pen.size) +
-      annotate('segment', x = locations.lookup['8CNW', 'xmin'], xend = locations.lookup['8CNE', 'xmax'], y = locations.lookup['8CNW', 'ymin'], yend = locations.lookup['8CNE', 'ymin'], colour = pen.col, linetype = 'dotted', size = pen.size) +
-      annotate('segment', x = locations.lookup['8CNE', 'xmin'], xend = locations.lookup['8CSE', 'xmin'], y = locations.lookup['8CNE', 'ymax'], yend = locations.lookup['8CSE', 'ymin'], colour = pen.col, linetype = 'dotted', size = pen.size) +
-      annotate('curve', x = locations.lookup['8WHSW', 'xmin']+1, xend = locations.lookup['8WHSW', 'xmax']-1, y = locations.lookup['8WHSW', 'ymin']+1, yend = locations.lookup['8WHSW', 'ymax']-1, colour = pen.col, size = pen.size, curvature = 1) + # hide boundary
-      annotate('curve', x = locations.lookup['8WHSW', 'xmin']+1, xend = locations.lookup['8WHSW', 'xmax']-1, y = locations.lookup['8WHSW', 'ymin']+1, yend = locations.lookup['8WHSW', 'ymax']-1, colour = pen.col, size = pen.size, curvature = -1) + # hide boundary
-      annotate('curve', x = locations.lookup['8WHNE', 'xmin']+1, xend = locations.lookup['8WHNE', 'xmax']-1, y = locations.lookup['8WHNE', 'ymin']+1, yend = locations.lookup['8WHNE', 'ymax']-1, colour = pen.col, size = pen.size, curvature = 1) + # hide boundary
-      annotate('curve', x = locations.lookup['8WHNE', 'xmin']+1, xend = locations.lookup['8WHNE', 'xmax']-1, y = locations.lookup['8WHNE', 'ymin']+1, yend = locations.lookup['8WHNE', 'ymax']-1, colour = pen.col, size = pen.size, curvature = -1) + # hide boundary
-      theme(panel.background = element_rect(fill = 'white', colour = 'black')) +
-      scale_x_continuous('x (m)', limits = c(35,70)) + scale_y_continuous('y (m)', limits = c(10,45))
-  }  
+    }  
+  
+  print(hexplot)
   
 }
 
@@ -3070,38 +3168,58 @@ fish.3dmove <- function(period)
 plot.bydepth <- function(period)
 {
   depthpal <- diverge_hcl(30, h = c(11,266), c = 100, l = c(21,85), power = 0.6)
-  fish.id <- subset(dayfile, Period == period)
+  fish.id <- dayfile
+  #fish.id <- subset(dayfile, Period == period)
   
-  if(fish.id[1,3] == '7')
+  if(fish.id[1,'PEN'] == '12')
   {
-    
-    # plot(fish.id$PosX, fish.id$PosY, xlab = 'X', ylab = 'Y', pch = 20, cex = 0.8, xlim = c(0, 40), ylim = c(0, 45), type = 'p', col = rgb(0, 0.6, 0, 0.2)) # wider plot
-    plot(fish.id$PosX, fish.id$PosY, xlab = 'X (m)', ylab = 'Y (m)', pch = 20, cex = 1, xlim = c(10, 45), ylim = c(10, 45), type = 'p', col = depthpal[round(fish.id$PosZ)]) # tight plot
-    rect(locations.lookup['7EW', 'xmin'], locations.lookup['7EW', 'ymin'], locations.lookup['7EW', 'xmax'], locations.lookup['7EW', 'ymax'], lty = 2) # 7EW edge
-    rect(locations.lookup['7ES', 'xmin'], locations.lookup['7ES', 'ymin'], locations.lookup['7ES', 'xmax'], locations.lookup['7ES', 'ymax'], lty = 2) # 7ES edge
-    rect(locations.lookup['7EE', 'xmin'], locations.lookup['7EE', 'ymin'], locations.lookup['7EE', 'xmax'], locations.lookup['7EE', 'ymax'], lty = 2) # 7EE edge
-    rect(locations.lookup['7EN', 'xmin'], locations.lookup['7EN', 'ymin'], locations.lookup['7EN', 'xmax'], locations.lookup['7EN', 'ymax'], lty = 2) # 7EN edge
-    rect(locations.lookup['7WHSE', 'xmin'], locations.lookup['7WHSE', 'ymin'], locations.lookup['7WHSE', 'xmax'], locations.lookup['7WHSE', 'ymax'], lty = 3, col = rgb(1, 0.6, 0, 0.4)) # 7WHSE
-    rect(locations.lookup['7WHNW', 'xmin'], locations.lookup['7WHNW', 'ymin'], locations.lookup['7WHNW', 'xmax'], locations.lookup['7WHNW', 'ymax'], lty = 3, col = rgb(1, 0.6, 0, 0.4)) # 7WHNW
-    rect(locations.lookup['7EW', 'xmin'], locations.lookup['7ES', 'ymin'], locations.lookup['7EE', 'xmax'], locations.lookup['7EN', 'ymax'], lwd = 2) # cage limits
-    legend(41, 42, as.character(1:30), col = depthpal, pch = 15, bty = 'n', cex = 1, pt.cex = 2.6, horiz = FALSE, y.intersp = 0.5, title = 'depth (m)', text.width = 0.2, yjust = 1)
-    
-    
-  }else{
-    
-    #plot(fish.id$PosX, fish.id$PosY, xlab = 'X', ylab = 'Y', pch = 20, cex = 0.8, xlim = c(25, 70), ylim = c(0, 45), type = 'p', col = rgb(0, 0.6, 0, 0.2)) # wider plot
-    plot(fish.id$PosX, fish.id$PosY, xlab = 'X (m)', ylab = 'Y (m)', pch = 20, cex = 1, xlim = c(37, 72), ylim = c(10, 45), type = 'p', col = depthpal[round(fish.id$PosZ)]) # tight plot
-    rect(locations.lookup['8EW', 'xmin'], locations.lookup['8EW', 'ymin'], locations.lookup['8EW', 'xmax'], locations.lookup['8EW', 'ymax'], lty = 2) # 7EW edge
-    rect(locations.lookup['8ES', 'xmin'], locations.lookup['8ES', 'ymin'], locations.lookup['8ES', 'xmax'], locations.lookup['8ES', 'ymax'], lty = 2) # 7ES edge
-    rect(locations.lookup['8EE', 'xmin'], locations.lookup['8EE', 'ymin'], locations.lookup['8EE', 'xmax'], locations.lookup['8EE', 'ymax'], lty = 2) # 7EE edge
-    rect(locations.lookup['8EN', 'xmin'], locations.lookup['8EN', 'ymin'], locations.lookup['8EN', 'xmax'], locations.lookup['8EN', 'ymax'], lty = 2) # 7EN edge
-    rect(locations.lookup['8WHSW', 'xmin'], locations.lookup['8WHSW', 'ymin'], locations.lookup['8WHSW', 'xmax'], locations.lookup['8WHSW', 'ymax'], lty = 3, col = rgb(1, 0.6, 0, 0.4)) # 7WHSE
-    rect(locations.lookup['8WHNE', 'xmin'], locations.lookup['8WHNE', 'ymin'], locations.lookup['8WHNE', 'xmax'], locations.lookup['8WHNE', 'ymax'], lty = 3, col = rgb(1, 0.6, 0, 0.4)) # 7WHNW
-    rect(locations.lookup['8EW', 'xmin'], locations.lookup['8ES', 'ymin'], locations.lookup['8EE', 'xmax'], locations.lookup['8EN', 'ymax'], lwd = 2) # cage limits
-    legend(67, 42, as.character(1:30), col = depthpal, pch = 15, bty = 'n', cex = 1, pt.cex = 2.6, horiz = FALSE, y.intersp = 0.5, title = 'depth (m)', text.width = 0.2)
+#    if(alims == 't'){plot(fish.id$PosX, fish.id$PosY, xlab = 'X (m)', ylab = 'Y (m)', pch = 20, cex = 1, xlim = c(35, 70), ylim = c(35, 70), type = 'l', col = fishpal[20])}
+#    if(alims == 'w'){plot(fish.id$PosX, fish.id$PosY, xlab = 'X (m)', ylab = 'Y (m)', pch = 20, cex = 1, type = 'l', col = fishpal[20])}
+    plot(fish.id$PosX, fish.id$PosY, xlab = 'X (m)', ylab = 'Y (m)', pch = 20, cex = 1, xlim = c(35, 70), ylim = c(35, 70), type = 'p', col = depthpal[round(fish.id$PosZ)]) # tight plot
+    rect(locations.lookup['12EW', 'xmin'], locations.lookup['12EW', 'ymin'], locations.lookup['12EW', 'xmax'], locations.lookup['12EW', 'ymax'], lty = 2) # 12EW edge
+    rect(locations.lookup['12ES', 'xmin'], locations.lookup['12ES', 'ymin'], locations.lookup['12ES', 'xmax'], locations.lookup['12ES', 'ymax'], lty = 2) # 12ES edge
+    rect(locations.lookup['12EE', 'xmin'], locations.lookup['12EE', 'ymin'], locations.lookup['12EE', 'xmax'], locations.lookup['12EE', 'ymax'], lty = 2) # 12EE edge
+    rect(locations.lookup['12EN', 'xmin'], locations.lookup['12EN', 'ymin'], locations.lookup['12EN', 'xmax'], locations.lookup['12EN', 'ymax'], lty = 2) # 12EN edge
+    rect(locations.lookup['12HET', 'xmin'], locations.lookup['12HET', 'ymin'], locations.lookup['12HET', 'xmax'], locations.lookup['12HET', 'ymax'], lty = 3, col = rgb(1, 0.6, 0, 0.4)) # 12HET
+    rect(locations.lookup['12HWT', 'xmin'], locations.lookup['12HWT', 'ymin'], locations.lookup['12HWT', 'xmax'], locations.lookup['12HWT', 'ymax'], lty = 3, col = rgb(1, 0.6, 0, 0.4)) # 12HWT
+    rect(locations.lookup['12FS', 'xmin'], locations.lookup['12FS', 'ymin'], locations.lookup['12FS', 'xmax'], locations.lookup['12FS', 'ymax'], lty = 3, col = rgb(1, 1, 0.1, 0.4)) # 12FS
+    rect(locations.lookup['12EW', 'xmin'], locations.lookup['12ES', 'ymin'], locations.lookup['12EE', 'xmax'], locations.lookup['12EN', 'ymax'], lwd = 2) # cage limits
     
   }
-}
+  
+  if(fish.id[1,'PEN'] == '14'){
+    
+#    if(alims == 't'){plot(fish.id$PosX, fish.id$PosY, xlab = 'X (m)', ylab = 'Y (m)', pch = 20, cex = 1, xlim = c(10, 45), ylim = c(35, 70), type = 'l', col = fishpal[20])}
+#    if(alims == 'w'){plot(fish.id$PosX, fish.id$PosY, xlab = 'X (m)', ylab = 'Y (m)', pch = 20, cex = 1, type = 'l', col = fishpal[20])}
+    plot(fish.id$PosX, fish.id$PosY, xlab = 'X (m)', ylab = 'Y (m)', pch = 20, cex = 1, xlim = c(10, 45), ylim = c(35, 70), type = 'p', col = depthpal[round(fish.id$PosZ)]) # tight plot
+    rect(locations.lookup['14EW', 'xmin'], locations.lookup['14EW', 'ymin'], locations.lookup['14EW', 'xmax'], locations.lookup['14EW', 'ymax'], lty = 2) # 14EW edge
+    rect(locations.lookup['14ES', 'xmin'], locations.lookup['14ES', 'ymin'], locations.lookup['14ES', 'xmax'], locations.lookup['14ES', 'ymax'], lty = 2) # 14ES edge
+    rect(locations.lookup['14EE', 'xmin'], locations.lookup['14EE', 'ymin'], locations.lookup['14EE', 'xmax'], locations.lookup['14EE', 'ymax'], lty = 2) # 14EE edge
+    rect(locations.lookup['14EN', 'xmin'], locations.lookup['14EN', 'ymin'], locations.lookup['14EN', 'xmax'], locations.lookup['14EN', 'ymax'], lty = 2) # 14EN edge
+    rect(locations.lookup['14HET', 'xmin'], locations.lookup['14HET', 'ymin'], locations.lookup['14HET', 'xmax'], locations.lookup['14HET', 'ymax'], lty = 3, col = rgb(1, 0.6, 0, 0.4)) # 14HET
+    rect(locations.lookup['14HWT', 'xmin'], locations.lookup['14HWT', 'ymin'], locations.lookup['14HWT', 'xmax'], locations.lookup['14HWT', 'ymax'], lty = 3, col = rgb(1, 0.6, 0, 0.4)) # 14HWT
+    rect(locations.lookup['14FS', 'xmin'], locations.lookup['14FS', 'ymin'], locations.lookup['14FS', 'xmax'], locations.lookup['14FS', 'ymax'], lty = 3, col = rgb(1, 1, 0.1, 0.4)) # 14FS
+    rect(locations.lookup['14EW', 'xmin'], locations.lookup['14ES', 'ymin'], locations.lookup['14EE', 'xmax'], locations.lookup['14EN', 'ymax'], lwd = 2) # cage limits
+    
+  }
+  
+  if(fish.id[1,'PEN'] == '15'){
+    
+#    if(alims == 't'){plot(fish.id$PosX, fish.id$PosY, xlab = 'X (m)', ylab = 'Y (m)', pch = 20, cex = 1, xlim = c(10, 45), ylim = c(10, 45), type = 'l', col = fishpal[20])}
+#    if(alims == 'w'){plot(fish.id$PosX, fish.id$PosY, xlab = 'X (m)', ylab = 'Y (m)', pch = 20, cex = 1, xlim = c(10, 45), ylim = c(10, 45), type = 'l', col = fishpal[20])}
+    plot(fish.id$PosX, fish.id$PosY, xlab = 'X (m)', ylab = 'Y (m)', pch = 20, cex = 1, xlim = c(10, 45), ylim = c(10, 45), type = 'p', col = depthpal[round(fish.id$PosZ)]) # tight plot
+    rect(locations.lookup['15EW', 'xmin'], locations.lookup['15EW', 'ymin'], locations.lookup['15EW', 'xmax'], locations.lookup['15EW', 'ymax'], lty = 2) # 15EW edge
+    rect(locations.lookup['15ES', 'xmin'], locations.lookup['15ES', 'ymin'], locations.lookup['15ES', 'xmax'], locations.lookup['15ES', 'ymax'], lty = 2) # 15ES edge
+    rect(locations.lookup['15EE', 'xmin'], locations.lookup['15EE', 'ymin'], locations.lookup['15EE', 'xmax'], locations.lookup['15EE', 'ymax'], lty = 2) # 15EE edge
+    rect(locations.lookup['15EN', 'xmin'], locations.lookup['15EN', 'ymin'], locations.lookup['15EN', 'xmax'], locations.lookup['15EN', 'ymax'], lty = 2) # 15EN edge
+    rect(locations.lookup['15HET', 'xmin'], locations.lookup['15HET', 'ymin'], locations.lookup['15HET', 'xmax'], locations.lookup['15HET', 'ymax'], lty = 3, col = rgb(1, 0.6, 0, 0.4)) # 15HET
+    rect(locations.lookup['15HWT', 'xmin'], locations.lookup['15HWT', 'ymin'], locations.lookup['15HWT', 'xmax'], locations.lookup['15HWT', 'ymax'], lty = 3, col = rgb(1, 0.6, 0, 0.4)) # 15HWT
+    rect(locations.lookup['15FS', 'xmin'], locations.lookup['15FS', 'ymin'], locations.lookup['15FS', 'xmax'], locations.lookup['15FS', 'ymax'], lty = 3, col = rgb(1, 1, 0.1, 0.4)) # 15FS
+    rect(locations.lookup['15EW', 'xmin'], locations.lookup['15ES', 'ymin'], locations.lookup['15EE', 'xmax'], locations.lookup['15EN', 'ymax'], lwd = 2) # cage limits
+    
+  }
+  
+} # end of function
 
 
 
@@ -4501,28 +4619,47 @@ multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
 
 # 40. Polar plots of headings
 
-headplot <- function(threshold = 0.1){
+headplot <- function(threshold = 0.1, penoffset = 14.24){
   
-  p7 <- subset(dayfile, PEN == 7 & MSEC >= threshold)
-  p8 <- subset(dayfile, PEN == 8 & MSEC >= threshold)
+  dayfile$HEAD <- ifelse(dayfile$HEAD + penoffset > 359.99, 0 + (penoffset - (359.99 - dayfile$HEAD)), dayfile$HEAD + penoffset) # recalculate headings with pen offset from north
   
-  pplot7 <- ggplot(p7, aes(HEAD))
-  pplot7 <- pplot7 + geom_histogram(breaks = seq(0, 360, 10), color = 'black', alpha = 0, size = 0.75, closed = 'left') + 
+  p12 <- subset(dayfile, PEN == 12 & MSEC >= threshold)
+  p14 <- subset(dayfile, PEN == 14 & MSEC >= threshold)
+  p15 <- subset(dayfile, PEN == 15 & MSEC >= threshold)
+  
+  pplot12 <- ggplot(p12, aes(HEAD))
+  pplot12 <- pplot12 + geom_histogram(breaks = seq(0, 360, 10), color = 'black', alpha = 0, size = 0.75, closed = 'left') + 
     theme_minimal() + theme(axis.text.y = element_blank(), axis.title.y = element_blank()) +
     scale_x_continuous('', limits = c(0, 360), expand = c(0, 0), breaks = c(0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330)) +
     #scale_y_continuous(limits = c(0, 1500)) +
     coord_polar(theta = 'x', start = 0) +
-    ggtitle('Acclimated wrasse') + theme(plot.title = element_text(hjust = 0.5))
+    ggtitle('Pen 12') + theme(plot.title = element_text(hjust = 0.5))
   
-  pplot8 <- ggplot(p8, aes(HEAD))
-  pplot8 <- pplot8 + geom_histogram(breaks = seq(0, 360, 10), color = 'black', alpha = 0, size = 0.75) + 
+  pplot14 <- ggplot(p14, aes(HEAD))
+  pplot14 <- pplot14 + geom_histogram(breaks = seq(0, 360, 10), color = 'black', alpha = 0, size = 0.75) + 
     theme_minimal() + theme(axis.text.y = element_blank(), axis.title.y = element_blank()) +
     scale_x_continuous('', limits = c(0, 360), breaks = c(0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330)) +
     # scale_y_continuous(limits = c(0, 1500)) +
     coord_polar(theta = 'x', start = 0) +
-    ggtitle('Non-acclimated wrasse') + theme(plot.title = element_text(hjust = 0.5))
+    ggtitle('Pen 14') + theme(plot.title = element_text(hjust = 0.5))
   
-  multiplot(pplot7, pplot8, cols = 2)
+  pplot15 <- ggplot(p15, aes(HEAD))
+  pplot15 <- pplot15 + geom_histogram(breaks = seq(0, 360, 10), color = 'black', alpha = 0, size = 0.75) + 
+    theme_minimal() + theme(axis.text.y = element_blank(), axis.title.y = element_blank()) +
+    scale_x_continuous('', limits = c(0, 360), breaks = c(0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330)) +
+    # scale_y_continuous(limits = c(0, 1500)) +
+    coord_polar(theta = 'x', start = 0) +
+    ggtitle('Pen 15') + theme(plot.title = element_text(hjust = 0.5))
+  
+  pplottot <- ggplot(dayfile[dayfile$MSEC >= threshold,], aes(HEAD))
+  pplottot <- pplottot + geom_histogram(breaks = seq(0, 360, 10), color = 'black', alpha = 0, size = 0.75) + 
+    theme_minimal() + theme(axis.text.y = element_blank(), axis.title.y = element_blank()) +
+    scale_x_continuous('', limits = c(0, 360), breaks = c(0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330)) +
+    # scale_y_continuous(limits = c(0, 1500)) +
+    coord_polar(theta = 'x', start = 0) +
+    ggtitle('All pens') + theme(plot.title = element_text(hjust = 0.5))
+  
+  multiplot(pplot12, pplot14, pplot15, pplottot, cols = 2)
   
 }
 
