@@ -1486,56 +1486,53 @@ daily.locations <- function()
 # 2c. Location summary by fish for loaded dataset
 fish.locations <- function()
 {
-  locations.P12 <- data.frame(c('0', '0', '0', '0', '0', '0', '0', '0', '0'))
+  locations.P12 <- data.frame(c('0', '0', '0', '0', '0', '0', '0'))
   colnames(locations.P12) <- 'ID'
-  rownames(locations.P12) <- c('P12_<15m', 'P12_>15m', 'P12_outer', 'P12_edge', 'P12_hidecorner', 'P12_emptycorner', 'P12_centre', 'P12_hides', 'P12_feedblock')
-  locations.P14 <- data.frame(c('0', '0', '0', '0', '0', '0', '0', '0', '0'))
+  rownames(locations.P12) <- c('P12_<15m', 'P12_outer', 'P12_edge', 'P12_corner', 'P12_centre', 'P12_hides', 'P12_feedblock')
+  locations.P14 <- data.frame(c('0', '0', '0', '0', '0', '0', '0'))
   colnames(locations.P14) <- 'ID'
-  rownames(locations.P14) <- c('P14_<15m', 'P14_>15m', 'P14_outer', 'P14_edge', 'P14_hidecorner', 'P14_emptycorner', 'P14_centre', 'P14_hides', 'P14_feedblock')
-  locations.P15 <- data.frame(c('0', '0', '0', '0', '0', '0', '0', '0', '0'))
+  rownames(locations.P14) <- c('P14_<15m', 'P14_outer', 'P14_edge', 'P14_corner', 'P14_centre', 'P14_hides', 'P14_feedblock')
+  locations.P15 <- data.frame(c('0', '0', '0', '0', '0', '0', '0'))
   colnames(locations.P15) <- 'ID'
-  rownames(locations.P15) <- c('P15_<15m', 'P15_>15m', 'P15_outer', 'P15_edge', 'P15_hidecorner', 'P15_emptycorner', 'P15_centre', 'P15_hides', 'P15_feedblock')
+  rownames(locations.P15) <- c('P15_<15m', 'P15_outer', 'P15_edge', 'P15_corner', 'P15_centre', 'P15_hides', 'P15_feedblock')
   
   for (i in 1:length(unique(dayfile$Period)))
   {
     daysub <- subset(dayfile, Period == unique(dayfile$Period)[[i]])
     
     # pen 12 location summary
-    dayfile.bot <- subset(daysub, BOT == 'B' & PEN == '12' & SEC >= 0)
-    dayfile.top <- subset(daysub, BOT == 'Z' & PEN == '12' & SEC >= 0)
-    dayfile.out <- subset(daysub, OUT == '12OE' & PEN == '12' & SEC >= 0 | OUT == '12OS' & PEN == '12' & SEC >= 0 | OUT == '12ON' & PEN == '12' & SEC >= 0 | OUT == '12OW' & PEN == '12' & SEC >= 0)
-    dayfile.edg <- subset(daysub, EDG == '12EN' & PEN == '12' & SEC >= 0 | EDG == '12EW' & PEN == '12' & SEC >= 0 | EDG == '12ES' & PEN == '12' & SEC >= 0 | EDG == '12EE' & PEN == '12' & SEC >= 0)
-    dayfile.hidc <- subset(daysub, BIGC == '12CNW' & PEN == '12' & SEC >= 0 | BIGC == '12CSE' & PEN == '12' & SEC >= 0)
-    dayfile.mtc <- subset(daysub, BIGC == '12CSW' & PEN == '12' & SEC >= 0 | BIGC == '12CNE' & PEN == '12' & SEC >= 0)
-    dayfile.cen <- subset(daysub, CEN == '12MH' & PEN == '12' & SEC >= 0 | CEN == '12MM' & PEN == '12' & SEC >= 0 | CEN == '12ML' & PEN == '12' & SEC >= 0)
-    dayfile.hid <- subset(daysub, HID == 'P12HE' & PEN == '12' & SEC >= 0 | HID == 'P12HW' & PEN == '12' & SEC >= 0)
-    dayfile.fdb <- subset(daysub, FS == 'FS12'  & PEN == '12' & SEC >= 0)
-    locations.P12[,as.character(i)] <- c(sum(dayfile.bot$SEC, na.rm = T)/3600, sum(dayfile.top$SEC, na.rm = T)/3600, sum(dayfile.out$SEC, na.rm = T)/3600, sum(dayfile.edg$SEC, na.rm = T)/3600, sum(dayfile.hidc$SEC, na.rm = T)/3600, sum(dayfile.mtc$SEC, na.rm = T)/3600, sum(dayfile.cen$SEC, na.rm = T)/3600, sum(dayfile.hid$SEC, na.rm = T)/3600, sum(dayfile.fdb$SEC, na.rm = T)/3600)
+    pen12 <- filter(daysub, PEN == '12' & SEC >= 0)
+    dayfile.bot <- subset(pen12, BOT == 'B')
+    dayfile.cor <- subset(pen12, BIGC == '12CNW' | BIGC == '12CSE' | BIGC == '12CSW' | BIGC == '12CNE')
+    dayfile.out <- subset(pen12, OUT == '12OE' | OUT == '12OS' | OUT == '12ON' | OUT == '12OW')
+    dayfile.edg <- subset(pen12, EDG == '12EN' & HID == '' | EDG == '12EW' & HID == ''| EDG == '12ES'& HID == ''| EDG == '12EE' & HID == '')
+    dayfile.cen <- subset(pen12, CEN == '12MH'  & HID == '' | CEN == '12MM'  & HID == '' | CEN == '12ML' & HID == '')
+    dayfile.hid <- subset(pen12, HID == 'P12HE' | HID == 'P12HW')
+    dayfile.fdb <- subset(pen12, FS == 'FS12')
+    locations.P12[,as.character(i)] <- c(sum(dayfile.bot$SEC, na.rm = T)/3600, sum(dayfile.out$SEC, na.rm = T)/3600, sum(dayfile.edg$SEC, na.rm = T)/3600, sum(dayfile.cor$SEC, na.rm = T)/3600, sum(dayfile.cen$SEC, na.rm = T)/3600, sum(dayfile.hid$SEC, na.rm = T)/3600, sum(dayfile.fdb$SEC, na.rm = T)/3600)
     
     # pen 14 location summary
-    dayfile.bot <- subset(daysub, BOT == 'B' & PEN == '14' & SEC >= 0)
-    dayfile.top <- subset(daysub, BOT == 'Z' & PEN == '14' & SEC >= 0)
-    dayfile.out <- subset(daysub, OUT == '14OE' & PEN == '14' & SEC >= 0 | OUT == '14OS' & PEN == '14' & SEC >= 0 | OUT == '14ON' & PEN == '14' & SEC >= 0 | OUT == '14OW' & PEN == '14' & SEC >= 0)
-    dayfile.edg <- subset(daysub, EDG == '14EN' & PEN == '14' & SEC >= 0 | EDG == '14EW' & PEN == '14' & SEC >= 0 | EDG == '14ES' & PEN == '14' & SEC >= 0 | EDG == '14EE' & PEN == '14' & SEC >= 0)
-    dayfile.hidc <- subset(daysub, BIGC == '14CNW' & PEN == '14' & SEC >= 0 | BIGC == '14CSE' & PEN == '14' & SEC >= 0)
-    dayfile.mtc <- subset(daysub, BIGC == '14CSW' & PEN == '14' & SEC >= 0 | BIGC == '14CNE' & PEN == '14' & SEC >= 0)
-    dayfile.cen <- subset(daysub, CEN == '14MH' & PEN == '14' & SEC >= 0 | CEN == '14MM' & PEN == '14' & SEC >= 0 | CEN == '14ML' & PEN == '14' & SEC >= 0)
-    dayfile.hid <- subset(daysub, HID == 'P14HE' & PEN == '14' & SEC >= 0 | HID == 'P14HW' & PEN == '14' & SEC >= 0)
-    dayfile.fdb <- subset(daysub, FS == 'FS14'  & PEN == '14' & SEC >= 0)
-    locations.P14[,as.character(i)] <- c(sum(dayfile.bot$SEC, na.rm = T)/3600, sum(dayfile.top$SEC, na.rm = T)/3600, sum(dayfile.out$SEC, na.rm = T)/3600, sum(dayfile.edg$SEC, na.rm = T)/3600, sum(dayfile.hidc$SEC, na.rm = T)/3600, sum(dayfile.mtc$SEC, na.rm = T)/3600, sum(dayfile.cen$SEC, na.rm = T)/3600, sum(dayfile.hid$SEC, na.rm = T)/3600, sum(dayfile.fdb$SEC, na.rm = T)/3600)
+    pen14 <- filter(daysub, PEN == '14' & SEC >= 0)
+    dayfile.bot <- subset(pen14, BOT == 'B')
+    dayfile.cor <- subset(pen14, BIGC == '14CNW' | BIGC == '14CSE' | BIGC == '14CSW' | BIGC == '14CNE')
+    dayfile.out <- subset(pen14, OUT == '14OE' | OUT == '14OS' | OUT == '14ON' | OUT == '14OW')
+    dayfile.edg <- subset(pen14, EDG == '14EN' & HID == '' | EDG == '14EW' & HID == ''| EDG == '14ES'& HID == ''| EDG == '14EE' & HID == '')
+    dayfile.cen <- subset(pen14, CEN == '14MH'  & HID == '' | CEN == '14MM'  & HID == '' | CEN == '14ML' & HID == '')
+    dayfile.hid <- subset(pen14, HID == 'P14HE' | HID == 'P14HW')
+    dayfile.fdb <- subset(pen14, FS == 'FS14')
+    locations.P14[,as.character(i)] <- c(sum(dayfile.bot$SEC, na.rm = T)/3600, sum(dayfile.out$SEC, na.rm = T)/3600, sum(dayfile.edg$SEC, na.rm = T)/3600, sum(dayfile.cor$SEC, na.rm = T)/3600, sum(dayfile.cen$SEC, na.rm = T)/3600, sum(dayfile.hid$SEC, na.rm = T)/3600, sum(dayfile.fdb$SEC, na.rm = T)/3600)
     
     # pen 15 location summary
-    dayfile.bot <- subset(daysub, BOT == 'B' & PEN == '15' & SEC >= 0)
-    dayfile.top <- subset(daysub, BOT == 'Z' & PEN == '15' & SEC >= 0)
-    dayfile.out <- subset(daysub, OUT == '15OE' & PEN == '15' & SEC >= 0 | OUT == '15OS' & PEN == '15' & SEC >= 0 | OUT == '15ON' & PEN == '15' & SEC >= 0 | OUT == '15OW' & PEN == '15' & SEC >= 0)
-    dayfile.edg <- subset(daysub, EDG == '15EN' & PEN == '15' & SEC >= 0 | EDG == '15EW' & PEN == '15' & SEC >= 0 | EDG == '15ES' & PEN == '15' & SEC >= 0 | EDG == '15EE' & PEN == '15' & SEC >= 0)
-    dayfile.hidc <- subset(daysub, BIGC == '15CNW' & PEN == '15' & SEC >= 0 | BIGC == '15CSE' & PEN == '15' & SEC >= 0)
-    dayfile.mtc <- subset(daysub, BIGC == '15CSW' & PEN == '15' & SEC >= 0 | BIGC == '15CNE' & PEN == '15' & SEC >= 0)
-    dayfile.cen <- subset(daysub, CEN == '15MH' & PEN == '15' & SEC >= 0 | CEN == '15MM' & PEN == '15' & SEC >= 0 | CEN == '15ML' & PEN == '15' & SEC >= 0)
-    dayfile.hid <- subset(daysub, HID == 'P15HE' & PEN == '15' & SEC >= 0 | HID == 'P15HW' & PEN == '15' & SEC >= 0)
-    dayfile.fdb <- subset(daysub, FS == 'FS15'  & PEN == '15' & SEC >= 0)
-    locations.P15[,as.character(i)] <- c(sum(dayfile.bot$SEC, na.rm = T)/3600, sum(dayfile.top$SEC, na.rm = T)/3600, sum(dayfile.out$SEC, na.rm = T)/3600, sum(dayfile.edg$SEC, na.rm = T)/3600, sum(dayfile.hidc$SEC, na.rm = T)/3600, sum(dayfile.mtc$SEC, na.rm = T)/3600, sum(dayfile.cen$SEC, na.rm = T)/3600, sum(dayfile.hid$SEC, na.rm = T)/3600, sum(dayfile.fdb$SEC, na.rm = T)/3600)
-    
+    pen15 <- filter(daysub, PEN == '15' & SEC >= 0)
+    dayfile.bot <- subset(pen15, BOT == 'B')
+    dayfile.cor <- subset(pen15, BIGC == '15CNW' | BIGC == '15CSE' | BIGC == '15CSW' | BIGC == '15CNE')
+    dayfile.out <- subset(pen15, OUT == '15OE' | OUT == '15OS' | OUT == '15ON' | OUT == '15OW')
+    dayfile.edg <- subset(pen15, EDG == '15EN' & HID == '' | EDG == '15EW' & HID == ''| EDG == '15ES'& HID == ''| EDG == '15EE' & HID == '')
+    dayfile.cen <- subset(pen15, CEN == '15MH'  & HID == '' | CEN == '15MM'  & HID == '' | CEN == '15ML' & HID == '')
+    dayfile.hid <- subset(pen15, HID == 'P15HE' | HID == 'P15HW')
+    dayfile.fdb <- subset(pen15, FS == 'FS15')
+    locations.P15[,as.character(i)] <- c(sum(dayfile.bot$SEC, na.rm = T)/3600, sum(dayfile.out$SEC, na.rm = T)/3600, sum(dayfile.edg$SEC, na.rm = T)/3600, sum(dayfile.cor$SEC, na.rm = T)/3600, sum(dayfile.cen$SEC, na.rm = T)/3600, sum(dayfile.hid$SEC, na.rm = T)/3600, sum(dayfile.fdb$SEC, na.rm = T)/3600)
+
   }
   location.sum <- rbind(locations.P12, locations.P14, locations.P15)  
   location.sum$ID <- NULL
@@ -3056,45 +3053,133 @@ fish.hexplot <- function(period)
 
 
 #16b. draws a plot of fish location density for all fish in the specified pen (7 or 8)
-
-
-hexplot.all <- function(pen)
+hexplot.all <- function(pen, diviser = 300, axes = 'xy')
 {
   
   pen.col <- 'black'
   pen.size <- 1.4
   #plot.col <- rev(heat.colors(2, alpha = 1))
   plot.col <- matlab.like(1000)  
-  pingmax <- as.integer((as.double(max(fish.id$EchoTime))-as.double(min(fish.id$EchoTime)))/300)
+  #pingmax <- as.integer((as.double(max(fish.id$EchoTime))-as.double(min(fish.id$EchoTime)))/diviser)
   #pingmax <- 1000
   
   if(pen == 12){  
     
     fish.id <- subset(dayfile, PEN == '12')  
+    pingmax <- as.integer((as.double(max(fish.id$EchoTime))-as.double(min(fish.id$EchoTime)))/diviser)
     
-    hexplot <- ggplot(fish.id, aes(fish.id$PosX, fish.id$PosY))
-    hexplot <- hexplot + geom_hex(bins = 55, alpha = 0.6) + scale_fill_gradientn(colours=plot.col, space = 'Lab', limits = c(0, pingmax), na.value = plot.col[length(plot.col)], name = 'No. pings')
-    hexplot <- hexplot +
-      annotate('segment', x = locations.lookup['12CSW', 'xmin'], xend = locations.lookup['12CSE', 'xmax'], y = locations.lookup['12CSW', 'ymin'], yend = locations.lookup['12CSE', 'ymin'], colour = pen.col, size = pen.size) + # pen boundary
-      annotate('segment', x = locations.lookup['12CSW', 'xmin'], xend = locations.lookup['12CNW', 'xmin'], y = locations.lookup['12CSW', 'ymin'], yend = locations.lookup['12CNW', 'ymax'], colour = pen.col, size = pen.size) +  # pen boundary
-      annotate('segment', x = locations.lookup['12CNW', 'xmin'], xend = locations.lookup['12CNE', 'xmax'], y = locations.lookup['12CNW', 'ymax'], yend = locations.lookup['12CNE', 'ymax'], colour = pen.col, size = pen.size) + # pen boundary
-      annotate('segment', x = locations.lookup['12CNE', 'xmax'], xend = locations.lookup['12CSE', 'xmax'], y = locations.lookup['12CNE', 'ymax'], yend = locations.lookup['12CSE', 'ymin'], colour = pen.col, size = pen.size) + # pen boundary
-      annotate('segment', x = locations.lookup['12CSW', 'xmin'], xend = locations.lookup['12CSE', 'xmax'], y = locations.lookup['12CSW', 'ymax'], yend = locations.lookup['12CSE', 'ymax'], colour = pen.col, linetype = 'dotted', size = pen.size) + # pen location boundary
-      annotate('segment', x = locations.lookup['12CSW', 'xmax'], xend = locations.lookup['12CNW', 'xmax'], y = locations.lookup['12CSW', 'ymin'], yend = locations.lookup['12CNW', 'ymax'], colour = pen.col, linetype = 'dotted', size = pen.size) + # pen location boundary
-      annotate('segment', x = locations.lookup['12CNW', 'xmin'], xend = locations.lookup['12CNE', 'xmax'], y = locations.lookup['12CNW', 'ymin'], yend = locations.lookup['12CNE', 'ymin'], colour = pen.col, linetype = 'dotted', size = pen.size) + # pen location boundary
-      annotate('segment', x = locations.lookup['12CNE', 'xmin'], xend = locations.lookup['12CSE', 'xmin'], y = locations.lookup['12CNE', 'ymax'], yend = locations.lookup['12CSE', 'ymin'], colour = pen.col, linetype = 'dotted', size = pen.size) + # pen location boundary
-      annotate('rect', xmin = locations.lookup['12HET', 'xmin'], xmax = locations.lookup['12HET', 'xmax'], ymin = locations.lookup['12HET', 'ymin'], ymax = locations.lookup['12HET', 'ymax'], colour = pen.col, size = pen.size, alpha = 0.3) + # hide boundary
-      annotate('rect', xmin = locations.lookup['12HWT', 'xmin'], xmax = locations.lookup['12HWT', 'xmax'], ymin = locations.lookup['12HWT', 'ymin'], ymax = locations.lookup['12HWT', 'ymax'], colour = pen.col, size = pen.size, alpha = 0.3) + # hide boundary
-      annotate('rect', xmin = locations.lookup['FS12', 'xmin'], xmax = locations.lookup['FS12', 'xmax'], ymin = locations.lookup['FS12', 'ymin'], ymax = locations.lookup['FS12', 'ymax'], colour = pen.col, size = pen.size, alpha = 0.3) + # hide boundary
-      theme(panel.background = element_rect(fill = 'white', colour = 'black')) +
-      scale_x_continuous('x (m)', limits = c(35, 70)) + scale_y_continuous('y (m)', limits = c(35,70))
+    if(axes == 'xz') {
+      hexplot <- ggplot(fish.id, aes(fish.id$PosX, fish.id$PosZ))
+      hexplot <- hexplot + geom_hex(bins = 55, alpha = 0.6) + scale_fill_gradientn(colours=plot.col, space = 'Lab', limits = c(0, pingmax), na.value = plot.col[length(plot.col)], name = 'No. pings')
+      hexplot <- hexplot +
+        annotate('segment', x = locations.lookup['12EW', 'xmin'], xend = locations.lookup['12EE', 'xmax'], y = 0, yend = 0, colour = pen.col, size = pen.size) + # pEE boundary
+        annotate('segment', x = locations.lookup['12EW', 'xmin'], xend = locations.lookup['12EW', 'xmin'], y = 0, yend = 15, colour = pen.col, size = pen.size) +  # pEE boundary
+        annotate('segment', x = locations.lookup['12EE', 'xmax'], xend = locations.lookup['12EE', 'xmax'], y = 0, yend = 15, colour = pen.col, size = pen.size) + # pEE boundary
+        annotate('segment', x = locations.lookup['12EW', 'xmin'], xend = ((locations.lookup['12EE', 'xmax'] - locations.lookup['12EW', 'xmin'])/2 + locations.lookup['12EW', 'xmin']), y = 15, yend = 20, colour = pen.col, size = pen.size) + # pEE boundary
+        annotate('segment', x = locations.lookup['12EE', 'xmax'], xend = ((locations.lookup['12EE', 'xmax'] - locations.lookup['12EW', 'xmin'])/2 + locations.lookup['12EW', 'xmin']), y = 15, yend = 20, colour = pen.col, size = pen.size) + # pEE boundary
+        annotate('segment', x = locations.lookup['12EW', 'xmax'], xend = locations.lookup['12EW', 'xmax'], y = 0, yend = 15, colour = pen.col, linetype = 'dotted', size = pen.size) + # pEE location boundary
+        annotate('segment', x = locations.lookup['12EE', 'xmin'], xend = locations.lookup['12EE', 'xmin'], y = 0, yend = 15, colour = pen.col, linetype = 'dotted', size = pen.size) + # pEE location boundary
+        annotate('segment', x = locations.lookup['12EW', 'xmin'], xend = locations.lookup['12EE', 'xmax'], y = 15, yend = 15, colour = pen.col, linetype = 'dotted', size = pen.size) + # pEE location boundary
+        annotate('polygon', x = c(locations.lookup['12HET', 'xmin'], locations.lookup['12HET', 'xmax'], locations.lookup['12HEB', 'xmax'], locations.lookup['12HEB', 'xmin']), y = c(locations.lookup['12HET', 'zmin'], locations.lookup['12HET', 'zmin'], locations.lookup['12HET', 'zmax'], locations.lookup['12HET', 'zmax']), colour = pen.col, size = pen.size, alpha = 0.3) + # hide boundary
+        annotate('polygon', x = c(locations.lookup['12HWT', 'xmin'], locations.lookup['12HWT', 'xmax'], locations.lookup['12HWB', 'xmax'], locations.lookup['12HWB', 'xmin']), y = c(locations.lookup['12HWT', 'zmin'], locations.lookup['12HWT', 'zmin'], locations.lookup['12HWT', 'zmax'], locations.lookup['12HWT', 'zmax']), colour = pen.col, size = pen.size, alpha = 0.3) + # hide boundary
+        annotate('rect', xmin = locations.lookup['FS12', 'xmin'], xmax = locations.lookup['FS12', 'xmax'], ymin = locations.lookup['FS12', 'zmin'], ymax = locations.lookup['FS12', 'zmax'], colour = pen.col, size = pen.size, alpha = 0.3) + # hide boundary
+        theme(panel.background = element_rect(fill = 'white', colour = 'black')) +
+        scale_x_continuous('x (m)', limits = c(35, 70)) + scale_y_reverse('z (m)', limits = c(30,0))
+      
+    }
+      
+      if(axes == 'yz') {
+        
+        hexplot <- ggplot(fish.id, aes(fish.id$PosY, fish.id$PosZ))
+        hexplot <- hexplot + geom_hex(bins = 55, alpha = 0.6) + scale_fill_gradientn(colours=plot.col, space = 'Lab', limits = c(0, pingmax), na.value = plot.col[length(plot.col)], name = 'No. pings')
+        hexplot <- hexplot +
+          annotate('segment', x = locations.lookup['12ES', 'ymin'], xend = locations.lookup['12EN', 'ymax'], y = 0, yend = 0, colour = pen.col, size = pen.size) + # pEE boundary
+          annotate('segment', x = locations.lookup['12ES', 'ymin'], xend = locations.lookup['12ES', 'ymin'], y = 0, yend = 15, colour = pen.col, size = pen.size) +  # pEE boundary
+          annotate('segment', x = locations.lookup['12EN', 'ymax'], xend = locations.lookup['12EN', 'ymax'], y = 0, yend = 15, colour = pen.col, size = pen.size) + # pEE boundary
+          annotate('segment', x = locations.lookup['12ES', 'ymin'], xend = ((locations.lookup['12EN', 'ymax'] - locations.lookup['12ES', 'ymin'])/2 + locations.lookup['12ES', 'ymin']), y = 15, yend = 20, colour = pen.col, size = pen.size) + # pEE boundary
+          annotate('segment', x = locations.lookup['12EN', 'ymax'], xend = ((locations.lookup['12EN', 'ymax'] - locations.lookup['12ES', 'ymin'])/2 + locations.lookup['12ES', 'ymin']), y = 15, yend = 20, colour = pen.col, size = pen.size) + # pEE boundary
+          annotate('segment', x = locations.lookup['12ES', 'ymax'], xend = locations.lookup['12ES', 'ymax'], y = 0, yend = 15, colour = pen.col, linetype = 'dotted', size = pen.size) + # pEE location boundary
+          annotate('segment', x = locations.lookup['12EN', 'ymin'], xend = locations.lookup['12EN', 'ymin'], y = 0, yend = 15, colour = pen.col, linetype = 'dotted', size = pen.size) + # pEE location boundary
+          annotate('segment', x = locations.lookup['12ES', 'ymin'], xend = locations.lookup['12EN', 'ymax'], y = 15, yend = 15, colour = pen.col, linetype = 'dotted', size = pen.size) + # pEE location boundary
+          annotate('polygon', x = c(locations.lookup['12HET', 'ymin'], locations.lookup['12HET', 'ymax'], locations.lookup['12HEB', 'ymax'], locations.lookup['12HEB', 'ymin']), y = c(locations.lookup['12HET', 'zmin'], locations.lookup['12HET', 'zmin'], locations.lookup['12HET', 'zmax'], locations.lookup['12HET', 'zmax']), colour = pen.col, size = pen.size, alpha = 0.3) + # hide boundary
+          annotate('polygon', x = c(locations.lookup['12HWT', 'ymin'], locations.lookup['12HWT', 'ymax'], locations.lookup['12HWB', 'ymax'], locations.lookup['12HWB', 'ymin']), y = c(locations.lookup['12HWT', 'zmin'], locations.lookup['12HWT', 'zmin'], locations.lookup['12HWT', 'zmax'], locations.lookup['12HWT', 'zmax']), colour = pen.col, size = pen.size, alpha = 0.3) + # hide boundary
+          annotate('rect', xmin = locations.lookup['FS12', 'ymin'], xmax = locations.lookup['FS12', 'ymax'], ymin = locations.lookup['FS12', 'zmin'], ymax = locations.lookup['FS12', 'zmax'], colour = pen.col, size = pen.size, alpha = 0.3) + # hide boundary
+          theme(panel.background = element_rect(fill = 'white', colour = 'black')) +
+          scale_x_continuous('y (m)', limits = c(35, 70)) + scale_y_reverse('z (m)', limits = c(30,0))
+        
+      } 
+    
+    if(axes == 'xy') {
+        
+      hexplot <- ggplot(fish.id, aes(fish.id$PosX, fish.id$PosY))
+      hexplot <- hexplot + geom_hex(bins = 55, alpha = 0.6) + scale_fill_gradientn(colours=plot.col, space = 'Lab', limits = c(0, pingmax), na.value = plot.col[length(plot.col)], name = 'No. pings')
+      hexplot <- hexplot +
+        annotate('segment', x = locations.lookup['12CSW', 'xmin'], xend = locations.lookup['12CSE', 'xmax'], y = locations.lookup['12CSW', 'ymin'], yend = locations.lookup['12CSE', 'ymin'], colour = pen.col, size = pen.size) + # pen boundary
+        annotate('segment', x = locations.lookup['12CSW', 'xmin'], xend = locations.lookup['12CNW', 'xmin'], y = locations.lookup['12CSW', 'ymin'], yend = locations.lookup['12CNW', 'ymax'], colour = pen.col, size = pen.size) +  # pen boundary
+        annotate('segment', x = locations.lookup['12CNW', 'xmin'], xend = locations.lookup['12CNE', 'xmax'], y = locations.lookup['12CNW', 'ymax'], yend = locations.lookup['12CNE', 'ymax'], colour = pen.col, size = pen.size) + # pen boundary
+        annotate('segment', x = locations.lookup['12CNE', 'xmax'], xend = locations.lookup['12CSE', 'xmax'], y = locations.lookup['12CNE', 'ymax'], yend = locations.lookup['12CSE', 'ymin'], colour = pen.col, size = pen.size) + # pen boundary
+        annotate('segment', x = locations.lookup['12CSW', 'xmin'], xend = locations.lookup['12CSE', 'xmax'], y = locations.lookup['12CSW', 'ymax'], yend = locations.lookup['12CSE', 'ymax'], colour = pen.col, linetype = 'dotted', size = pen.size) + # pen location boundary
+        annotate('segment', x = locations.lookup['12CSW', 'xmax'], xend = locations.lookup['12CNW', 'xmax'], y = locations.lookup['12CSW', 'ymin'], yend = locations.lookup['12CNW', 'ymax'], colour = pen.col, linetype = 'dotted', size = pen.size) + # pen location boundary
+        annotate('segment', x = locations.lookup['12CNW', 'xmin'], xend = locations.lookup['12CNE', 'xmax'], y = locations.lookup['12CNW', 'ymin'], yend = locations.lookup['12CNE', 'ymin'], colour = pen.col, linetype = 'dotted', size = pen.size) + # pen location boundary
+        annotate('segment', x = locations.lookup['12CNE', 'xmin'], xend = locations.lookup['12CSE', 'xmin'], y = locations.lookup['12CNE', 'ymax'], yend = locations.lookup['12CSE', 'ymin'], colour = pen.col, linetype = 'dotted', size = pen.size) + # pen location boundary
+        annotate('rect', xmin = locations.lookup['12HET', 'xmin'], xmax = locations.lookup['12HET', 'xmax'], ymin = locations.lookup['12HET', 'ymin'], ymax = locations.lookup['12HET', 'ymax'], colour = pen.col, size = pen.size, alpha = 0.3) + # hide boundary
+        annotate('rect', xmin = locations.lookup['12HWT', 'xmin'], xmax = locations.lookup['12HWT', 'xmax'], ymin = locations.lookup['12HWT', 'ymin'], ymax = locations.lookup['12HWT', 'ymax'], colour = pen.col, size = pen.size, alpha = 0.3) + # hide boundary
+        annotate('rect', xmin = locations.lookup['FS12', 'xmin'], xmax = locations.lookup['FS12', 'xmax'], ymin = locations.lookup['FS12', 'ymin'], ymax = locations.lookup['FS12', 'ymax'], colour = pen.col, size = pen.size, alpha = 0.3) + # hide boundary
+        theme(panel.background = element_rect(fill = 'white', colour = 'black')) +
+        scale_x_continuous('x (m)', limits = c(35, 70)) + scale_y_continuous('y (m)', limits = c(35,70))
+      }
+    
     } 
   
   if(pen == 14){
     
     
     fish.id <- subset(dayfile, PEN == 14)  
+    pingmax <- as.integer((as.double(max(fish.id$EchoTime))-as.double(min(fish.id$EchoTime)))/diviser)
     
+    if(axes == 'xz') {
+      hexplot <- ggplot(fish.id, aes(fish.id$PosX, fish.id$PosZ))
+      hexplot <- hexplot + geom_hex(bins = 55, alpha = 0.6) + scale_fill_gradientn(colours=plot.col, space = 'Lab', limits = c(0, pingmax), na.value = plot.col[length(plot.col)], name = 'No. pings')
+      hexplot <- hexplot +
+        annotate('segment', x = locations.lookup['14EW', 'xmin'], xend = locations.lookup['14EE', 'xmax'], y = 0, yend = 0, colour = pen.col, size = pen.size) + # pEE boundary
+        annotate('segment', x = locations.lookup['14EW', 'xmin'], xend = locations.lookup['14EW', 'xmin'], y = 0, yend = 15, colour = pen.col, size = pen.size) +  # pEE boundary
+        annotate('segment', x = locations.lookup['14EE', 'xmax'], xend = locations.lookup['14EE', 'xmax'], y = 0, yend = 15, colour = pen.col, size = pen.size) + # pEE boundary
+        annotate('segment', x = locations.lookup['14EW', 'xmin'], xend = ((locations.lookup['14EE', 'xmax'] - locations.lookup['14EW', 'xmin'])/2 + locations.lookup['14EW', 'xmin']), y = 15, yend = 20, colour = pen.col, size = pen.size) + # pEE boundary
+        annotate('segment', x = locations.lookup['14EE', 'xmax'], xend = ((locations.lookup['14EE', 'xmax'] - locations.lookup['14EW', 'xmin'])/2 + locations.lookup['14EW', 'xmin']), y = 15, yend = 20, colour = pen.col, size = pen.size) + # pEE boundary
+        annotate('segment', x = locations.lookup['14EW', 'xmax'], xend = locations.lookup['14EW', 'xmax'], y = 0, yend = 15, colour = pen.col, linetype = 'dotted', size = pen.size) + # pEE location boundary
+        annotate('segment', x = locations.lookup['14EE', 'xmin'], xend = locations.lookup['14EE', 'xmin'], y = 0, yend = 15, colour = pen.col, linetype = 'dotted', size = pen.size) + # pEE location boundary
+        annotate('segment', x = locations.lookup['14EW', 'xmin'], xend = locations.lookup['14EE', 'xmax'], y = 15, yend = 15, colour = pen.col, linetype = 'dotted', size = pen.size) + # pEE location boundary
+        annotate('polygon', x = c(locations.lookup['14HET', 'xmin'], locations.lookup['14HET', 'xmax'], locations.lookup['14HEB', 'xmax'], locations.lookup['14HEB', 'xmin']), y = c(locations.lookup['14HET', 'zmin'], locations.lookup['14HET', 'zmin'], locations.lookup['14HET', 'zmax'], locations.lookup['14HET', 'zmax']), colour = pen.col, size = pen.size, alpha = 0.3) + # hide boundary
+        annotate('polygon', x = c(locations.lookup['14HWT', 'xmin'], locations.lookup['14HWT', 'xmax'], locations.lookup['14HWB', 'xmax'], locations.lookup['14HWB', 'xmin']), y = c(locations.lookup['14HWT', 'zmin'], locations.lookup['14HWT', 'zmin'], locations.lookup['14HWT', 'zmax'], locations.lookup['14HWT', 'zmax']), colour = pen.col, size = pen.size, alpha = 0.3) + # hide boundary
+        annotate('rect', xmin = locations.lookup['FS14', 'xmin'], xmax = locations.lookup['FS14', 'xmax'], ymin = locations.lookup['FS14', 'zmin'], ymax = locations.lookup['FS14', 'zmax'], colour = pen.col, size = pen.size, alpha = 0.3) + # hide boundary
+        theme(panel.background = element_rect(fill = 'white', colour = 'black')) +
+        scale_x_continuous('x (m)', limits = c(10, 45)) + scale_y_reverse('z (m)', limits = c(30,0))
+      
+    }
+    
+    if(axes == 'yz') {
+      
+      hexplot <- ggplot(fish.id, aes(fish.id$PosY, fish.id$PosZ))
+      hexplot <- hexplot + geom_hex(bins = 55, alpha = 0.6) + scale_fill_gradientn(colours=plot.col, space = 'Lab', limits = c(0, pingmax), na.value = plot.col[length(plot.col)], name = 'No. pings')
+      hexplot <- hexplot +
+        annotate('segment', x = locations.lookup['14ES', 'ymin'], xend = locations.lookup['14EN', 'ymax'], y = 0, yend = 0, colour = pen.col, size = pen.size) + # pEE boundary
+        annotate('segment', x = locations.lookup['14ES', 'ymin'], xend = locations.lookup['14ES', 'ymin'], y = 0, yend = 15, colour = pen.col, size = pen.size) +  # pEE boundary
+        annotate('segment', x = locations.lookup['14EN', 'ymax'], xend = locations.lookup['14EN', 'ymax'], y = 0, yend = 15, colour = pen.col, size = pen.size) + # pEE boundary
+        annotate('segment', x = locations.lookup['14ES', 'ymin'], xend = ((locations.lookup['14EN', 'ymax'] - locations.lookup['14ES', 'ymin'])/2 + locations.lookup['14ES', 'ymin']), y = 15, yend = 20, colour = pen.col, size = pen.size) + # pEE boundary
+        annotate('segment', x = locations.lookup['14EN', 'ymax'], xend = ((locations.lookup['14EN', 'ymax'] - locations.lookup['14ES', 'ymin'])/2 + locations.lookup['14ES', 'ymin']), y = 15, yend = 20, colour = pen.col, size = pen.size) + # pEE boundary
+        annotate('segment', x = locations.lookup['14ES', 'ymax'], xend = locations.lookup['14ES', 'ymax'], y = 0, yend = 15, colour = pen.col, linetype = 'dotted', size = pen.size) + # pEE location boundary
+        annotate('segment', x = locations.lookup['14EN', 'ymin'], xend = locations.lookup['14EN', 'ymin'], y = 0, yend = 15, colour = pen.col, linetype = 'dotted', size = pen.size) + # pEE location boundary
+        annotate('segment', x = locations.lookup['14ES', 'ymin'], xend = locations.lookup['14EN', 'ymax'], y = 15, yend = 15, colour = pen.col, linetype = 'dotted', size = pen.size) + # pEE location boundary
+        annotate('polygon', x = c(locations.lookup['14HET', 'ymin'], locations.lookup['14HET', 'ymax'], locations.lookup['14HEB', 'ymax'], locations.lookup['14HEB', 'ymin']), y = c(locations.lookup['14HET', 'zmin'], locations.lookup['14HET', 'zmin'], locations.lookup['14HET', 'zmax'], locations.lookup['14HET', 'zmax']), colour = pen.col, size = pen.size, alpha = 0.3) + # hide boundary
+        annotate('polygon', x = c(locations.lookup['14HWT', 'ymin'], locations.lookup['14HWT', 'ymax'], locations.lookup['14HWB', 'ymax'], locations.lookup['14HWB', 'ymin']), y = c(locations.lookup['14HWT', 'zmin'], locations.lookup['14HWT', 'zmin'], locations.lookup['14HWT', 'zmax'], locations.lookup['14HWT', 'zmax']), colour = pen.col, size = pen.size, alpha = 0.3) + # hide boundary
+        annotate('rect', xmin = locations.lookup['FS14', 'ymin'], xmax = locations.lookup['FS14', 'ymax'], ymin = locations.lookup['FS14', 'zmin'], ymax = locations.lookup['FS14', 'zmax'], colour = pen.col, size = pen.size, alpha = 0.3) + # hide boundary
+        theme(panel.background = element_rect(fill = 'white', colour = 'black')) +
+        scale_x_continuous('y (m)', limits = c(35, 70)) + scale_y_reverse('z (m)', limits = c(30,0))
+      
+    } 
+    
+    if(axes == 'xy') {
+      
     hexplot <- ggplot(fish.id, aes(fish.id$PosX, fish.id$PosY))
     hexplot <- hexplot + geom_hex(bins = 55, alpha = 0.6) + scale_fill_gradientn(colours=plot.col, space = 'Lab', limits = c(0, pingmax), na.value = plot.col[length(plot.col)], name = 'No. pings')
     hexplot <- hexplot +
@@ -3112,13 +3197,60 @@ hexplot.all <- function(pen)
       theme(panel.background = element_rect(fill = 'white', colour = 'black')) +
       scale_x_continuous('x (m)', limits = c(10, 45)) + scale_y_continuous('y (m)', limits = c(35,70))
     
+    }
+    
     }  
   
   if(pen == 15){
     
     
     fish.id <- subset(dayfile, PEN == 15)  
+    pingmax <- as.integer((as.double(max(fish.id$EchoTime))-as.double(min(fish.id$EchoTime)))/diviser)
     
+    if(axes == 'xz') {
+      hexplot <- ggplot(fish.id, aes(fish.id$PosX, fish.id$PosZ))
+      hexplot <- hexplot + geom_hex(bins = 55, alpha = 0.6) + scale_fill_gradientn(colours=plot.col, space = 'Lab', limits = c(0, pingmax), na.value = plot.col[length(plot.col)], name = 'No. pings')
+      hexplot <- hexplot +
+        annotate('segment', x = locations.lookup['15EW', 'xmin'], xend = locations.lookup['15EE', 'xmax'], y = 0, yend = 0, colour = pen.col, size = pen.size) + # pEE boundary
+        annotate('segment', x = locations.lookup['15EW', 'xmin'], xend = locations.lookup['15EW', 'xmin'], y = 0, yend = 15, colour = pen.col, size = pen.size) +  # pEE boundary
+        annotate('segment', x = locations.lookup['15EE', 'xmax'], xend = locations.lookup['15EE', 'xmax'], y = 0, yend = 15, colour = pen.col, size = pen.size) + # pEE boundary
+        annotate('segment', x = locations.lookup['15EW', 'xmin'], xend = ((locations.lookup['15EE', 'xmax'] - locations.lookup['15EW', 'xmin'])/2 + locations.lookup['15EW', 'xmin']), y = 15, yend = 20, colour = pen.col, size = pen.size) + # pEE boundary
+        annotate('segment', x = locations.lookup['15EE', 'xmax'], xend = ((locations.lookup['15EE', 'xmax'] - locations.lookup['15EW', 'xmin'])/2 + locations.lookup['15EW', 'xmin']), y = 15, yend = 20, colour = pen.col, size = pen.size) + # pEE boundary
+        annotate('segment', x = locations.lookup['15EW', 'xmax'], xend = locations.lookup['15EW', 'xmax'], y = 0, yend = 15, colour = pen.col, linetype = 'dotted', size = pen.size) + # pEE location boundary
+        annotate('segment', x = locations.lookup['15EE', 'xmin'], xend = locations.lookup['15EE', 'xmin'], y = 0, yend = 15, colour = pen.col, linetype = 'dotted', size = pen.size) + # pEE location boundary
+        annotate('segment', x = locations.lookup['15EW', 'xmin'], xend = locations.lookup['15EE', 'xmax'], y = 15, yend = 15, colour = pen.col, linetype = 'dotted', size = pen.size) + # pEE location boundary
+        annotate('polygon', x = c(locations.lookup['15HET', 'xmin'], locations.lookup['15HET', 'xmax'], locations.lookup['15HEB', 'xmax'], locations.lookup['15HEB', 'xmin']), y = c(locations.lookup['15HET', 'zmin'], locations.lookup['15HET', 'zmin'], locations.lookup['15HET', 'zmax'], locations.lookup['15HET', 'zmax']), colour = pen.col, size = pen.size, alpha = 0.3) + # hide boundary
+        annotate('polygon', x = c(locations.lookup['15HWT', 'xmin'], locations.lookup['15HWT', 'xmax'], locations.lookup['15HWB', 'xmax'], locations.lookup['15HWB', 'xmin']), y = c(locations.lookup['15HWT', 'zmin'], locations.lookup['15HWT', 'zmin'], locations.lookup['15HWT', 'zmax'], locations.lookup['15HWT', 'zmax']), colour = pen.col, size = pen.size, alpha = 0.3) + # hide boundary
+        annotate('rect', xmin = locations.lookup['FS15', 'xmin'], xmax = locations.lookup['FS15', 'xmax'], ymin = locations.lookup['FS15', 'zmin'], ymax = locations.lookup['FS15', 'zmax'], colour = pen.col, size = pen.size, alpha = 0.3) + # hide boundary
+        theme(panel.background = element_rect(fill = 'white', colour = 'black')) +
+        scale_x_continuous('x (m)', limits = c(10, 45)) + scale_y_reverse('z (m)', limits = c(30,0))
+      
+    }
+    
+    if(axes == 'yz') {
+      
+      hexplot <- ggplot(fish.id, aes(fish.id$PosY, fish.id$PosZ))
+      hexplot <- hexplot + geom_hex(bins = 55, alpha = 0.6) + scale_fill_gradientn(colours=plot.col, space = 'Lab', limits = c(0, pingmax), na.value = plot.col[length(plot.col)], name = 'No. pings')
+      hexplot <- hexplot +
+        annotate('segment', x = locations.lookup['15ES', 'ymin'], xend = locations.lookup['15EN', 'ymax'], y = 0, yend = 0, colour = pen.col, size = pen.size) + # pEE boundary
+        annotate('segment', x = locations.lookup['15ES', 'ymin'], xend = locations.lookup['15ES', 'ymin'], y = 0, yend = 15, colour = pen.col, size = pen.size) +  # pEE boundary
+        annotate('segment', x = locations.lookup['15EN', 'ymax'], xend = locations.lookup['15EN', 'ymax'], y = 0, yend = 15, colour = pen.col, size = pen.size) + # pEE boundary
+        annotate('segment', x = locations.lookup['15ES', 'ymin'], xend = ((locations.lookup['15EN', 'ymax'] - locations.lookup['15ES', 'ymin'])/2 + locations.lookup['15ES', 'ymin']), y = 15, yend = 20, colour = pen.col, size = pen.size) + # pEE boundary
+        annotate('segment', x = locations.lookup['15EN', 'ymax'], xend = ((locations.lookup['15EN', 'ymax'] - locations.lookup['15ES', 'ymin'])/2 + locations.lookup['15ES', 'ymin']), y = 15, yend = 20, colour = pen.col, size = pen.size) + # pEE boundary
+        annotate('segment', x = locations.lookup['15ES', 'ymax'], xend = locations.lookup['15ES', 'ymax'], y = 0, yend = 15, colour = pen.col, linetype = 'dotted', size = pen.size) + # pEE location boundary
+        annotate('segment', x = locations.lookup['15EN', 'ymin'], xend = locations.lookup['15EN', 'ymin'], y = 0, yend = 15, colour = pen.col, linetype = 'dotted', size = pen.size) + # pEE location boundary
+        annotate('segment', x = locations.lookup['15ES', 'ymin'], xend = locations.lookup['15EN', 'ymax'], y = 15, yend = 15, colour = pen.col, linetype = 'dotted', size = pen.size) + # pEE location boundary
+        annotate('polygon', x = c(locations.lookup['15HET', 'ymin'], locations.lookup['15HET', 'ymax'], locations.lookup['15HEB', 'ymax'], locations.lookup['15HEB', 'ymin']), y = c(locations.lookup['15HET', 'zmin'], locations.lookup['15HET', 'zmin'], locations.lookup['15HET', 'zmax'], locations.lookup['15HET', 'zmax']), colour = pen.col, size = pen.size, alpha = 0.3) + # hide boundary
+        annotate('polygon', x = c(locations.lookup['15HWT', 'ymin'], locations.lookup['15HWT', 'ymax'], locations.lookup['15HWB', 'ymax'], locations.lookup['15HWB', 'ymin']), y = c(locations.lookup['15HWT', 'zmin'], locations.lookup['15HWT', 'zmin'], locations.lookup['15HWT', 'zmax'], locations.lookup['15HWT', 'zmax']), colour = pen.col, size = pen.size, alpha = 0.3) + # hide boundary
+        annotate('rect', xmin = locations.lookup['FS15', 'ymin'], xmax = locations.lookup['FS15', 'ymax'], ymin = locations.lookup['FS15', 'zmin'], ymax = locations.lookup['FS15', 'zmax'], colour = pen.col, size = pen.size, alpha = 0.3) + # hide boundary
+        theme(panel.background = element_rect(fill = 'white', colour = 'black')) +
+        scale_x_continuous('y (m)', limits = c(10, 45)) + scale_y_reverse('z (m)', limits = c(30,0))
+      
+    } 
+    
+    
+    if(axes == 'xy') {
+      
     hexplot <- ggplot(fish.id, aes(fish.id$PosX, fish.id$PosY))
     hexplot <- hexplot + geom_hex(bins = 55, alpha = 0.6) + scale_fill_gradientn(colours=plot.col, space = 'Lab', limits = c(0, pingmax), na.value = plot.col[length(plot.col)], name = 'No. pings')
     hexplot <- hexplot +
@@ -3135,6 +3267,8 @@ hexplot.all <- function(pen)
       annotate('rect', xmin = locations.lookup['FS15', 'xmin'], xmax = locations.lookup['FS15', 'xmax'], ymin = locations.lookup['FS15', 'ymin'], ymax = locations.lookup['FS15', 'ymax'], colour = pen.col, size = pen.size, alpha = 0.3) + # hide boundary
       theme(panel.background = element_rect(fill = 'white', colour = 'black')) +
       scale_x_continuous('x (m)', limits = c(10, 45)) + scale_y_continuous('y (m)', limits = c(10,45))
+    
+    }
     
     }  
   
