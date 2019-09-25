@@ -3053,7 +3053,7 @@ fish.hexplot <- function(period)
 
 
 #16b. draws a plot of fish location density for all fish in the specified pen (7 or 8)
-hexplot.all <- function(pen, diviser = 300, axes = 'xy')
+hexplot.all <- function(pen, diviser = 300, axes = 'xy', hideselect)
 {
   
   pen.col <- 'black'
@@ -3072,20 +3072,28 @@ hexplot.all <- function(pen, diviser = 300, axes = 'xy')
       hexplot <- ggplot(fish.id, aes(fish.id$PosX, fish.id$PosZ))
       hexplot <- hexplot + geom_hex(bins = 55, alpha = 0.6) + scale_fill_gradientn(colours=plot.col, space = 'Lab', limits = c(0, pingmax), na.value = plot.col[length(plot.col)], name = 'No. pings')
       hexplot <- hexplot +
-        annotate('segment', x = locations.lookup['12EW', 'xmin'], xend = locations.lookup['12EE', 'xmax'], y = 0, yend = 0, colour = pen.col, size = pen.size) + # pEE boundary
-        annotate('segment', x = locations.lookup['12EW', 'xmin'], xend = locations.lookup['12EW', 'xmin'], y = 0, yend = 15, colour = pen.col, size = pen.size) +  # pEE boundary
-        annotate('segment', x = locations.lookup['12EE', 'xmax'], xend = locations.lookup['12EE', 'xmax'], y = 0, yend = 15, colour = pen.col, size = pen.size) + # pEE boundary
-        annotate('segment', x = locations.lookup['12EW', 'xmin'], xend = ((locations.lookup['12EE', 'xmax'] - locations.lookup['12EW', 'xmin'])/2 + locations.lookup['12EW', 'xmin']), y = 15, yend = 20, colour = pen.col, size = pen.size) + # pEE boundary
-        annotate('segment', x = locations.lookup['12EE', 'xmax'], xend = ((locations.lookup['12EE', 'xmax'] - locations.lookup['12EW', 'xmin'])/2 + locations.lookup['12EW', 'xmin']), y = 15, yend = 20, colour = pen.col, size = pen.size) + # pEE boundary
-        annotate('segment', x = locations.lookup['12EW', 'xmax'], xend = locations.lookup['12EW', 'xmax'], y = 0, yend = 15, colour = pen.col, linetype = 'dotted', size = pen.size) + # pEE location boundary
-        annotate('segment', x = locations.lookup['12EE', 'xmin'], xend = locations.lookup['12EE', 'xmin'], y = 0, yend = 15, colour = pen.col, linetype = 'dotted', size = pen.size) + # pEE location boundary
-        annotate('segment', x = locations.lookup['12EW', 'xmin'], xend = locations.lookup['12EE', 'xmax'], y = 15, yend = 15, colour = pen.col, linetype = 'dotted', size = pen.size) + # pEE location boundary
-        annotate('polygon', x = c(locations.lookup['12HET', 'xmin'], locations.lookup['12HET', 'xmax'], locations.lookup['12HEB', 'xmax'], locations.lookup['12HEB', 'xmin']), y = c(locations.lookup['12HET', 'zmin'], locations.lookup['12HET', 'zmin'], locations.lookup['12HET', 'zmax'], locations.lookup['12HET', 'zmax']), colour = pen.col, size = pen.size, alpha = 0.3) + # hide boundary
-        annotate('polygon', x = c(locations.lookup['12HWT', 'xmin'], locations.lookup['12HWT', 'xmax'], locations.lookup['12HWB', 'xmax'], locations.lookup['12HWB', 'xmin']), y = c(locations.lookup['12HWT', 'zmin'], locations.lookup['12HWT', 'zmin'], locations.lookup['12HWT', 'zmax'], locations.lookup['12HWT', 'zmax']), colour = pen.col, size = pen.size, alpha = 0.3) + # hide boundary
-        annotate('rect', xmin = locations.lookup['FS12', 'xmin'], xmax = locations.lookup['FS12', 'xmax'], ymin = locations.lookup['FS12', 'zmin'], ymax = locations.lookup['FS12', 'zmax'], colour = pen.col, size = pen.size, alpha = 0.3) + # hide boundary
+        annotate('segment', x = locations.lookup['12EW', 'xmin'], xend = locations.lookup['12EE', 'xmax'], y = 0, yend = 0, colour = pen.col, size = pen.size) + # 
+        annotate('segment', x = locations.lookup['12EW', 'xmin'], xend = locations.lookup['12EW', 'xmin'], y = 0, yend = 15, colour = pen.col, size = pen.size) +  # 
+        annotate('segment', x = locations.lookup['12EE', 'xmax'], xend = locations.lookup['12EE', 'xmax'], y = 0, yend = 15, colour = pen.col, size = pen.size) + # 
+        annotate('segment', x = locations.lookup['12EW', 'xmin'], xend = ((locations.lookup['12EE', 'xmax'] - locations.lookup['12EW', 'xmin'])/2 + locations.lookup['12EW', 'xmin']), y = 15, yend = 20, colour = pen.col, size = pen.size) + # 
+        annotate('segment', x = locations.lookup['12EE', 'xmax'], xend = ((locations.lookup['12EE', 'xmax'] - locations.lookup['12EW', 'xmin'])/2 + locations.lookup['12EW', 'xmin']), y = 15, yend = 20, colour = pen.col, size = pen.size) + # 
+        annotate('segment', x = locations.lookup['12EW', 'xmax'], xend = locations.lookup['12EW', 'xmax'], y = 0, yend = 15, colour = pen.col, linetype = 'dotted', size = pen.size) + # 
+        annotate('segment', x = locations.lookup['12EE', 'xmin'], xend = locations.lookup['12EE', 'xmin'], y = 0, yend = 15, colour = pen.col, linetype = 'dotted', size = pen.size) + # 
+        annotate('segment', x = locations.lookup['12EW', 'xmin'], xend = locations.lookup['12EE', 'xmax'], y = 15, yend = 15, colour = pen.col, linetype = 'dotted', size = pen.size) + # 
+        annotate('rect', xmin = locations.lookup['FS12', 'xmin'], xmax = locations.lookup['FS12', 'xmax'], ymin = locations.lookup['FS12', 'zmin'], ymax = locations.lookup['FS12', 'zmax'], colour = pen.col, size = pen.size, alpha = 0.3) + # feed station
         theme(panel.background = element_rect(fill = 'white', colour = 'black')) +
         scale_x_continuous('x (m)', limits = c(35, 70)) + scale_y_reverse('z (m)', limits = c(30,0))
       
+        if(hideselect == 'E'){ # east hide
+            hexplot <- hexplot +
+            annotate('polygon', x = c(locations.lookup['12HET', 'xmin'], locations.lookup['12HET', 'xmax'], locations.lookup['12HEB', 'xmax'], locations.lookup['12HEB', 'xmin']), y = c(locations.lookup['12HET', 'zmin'], locations.lookup['12HET', 'zmin'], locations.lookup['12HET', 'zmax'], locations.lookup['12HET', 'zmax']), colour = pen.col, size = pen.size, alpha = 0.3)
+        }
+      
+        if(hideselect == 'W'){ # west hide
+          hexplot <- hexplot +
+          annotate('polygon', x = c(locations.lookup['12HWT', 'xmin'], locations.lookup['12HWT', 'xmax'], locations.lookup['12HWB', 'xmax'], locations.lookup['12HWB', 'xmin']), y = c(locations.lookup['12HWT', 'zmin'], locations.lookup['12HWT', 'zmin'], locations.lookup['12HWT', 'zmax'], locations.lookup['12HWT', 'zmax']), colour = pen.col, size = pen.size, alpha = 0.3) # west hide
+        }
+            
     }
       
       if(axes == 'yz') {
@@ -3101,12 +3109,20 @@ hexplot.all <- function(pen, diviser = 300, axes = 'xy')
           annotate('segment', x = locations.lookup['12ES', 'ymax'], xend = locations.lookup['12ES', 'ymax'], y = 0, yend = 15, colour = pen.col, linetype = 'dotted', size = pen.size) + # pEE location boundary
           annotate('segment', x = locations.lookup['12EN', 'ymin'], xend = locations.lookup['12EN', 'ymin'], y = 0, yend = 15, colour = pen.col, linetype = 'dotted', size = pen.size) + # pEE location boundary
           annotate('segment', x = locations.lookup['12ES', 'ymin'], xend = locations.lookup['12EN', 'ymax'], y = 15, yend = 15, colour = pen.col, linetype = 'dotted', size = pen.size) + # pEE location boundary
-          annotate('polygon', x = c(locations.lookup['12HET', 'ymin'], locations.lookup['12HET', 'ymax'], locations.lookup['12HEB', 'ymax'], locations.lookup['12HEB', 'ymin']), y = c(locations.lookup['12HET', 'zmin'], locations.lookup['12HET', 'zmin'], locations.lookup['12HET', 'zmax'], locations.lookup['12HET', 'zmax']), colour = pen.col, size = pen.size, alpha = 0.3) + # hide boundary
-          annotate('polygon', x = c(locations.lookup['12HWT', 'ymin'], locations.lookup['12HWT', 'ymax'], locations.lookup['12HWB', 'ymax'], locations.lookup['12HWB', 'ymin']), y = c(locations.lookup['12HWT', 'zmin'], locations.lookup['12HWT', 'zmin'], locations.lookup['12HWT', 'zmax'], locations.lookup['12HWT', 'zmax']), colour = pen.col, size = pen.size, alpha = 0.3) + # hide boundary
           annotate('rect', xmin = locations.lookup['FS12', 'ymin'], xmax = locations.lookup['FS12', 'ymax'], ymin = locations.lookup['FS12', 'zmin'], ymax = locations.lookup['FS12', 'zmax'], colour = pen.col, size = pen.size, alpha = 0.3) + # hide boundary
           theme(panel.background = element_rect(fill = 'white', colour = 'black')) +
           scale_x_continuous('y (m)', limits = c(35, 70)) + scale_y_reverse('z (m)', limits = c(30,0))
         
+        if(hideselect == 'E'){ # east hide
+          hexplot <- hexplot +
+          annotate('polygon', x = c(locations.lookup['12HET', 'ymin'], locations.lookup['12HET', 'ymax'], locations.lookup['12HEB', 'ymax'], locations.lookup['12HEB', 'ymin']), y = c(locations.lookup['12HET', 'zmin'], locations.lookup['12HET', 'zmin'], locations.lookup['12HET', 'zmax'], locations.lookup['12HET', 'zmax']), colour = pen.col, size = pen.size, alpha = 0.3)
+        }
+        
+        if(hideselect == 'W'){ # west hide
+          hexplot <- hexplot +
+          annotate('polygon', x = c(locations.lookup['12HWT', 'ymin'], locations.lookup['12HWT', 'ymax'], locations.lookup['12HWB', 'ymax'], locations.lookup['12HWB', 'ymin']), y = c(locations.lookup['12HWT', 'zmin'], locations.lookup['12HWT', 'zmin'], locations.lookup['12HWT', 'zmax'], locations.lookup['12HWT', 'zmax']), colour = pen.col, size = pen.size, alpha = 0.3)
+        }
+            
       } 
     
     if(axes == 'xy') {
@@ -3122,12 +3138,21 @@ hexplot.all <- function(pen, diviser = 300, axes = 'xy')
         annotate('segment', x = locations.lookup['12CSW', 'xmax'], xend = locations.lookup['12CNW', 'xmax'], y = locations.lookup['12CSW', 'ymin'], yend = locations.lookup['12CNW', 'ymax'], colour = pen.col, linetype = 'dotted', size = pen.size) + # pen location boundary
         annotate('segment', x = locations.lookup['12CNW', 'xmin'], xend = locations.lookup['12CNE', 'xmax'], y = locations.lookup['12CNW', 'ymin'], yend = locations.lookup['12CNE', 'ymin'], colour = pen.col, linetype = 'dotted', size = pen.size) + # pen location boundary
         annotate('segment', x = locations.lookup['12CNE', 'xmin'], xend = locations.lookup['12CSE', 'xmin'], y = locations.lookup['12CNE', 'ymax'], yend = locations.lookup['12CSE', 'ymin'], colour = pen.col, linetype = 'dotted', size = pen.size) + # pen location boundary
-        annotate('rect', xmin = locations.lookup['12HET', 'xmin'], xmax = locations.lookup['12HET', 'xmax'], ymin = locations.lookup['12HET', 'ymin'], ymax = locations.lookup['12HET', 'ymax'], colour = pen.col, size = pen.size, alpha = 0.3) + # hide boundary
-        annotate('rect', xmin = locations.lookup['12HWT', 'xmin'], xmax = locations.lookup['12HWT', 'xmax'], ymin = locations.lookup['12HWT', 'ymin'], ymax = locations.lookup['12HWT', 'ymax'], colour = pen.col, size = pen.size, alpha = 0.3) + # hide boundary
         annotate('rect', xmin = locations.lookup['FS12', 'xmin'], xmax = locations.lookup['FS12', 'xmax'], ymin = locations.lookup['FS12', 'ymin'], ymax = locations.lookup['FS12', 'ymax'], colour = pen.col, size = pen.size, alpha = 0.3) + # hide boundary
         theme(panel.background = element_rect(fill = 'white', colour = 'black')) +
         scale_x_continuous('x (m)', limits = c(35, 70)) + scale_y_continuous('y (m)', limits = c(35,70))
+      
+      if(hideselect == 'E'){ # east hide
+        hexplot <- hexplot +
+        annotate('rect', xmin = locations.lookup['12HET', 'xmin'], xmax = locations.lookup['12HET', 'xmax'], ymin = locations.lookup['12HET', 'ymin'], ymax = locations.lookup['12HET', 'ymax'], colour = pen.col, size = pen.size, alpha = 0.3)
       }
+      
+      if(hideselect == 'W'){ # west hide
+        hexplot <- hexplot +
+        annotate('rect', xmin = locations.lookup['12HWT', 'xmin'], xmax = locations.lookup['12HWT', 'xmax'], ymin = locations.lookup['12HWT', 'ymin'], ymax = locations.lookup['12HWT', 'ymax'], colour = pen.col, size = pen.size, alpha = 0.3)
+      }
+      
+        }
     
     } 
   
@@ -3149,11 +3174,22 @@ hexplot.all <- function(pen, diviser = 300, axes = 'xy')
         annotate('segment', x = locations.lookup['14EW', 'xmax'], xend = locations.lookup['14EW', 'xmax'], y = 0, yend = 15, colour = pen.col, linetype = 'dotted', size = pen.size) + # pEE location boundary
         annotate('segment', x = locations.lookup['14EE', 'xmin'], xend = locations.lookup['14EE', 'xmin'], y = 0, yend = 15, colour = pen.col, linetype = 'dotted', size = pen.size) + # pEE location boundary
         annotate('segment', x = locations.lookup['14EW', 'xmin'], xend = locations.lookup['14EE', 'xmax'], y = 15, yend = 15, colour = pen.col, linetype = 'dotted', size = pen.size) + # pEE location boundary
-        annotate('polygon', x = c(locations.lookup['14HET', 'xmin'], locations.lookup['14HET', 'xmax'], locations.lookup['14HEB', 'xmax'], locations.lookup['14HEB', 'xmin']), y = c(locations.lookup['14HET', 'zmin'], locations.lookup['14HET', 'zmin'], locations.lookup['14HET', 'zmax'], locations.lookup['14HET', 'zmax']), colour = pen.col, size = pen.size, alpha = 0.3) + # hide boundary
-        annotate('polygon', x = c(locations.lookup['14HWT', 'xmin'], locations.lookup['14HWT', 'xmax'], locations.lookup['14HWB', 'xmax'], locations.lookup['14HWB', 'xmin']), y = c(locations.lookup['14HWT', 'zmin'], locations.lookup['14HWT', 'zmin'], locations.lookup['14HWT', 'zmax'], locations.lookup['14HWT', 'zmax']), colour = pen.col, size = pen.size, alpha = 0.3) + # hide boundary
+        #annotate('polygon', x = c(locations.lookup['14HET', 'xmin'], locations.lookup['14HET', 'xmax'], locations.lookup['14HEB', 'xmax'], locations.lookup['14HEB', 'xmin']), y = c(locations.lookup['14HET', 'zmin'], locations.lookup['14HET', 'zmin'], locations.lookup['14HET', 'zmax'], locations.lookup['14HET', 'zmax']), colour = pen.col, size = pen.size, alpha = 0.3) + # hide boundary
+        #annotate('polygon', x = c(locations.lookup['14HWT', 'xmin'], locations.lookup['14HWT', 'xmax'], locations.lookup['14HWB', 'xmax'], locations.lookup['14HWB', 'xmin']), y = c(locations.lookup['14HWT', 'zmin'], locations.lookup['14HWT', 'zmin'], locations.lookup['14HWT', 'zmax'], locations.lookup['14HWT', 'zmax']), colour = pen.col, size = pen.size, alpha = 0.3) + # hide boundary
         annotate('rect', xmin = locations.lookup['FS14', 'xmin'], xmax = locations.lookup['FS14', 'xmax'], ymin = locations.lookup['FS14', 'zmin'], ymax = locations.lookup['FS14', 'zmax'], colour = pen.col, size = pen.size, alpha = 0.3) + # hide boundary
         theme(panel.background = element_rect(fill = 'white', colour = 'black')) +
         scale_x_continuous('x (m)', limits = c(10, 45)) + scale_y_reverse('z (m)', limits = c(30,0))
+      
+      if(hideselect == 'E'){ # east hide
+        hexplot <- hexplot +
+          annotate('polygon', x = c(locations.lookup['14HET', 'xmin'], locations.lookup['14HET', 'xmax'], locations.lookup['14HEB', 'xmax'], locations.lookup['14HEB', 'xmin']), y = c(locations.lookup['14HET', 'zmin'], locations.lookup['14HET', 'zmin'], locations.lookup['14HET', 'zmax'], locations.lookup['14HET', 'zmax']), colour = pen.col, size = pen.size, alpha = 0.3)
+      }
+      
+      if(hideselect == 'W'){ # west hide
+        hexplot <- hexplot +
+          annotate('polygon', x = c(locations.lookup['14HWT', 'xmin'], locations.lookup['14HWT', 'xmax'], locations.lookup['14HWB', 'xmax'], locations.lookup['14HWB', 'xmin']), y = c(locations.lookup['14HWT', 'zmin'], locations.lookup['14HWT', 'zmin'], locations.lookup['14HWT', 'zmax'], locations.lookup['14HWT', 'zmax']), colour = pen.col, size = pen.size, alpha = 0.3) # west hide
+      }
+      
       
     }
     
@@ -3170,11 +3206,22 @@ hexplot.all <- function(pen, diviser = 300, axes = 'xy')
         annotate('segment', x = locations.lookup['14ES', 'ymax'], xend = locations.lookup['14ES', 'ymax'], y = 0, yend = 15, colour = pen.col, linetype = 'dotted', size = pen.size) + # pEE location boundary
         annotate('segment', x = locations.lookup['14EN', 'ymin'], xend = locations.lookup['14EN', 'ymin'], y = 0, yend = 15, colour = pen.col, linetype = 'dotted', size = pen.size) + # pEE location boundary
         annotate('segment', x = locations.lookup['14ES', 'ymin'], xend = locations.lookup['14EN', 'ymax'], y = 15, yend = 15, colour = pen.col, linetype = 'dotted', size = pen.size) + # pEE location boundary
-        annotate('polygon', x = c(locations.lookup['14HET', 'ymin'], locations.lookup['14HET', 'ymax'], locations.lookup['14HEB', 'ymax'], locations.lookup['14HEB', 'ymin']), y = c(locations.lookup['14HET', 'zmin'], locations.lookup['14HET', 'zmin'], locations.lookup['14HET', 'zmax'], locations.lookup['14HET', 'zmax']), colour = pen.col, size = pen.size, alpha = 0.3) + # hide boundary
-        annotate('polygon', x = c(locations.lookup['14HWT', 'ymin'], locations.lookup['14HWT', 'ymax'], locations.lookup['14HWB', 'ymax'], locations.lookup['14HWB', 'ymin']), y = c(locations.lookup['14HWT', 'zmin'], locations.lookup['14HWT', 'zmin'], locations.lookup['14HWT', 'zmax'], locations.lookup['14HWT', 'zmax']), colour = pen.col, size = pen.size, alpha = 0.3) + # hide boundary
+        #annotate('polygon', x = c(locations.lookup['14HET', 'ymin'], locations.lookup['14HET', 'ymax'], locations.lookup['14HEB', 'ymax'], locations.lookup['14HEB', 'ymin']), y = c(locations.lookup['14HET', 'zmin'], locations.lookup['14HET', 'zmin'], locations.lookup['14HET', 'zmax'], locations.lookup['14HET', 'zmax']), colour = pen.col, size = pen.size, alpha = 0.3) + # hide boundary
+        #annotate('polygon', x = c(locations.lookup['14HWT', 'ymin'], locations.lookup['14HWT', 'ymax'], locations.lookup['14HWB', 'ymax'], locations.lookup['14HWB', 'ymin']), y = c(locations.lookup['14HWT', 'zmin'], locations.lookup['14HWT', 'zmin'], locations.lookup['14HWT', 'zmax'], locations.lookup['14HWT', 'zmax']), colour = pen.col, size = pen.size, alpha = 0.3) + # hide boundary
         annotate('rect', xmin = locations.lookup['FS14', 'ymin'], xmax = locations.lookup['FS14', 'ymax'], ymin = locations.lookup['FS14', 'zmin'], ymax = locations.lookup['FS14', 'zmax'], colour = pen.col, size = pen.size, alpha = 0.3) + # hide boundary
         theme(panel.background = element_rect(fill = 'white', colour = 'black')) +
         scale_x_continuous('y (m)', limits = c(35, 70)) + scale_y_reverse('z (m)', limits = c(30,0))
+      
+      if(hideselect == 'E'){ # east hide
+        hexplot <- hexplot +
+          annotate('polygon', x = c(locations.lookup['14HET', 'ymin'], locations.lookup['14HET', 'ymax'], locations.lookup['14HEB', 'ymax'], locations.lookup['14HEB', 'ymin']), y = c(locations.lookup['14HET', 'zmin'], locations.lookup['14HET', 'zmin'], locations.lookup['14HET', 'zmax'], locations.lookup['14HET', 'zmax']), colour = pen.col, size = pen.size, alpha = 0.3)
+      }
+      
+      if(hideselect == 'W'){ # west hide
+        hexplot <- hexplot +
+          annotate('polygon', x = c(locations.lookup['14HWT', 'ymin'], locations.lookup['14HWT', 'ymax'], locations.lookup['14HWB', 'ymax'], locations.lookup['14HWB', 'ymin']), y = c(locations.lookup['14HWT', 'zmin'], locations.lookup['14HWT', 'zmin'], locations.lookup['14HWT', 'zmax'], locations.lookup['14HWT', 'zmax']), colour = pen.col, size = pen.size, alpha = 0.3)
+      }
+      
       
     } 
     
@@ -3191,11 +3238,22 @@ hexplot.all <- function(pen, diviser = 300, axes = 'xy')
       annotate('segment', x = locations.lookup['14CSW', 'xmax'], xend = locations.lookup['14CNW', 'xmax'], y = locations.lookup['14CSW', 'ymin'], yend = locations.lookup['14CNW', 'ymax'], colour = pen.col, linetype = 'dotted', size = pen.size) + # pen location boundary
       annotate('segment', x = locations.lookup['14CNW', 'xmin'], xend = locations.lookup['14CNE', 'xmax'], y = locations.lookup['14CNW', 'ymin'], yend = locations.lookup['14CNE', 'ymin'], colour = pen.col, linetype = 'dotted', size = pen.size) + # pen location boundary
       annotate('segment', x = locations.lookup['14CNE', 'xmin'], xend = locations.lookup['14CSE', 'xmin'], y = locations.lookup['14CNE', 'ymax'], yend = locations.lookup['14CSE', 'ymin'], colour = pen.col, linetype = 'dotted', size = pen.size) + # pen location boundary
-      annotate('rect', xmin = locations.lookup['14HET', 'xmin'], xmax = locations.lookup['14HET', 'xmax'], ymin = locations.lookup['14HET', 'ymin'], ymax = locations.lookup['14HET', 'ymax'], colour = pen.col, size = pen.size, alpha = 0.3) + # hide boundary
-      annotate('rect', xmin = locations.lookup['14HWT', 'xmin'], xmax = locations.lookup['14HWT', 'xmax'], ymin = locations.lookup['14HWT', 'ymin'], ymax = locations.lookup['14HWT', 'ymax'], colour = pen.col, size = pen.size, alpha = 0.3) + # hide boundary
+      #annotate('rect', xmin = locations.lookup['14HET', 'xmin'], xmax = locations.lookup['14HET', 'xmax'], ymin = locations.lookup['14HET', 'ymin'], ymax = locations.lookup['14HET', 'ymax'], colour = pen.col, size = pen.size, alpha = 0.3) + # hide boundary
+      #annotate('rect', xmin = locations.lookup['14HWT', 'xmin'], xmax = locations.lookup['14HWT', 'xmax'], ymin = locations.lookup['14HWT', 'ymin'], ymax = locations.lookup['14HWT', 'ymax'], colour = pen.col, size = pen.size, alpha = 0.3) + # hide boundary
       annotate('rect', xmin = locations.lookup['FS14', 'xmin'], xmax = locations.lookup['FS14', 'xmax'], ymin = locations.lookup['FS14', 'ymin'], ymax = locations.lookup['FS14', 'ymax'], colour = pen.col, size = pen.size, alpha = 0.3) + # hide boundary
       theme(panel.background = element_rect(fill = 'white', colour = 'black')) +
       scale_x_continuous('x (m)', limits = c(10, 45)) + scale_y_continuous('y (m)', limits = c(35,70))
+    
+    if(hideselect == 'E'){ # east hide
+      hexplot <- hexplot +
+        annotate('rect', xmin = locations.lookup['14HET', 'xmin'], xmax = locations.lookup['14HET', 'xmax'], ymin = locations.lookup['14HET', 'ymin'], ymax = locations.lookup['14HET', 'ymax'], colour = pen.col, size = pen.size, alpha = 0.3)
+    }
+    
+    if(hideselect == 'W'){ # west hide
+      hexplot <- hexplot +
+        annotate('rect', xmin = locations.lookup['14HWT', 'xmin'], xmax = locations.lookup['14HWT', 'xmax'], ymin = locations.lookup['14HWT', 'ymin'], ymax = locations.lookup['14HWT', 'ymax'], colour = pen.col, size = pen.size, alpha = 0.3)
+    }
+    
     
     }
     
@@ -3219,11 +3277,22 @@ hexplot.all <- function(pen, diviser = 300, axes = 'xy')
         annotate('segment', x = locations.lookup['15EW', 'xmax'], xend = locations.lookup['15EW', 'xmax'], y = 0, yend = 15, colour = pen.col, linetype = 'dotted', size = pen.size) + # pEE location boundary
         annotate('segment', x = locations.lookup['15EE', 'xmin'], xend = locations.lookup['15EE', 'xmin'], y = 0, yend = 15, colour = pen.col, linetype = 'dotted', size = pen.size) + # pEE location boundary
         annotate('segment', x = locations.lookup['15EW', 'xmin'], xend = locations.lookup['15EE', 'xmax'], y = 15, yend = 15, colour = pen.col, linetype = 'dotted', size = pen.size) + # pEE location boundary
-        annotate('polygon', x = c(locations.lookup['15HET', 'xmin'], locations.lookup['15HET', 'xmax'], locations.lookup['15HEB', 'xmax'], locations.lookup['15HEB', 'xmin']), y = c(locations.lookup['15HET', 'zmin'], locations.lookup['15HET', 'zmin'], locations.lookup['15HET', 'zmax'], locations.lookup['15HET', 'zmax']), colour = pen.col, size = pen.size, alpha = 0.3) + # hide boundary
-        annotate('polygon', x = c(locations.lookup['15HWT', 'xmin'], locations.lookup['15HWT', 'xmax'], locations.lookup['15HWB', 'xmax'], locations.lookup['15HWB', 'xmin']), y = c(locations.lookup['15HWT', 'zmin'], locations.lookup['15HWT', 'zmin'], locations.lookup['15HWT', 'zmax'], locations.lookup['15HWT', 'zmax']), colour = pen.col, size = pen.size, alpha = 0.3) + # hide boundary
+        #annotate('polygon', x = c(locations.lookup['15HET', 'xmin'], locations.lookup['15HET', 'xmax'], locations.lookup['15HEB', 'xmax'], locations.lookup['15HEB', 'xmin']), y = c(locations.lookup['15HET', 'zmin'], locations.lookup['15HET', 'zmin'], locations.lookup['15HET', 'zmax'], locations.lookup['15HET', 'zmax']), colour = pen.col, size = pen.size, alpha = 0.3) + # hide boundary
+        #annotate('polygon', x = c(locations.lookup['15HWT', 'xmin'], locations.lookup['15HWT', 'xmax'], locations.lookup['15HWB', 'xmax'], locations.lookup['15HWB', 'xmin']), y = c(locations.lookup['15HWT', 'zmin'], locations.lookup['15HWT', 'zmin'], locations.lookup['15HWT', 'zmax'], locations.lookup['15HWT', 'zmax']), colour = pen.col, size = pen.size, alpha = 0.3) + # hide boundary
         annotate('rect', xmin = locations.lookup['FS15', 'xmin'], xmax = locations.lookup['FS15', 'xmax'], ymin = locations.lookup['FS15', 'zmin'], ymax = locations.lookup['FS15', 'zmax'], colour = pen.col, size = pen.size, alpha = 0.3) + # hide boundary
         theme(panel.background = element_rect(fill = 'white', colour = 'black')) +
         scale_x_continuous('x (m)', limits = c(10, 45)) + scale_y_reverse('z (m)', limits = c(30,0))
+      
+      if(hideselect == 'E'){ # east hide
+        hexplot <- hexplot +
+          annotate('polygon', x = c(locations.lookup['15HET', 'xmin'], locations.lookup['15HET', 'xmax'], locations.lookup['15HEB', 'xmax'], locations.lookup['15HEB', 'xmin']), y = c(locations.lookup['15HET', 'zmin'], locations.lookup['15HET', 'zmin'], locations.lookup['15HET', 'zmax'], locations.lookup['15HET', 'zmax']), colour = pen.col, size = pen.size, alpha = 0.3)
+      }
+      
+      if(hideselect == 'W'){ # west hide
+        hexplot <- hexplot +
+          annotate('polygon', x = c(locations.lookup['15HWT', 'xmin'], locations.lookup['15HWT', 'xmax'], locations.lookup['15HWB', 'xmax'], locations.lookup['15HWB', 'xmin']), y = c(locations.lookup['15HWT', 'zmin'], locations.lookup['15HWT', 'zmin'], locations.lookup['15HWT', 'zmax'], locations.lookup['15HWT', 'zmax']), colour = pen.col, size = pen.size, alpha = 0.3) # west hide
+      }
+      
       
     }
     
@@ -3240,11 +3309,22 @@ hexplot.all <- function(pen, diviser = 300, axes = 'xy')
         annotate('segment', x = locations.lookup['15ES', 'ymax'], xend = locations.lookup['15ES', 'ymax'], y = 0, yend = 15, colour = pen.col, linetype = 'dotted', size = pen.size) + # pEE location boundary
         annotate('segment', x = locations.lookup['15EN', 'ymin'], xend = locations.lookup['15EN', 'ymin'], y = 0, yend = 15, colour = pen.col, linetype = 'dotted', size = pen.size) + # pEE location boundary
         annotate('segment', x = locations.lookup['15ES', 'ymin'], xend = locations.lookup['15EN', 'ymax'], y = 15, yend = 15, colour = pen.col, linetype = 'dotted', size = pen.size) + # pEE location boundary
-        annotate('polygon', x = c(locations.lookup['15HET', 'ymin'], locations.lookup['15HET', 'ymax'], locations.lookup['15HEB', 'ymax'], locations.lookup['15HEB', 'ymin']), y = c(locations.lookup['15HET', 'zmin'], locations.lookup['15HET', 'zmin'], locations.lookup['15HET', 'zmax'], locations.lookup['15HET', 'zmax']), colour = pen.col, size = pen.size, alpha = 0.3) + # hide boundary
-        annotate('polygon', x = c(locations.lookup['15HWT', 'ymin'], locations.lookup['15HWT', 'ymax'], locations.lookup['15HWB', 'ymax'], locations.lookup['15HWB', 'ymin']), y = c(locations.lookup['15HWT', 'zmin'], locations.lookup['15HWT', 'zmin'], locations.lookup['15HWT', 'zmax'], locations.lookup['15HWT', 'zmax']), colour = pen.col, size = pen.size, alpha = 0.3) + # hide boundary
+        #annotate('polygon', x = c(locations.lookup['15HET', 'ymin'], locations.lookup['15HET', 'ymax'], locations.lookup['15HEB', 'ymax'], locations.lookup['15HEB', 'ymin']), y = c(locations.lookup['15HET', 'zmin'], locations.lookup['15HET', 'zmin'], locations.lookup['15HET', 'zmax'], locations.lookup['15HET', 'zmax']), colour = pen.col, size = pen.size, alpha = 0.3) + # hide boundary
+        #annotate('polygon', x = c(locations.lookup['15HWT', 'ymin'], locations.lookup['15HWT', 'ymax'], locations.lookup['15HWB', 'ymax'], locations.lookup['15HWB', 'ymin']), y = c(locations.lookup['15HWT', 'zmin'], locations.lookup['15HWT', 'zmin'], locations.lookup['15HWT', 'zmax'], locations.lookup['15HWT', 'zmax']), colour = pen.col, size = pen.size, alpha = 0.3) + # hide boundary
         annotate('rect', xmin = locations.lookup['FS15', 'ymin'], xmax = locations.lookup['FS15', 'ymax'], ymin = locations.lookup['FS15', 'zmin'], ymax = locations.lookup['FS15', 'zmax'], colour = pen.col, size = pen.size, alpha = 0.3) + # hide boundary
         theme(panel.background = element_rect(fill = 'white', colour = 'black')) +
         scale_x_continuous('y (m)', limits = c(10, 45)) + scale_y_reverse('z (m)', limits = c(30,0))
+      
+      if(hideselect == 'E'){ # east hide
+        hexplot <- hexplot +
+          annotate('polygon', x = c(locations.lookup['15HET', 'ymin'], locations.lookup['15HET', 'ymax'], locations.lookup['15HEB', 'ymax'], locations.lookup['15HEB', 'ymin']), y = c(locations.lookup['15HET', 'zmin'], locations.lookup['15HET', 'zmin'], locations.lookup['15HET', 'zmax'], locations.lookup['15HET', 'zmax']), colour = pen.col, size = pen.size, alpha = 0.3)
+      }
+      
+      if(hideselect == 'W'){ # west hide
+        hexplot <- hexplot +
+          annotate('polygon', x = c(locations.lookup['15HWT', 'ymin'], locations.lookup['15HWT', 'ymax'], locations.lookup['15HWB', 'ymax'], locations.lookup['15HWB', 'ymin']), y = c(locations.lookup['15HWT', 'zmin'], locations.lookup['15HWT', 'zmin'], locations.lookup['15HWT', 'zmax'], locations.lookup['15HWT', 'zmax']), colour = pen.col, size = pen.size, alpha = 0.3)
+      }
+      
       
     } 
     
@@ -3262,17 +3342,30 @@ hexplot.all <- function(pen, diviser = 300, axes = 'xy')
       annotate('segment', x = locations.lookup['15CSW', 'xmax'], xend = locations.lookup['15CNW', 'xmax'], y = locations.lookup['15CSW', 'ymin'], yend = locations.lookup['15CNW', 'ymax'], colour = pen.col, linetype = 'dotted', size = pen.size) + # pen location boundary
       annotate('segment', x = locations.lookup['15CNW', 'xmin'], xend = locations.lookup['15CNE', 'xmax'], y = locations.lookup['15CNW', 'ymin'], yend = locations.lookup['15CNE', 'ymin'], colour = pen.col, linetype = 'dotted', size = pen.size) + # pen location boundary
       annotate('segment', x = locations.lookup['15CNE', 'xmin'], xend = locations.lookup['15CSE', 'xmin'], y = locations.lookup['15CNE', 'ymax'], yend = locations.lookup['15CSE', 'ymin'], colour = pen.col, linetype = 'dotted', size = pen.size) + # pen location boundary
-      annotate('rect', xmin = locations.lookup['15HET', 'xmin'], xmax = locations.lookup['15HET', 'xmax'], ymin = locations.lookup['15HET', 'ymin'], ymax = locations.lookup['15HET', 'ymax'], colour = pen.col, size = pen.size, alpha = 0.3) + # hide boundary
-      annotate('rect', xmin = locations.lookup['15HWT', 'xmin'], xmax = locations.lookup['15HWT', 'xmax'], ymin = locations.lookup['15HWT', 'ymin'], ymax = locations.lookup['15HWT', 'ymax'], colour = pen.col, size = pen.size, alpha = 0.3) + # hide boundary
+      #annotate('rect', xmin = locations.lookup['15HET', 'xmin'], xmax = locations.lookup['15HET', 'xmax'], ymin = locations.lookup['15HET', 'ymin'], ymax = locations.lookup['15HET', 'ymax'], colour = pen.col, size = pen.size, alpha = 0.3) + # hide boundary
+      #annotate('rect', xmin = locations.lookup['15HWT', 'xmin'], xmax = locations.lookup['15HWT', 'xmax'], ymin = locations.lookup['15HWT', 'ymin'], ymax = locations.lookup['15HWT', 'ymax'], colour = pen.col, size = pen.size, alpha = 0.3) + # hide boundary
       annotate('rect', xmin = locations.lookup['FS15', 'xmin'], xmax = locations.lookup['FS15', 'xmax'], ymin = locations.lookup['FS15', 'ymin'], ymax = locations.lookup['FS15', 'ymax'], colour = pen.col, size = pen.size, alpha = 0.3) + # hide boundary
       theme(panel.background = element_rect(fill = 'white', colour = 'black')) +
       scale_x_continuous('x (m)', limits = c(10, 45)) + scale_y_continuous('y (m)', limits = c(10,45))
+    
+    if(hideselect == 'E'){ # east hide
+      hexplot <- hexplot +
+        annotate('rect', xmin = locations.lookup['15HET', 'xmin'], xmax = locations.lookup['15HET', 'xmax'], ymin = locations.lookup['15HET', 'ymin'], ymax = locations.lookup['15HET', 'ymax'], colour = pen.col, size = pen.size, alpha = 0.3)
+    }
+    
+    if(hideselect == 'W'){ # west hide
+      hexplot <- hexplot +
+        annotate('rect', xmin = locations.lookup['15HWT', 'xmin'], xmax = locations.lookup['15HWT', 'xmax'], ymin = locations.lookup['15HWT', 'ymin'], ymax = locations.lookup['15HWT', 'ymax'], colour = pen.col, size = pen.size, alpha = 0.3)
+    }
+    
     
     }
     
     }  
   
   print(hexplot)
+  hexplot <<- hexplot
+  fish.id <<- fish.id
   
 }
 
