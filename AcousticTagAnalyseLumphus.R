@@ -113,6 +113,8 @@ library(WaveletComp)
 library(dplyr)
 library(tidyr)
 library(data.table)
+library(emdbook)
+library(scales)
 
 
 
@@ -1127,9 +1129,69 @@ deadfish <- subset(fishids, !(fishids %in% livefish)) # create vector of dead fi
 
 multi.batch.remove(deadfish, '213', 1)
 
+# Workings for hexplot distribution analysis by various factors------------------------------------------------------------
+# hexplot all angles and grid by tide
+dayfile <- filter(genbehav.df, TID != 'Z')
 
+hexplot.all(15, 'xy', 'E')
+hexplot.all(15, 'yz', 'E')
+hexplot.all(15, 'xz', 'E')
 
+hexplot + 
+  facet_wrap(~TID, labeller = as_labeller(c('H' = 'High', 'HL' = 'Ebb', 'L' = 'Low', 'LH' = 'Flood'))) + 
+  ggtitle('Pen 15 distribution by tide')
 
+# hexplot by time of day and grid by angle
+#dayfile <- filter(genbehav.df, SUN == 'W')
+dayfile <- filter(genbehav.df, SUN == 'W')
+hexplot.all(12, 'xy', 'W')
+hexxy <- hexplot + theme(legend.position = 'none', plot.margin = unit(c(30, 5.5, 5.5, 5.5), 'points'))
+hexplot.all(12, 'xz', 'W')
+hexxz <- hexplot + theme(legend.position = 'none', plot.margin = unit(c(30, 5.5, 5.5, 5.5), 'points'))
+hexplot.all(12, 'yz', 'W')
+hexyz <- hexplot + theme(plot.margin = unit(c(30, 5.5, 5.5, 5.5), 'points'))
+plot_grid(hexxy, hexxz, hexyz, ncol = 3, rel_widths = c(0.315, 0.315, 0.37)) + draw_label('Pen 12 dawn distribution', 0.1, 0.95)
+
+dayfile <- filter(genbehav.df, SUN == 'D')
+hexplot.all(12, 'xy', 'W')
+hexxy <- hexplot + theme(legend.position = 'none', plot.margin = unit(c(30, 5.5, 5.5, 5.5), 'points'))
+hexplot.all(12, 'xz', 'W')
+hexxz <- hexplot + theme(legend.position = 'none', plot.margin = unit(c(30, 5.5, 5.5, 5.5), 'points'))
+hexplot.all(12, 'yz', 'W')
+hexyz <- hexplot + theme(plot.margin = unit(c(30, 5.5, 5.5, 5.5), 'points'))
+plot_grid(hexxy, hexxz, hexyz, ncol = 3, rel_widths = c(0.315, 0.315, 0.37)) + draw_label('Pen 12 day distribution', 0.1, 0.95)
+
+dayfile <- filter(genbehav.df, SUN == 'K')
+hexplot.all(12,'xy', 'W')
+hexxy <- hexplot + theme(legend.position = 'none', plot.margin = unit(c(30, 5.5, 5.5, 5.5), 'points'))
+hexplot.all(12, 'xz', 'W')
+hexxz <- hexplot + theme(legend.position = 'none', plot.margin = unit(c(30, 5.5, 5.5, 5.5), 'points'))
+hexplot.all(12,'yz', 'W')
+hexyz <- hexplot + theme(plot.margin = unit(c(30, 5.5, 5.5, 5.5), 'points'))
+plot_grid(hexxy, hexxz, hexyz, ncol = 3, rel_widths = c(0.315, 0.315, 0.37)) + draw_label('Pen 12 dusk distribution', 0.1, 0.95)
+
+#dayfile <- filter(genbehav.df, SUN == 'N')
+dayfile <- filter(genbehav.df, SUN == 'N')
+hexplot.all(15, 'xy', 'W')
+hexxy <- hexplot + theme(legend.position = 'none', plot.margin = unit(c(30, 5.5, 5.5, 5.5), 'points'))
+hexplot.all(15, 'xz', 'W')
+hexxz <- hexplot + theme(legend.position = 'none', plot.margin = unit(c(30, 5.5, 5.5, 5.5), 'points'))
+hexplot.all(15, 'yz', 'W')
+hexyz <- hexplot + theme(plot.margin = unit(c(30, 5.5, 5.5, 5.5), 'points'))
+plot_grid(hexxy, hexxz, hexyz, ncol = 3, rel_widths = c(0.315, 0.315, 0.37)) + draw_label('Pen 15 night distribution', 0.1, 0.95)
+
+# daily hexplots of day and night
+dayfile <- filter(genbehav.df, SUN == 'D')
+hexplot.all(15, 'xz', 'E')
+hexplot + 
+  facet_wrap(~day) + 
+  ggtitle('Pen 15 daytime daily distribution')
+
+dayfile <- filter(genbehav.df, SUN == 'N')
+hexplot.all(12, 'xz', 'W')
+hexplot + 
+  facet_wrap(~day) + 
+  ggtitle('Pen 12 night time daily distribution')
 
 #--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -3053,24 +3115,27 @@ fish.hexplot <- function(period)
 
 
 #16b. draws a plot of fish location density for all fish in the specified pen (7 or 8)
-hexplot.all <- function(pen, diviser = 300, axes = 'xy', hideselect)
+hexplot.all <- function(pen, axes = 'xy', hideselect)
 {
   
   pen.col <- 'black'
   pen.size <- 1.4
   #plot.col <- rev(heat.colors(2, alpha = 1))
-  plot.col <- matlab.like(1000)  
+  plot.col <- matlab.like(50)  
   #pingmax <- as.integer((as.double(max(fish.id$EchoTime))-as.double(min(fish.id$EchoTime)))/diviser)
   #pingmax <- 1000
-  
+  #pingmax <- diviser  
+  #colvals <- rescale(lseq(1, pingmax, length.out = 50), c(0, 1))
+  #colvals <- seq(0.001, 1, length.out = 50)
+
   if(pen == 12){  
     
     fish.id <- subset(dayfile, PEN == '12')  
-    pingmax <- as.integer((as.double(max(fish.id$EchoTime))-as.double(min(fish.id$EchoTime)))/diviser)
-    
+    #pingmax <- as.integer((as.double(max(fish.id$EchoTime))-as.double(min(fish.id$EchoTime)))/diviser)
+
     if(axes == 'xz') {
       hexplot <- ggplot(fish.id, aes(fish.id$PosX, fish.id$PosZ))
-      hexplot <- hexplot + geom_hex(bins = 55, alpha = 0.6) + scale_fill_gradientn(colours=plot.col, space = 'Lab', limits = c(0, pingmax), na.value = plot.col[length(plot.col)], name = 'No. pings')
+      hexplot <- hexplot + geom_hex(bins = 55, alpha = 0.6) + scale_fill_gradientn(colours = plot.col, space = 'Lab', limits = c(10, NA), na.value = NA, trans = 'log', breaks = c(10, 100, 1000), name = 'No. pings')
       hexplot <- hexplot +
         annotate('segment', x = locations.lookup['12EW', 'xmin'], xend = locations.lookup['12EE', 'xmax'], y = 0, yend = 0, colour = pen.col, size = pen.size) + # 
         annotate('segment', x = locations.lookup['12EW', 'xmin'], xend = locations.lookup['12EW', 'xmin'], y = 0, yend = 15, colour = pen.col, size = pen.size) +  # 
@@ -3082,7 +3147,7 @@ hexplot.all <- function(pen, diviser = 300, axes = 'xy', hideselect)
         annotate('segment', x = locations.lookup['12EW', 'xmin'], xend = locations.lookup['12EE', 'xmax'], y = 15, yend = 15, colour = pen.col, linetype = 'dotted', size = pen.size) + # 
         annotate('rect', xmin = locations.lookup['FS12', 'xmin'], xmax = locations.lookup['FS12', 'xmax'], ymin = locations.lookup['FS12', 'zmin'], ymax = locations.lookup['FS12', 'zmax'], colour = pen.col, size = pen.size, alpha = 0.3) + # feed station
         theme(panel.background = element_rect(fill = 'white', colour = 'black')) +
-        scale_x_continuous('x (m)', limits = c(35, 70)) + scale_y_reverse('z (m)', limits = c(30,0))
+        scale_x_continuous('x (m)', limits = c(35, 70)) + scale_y_reverse('z (m)', limits = c(35,0))
       
         if(hideselect == 'E'){ # east hide
             hexplot <- hexplot +
@@ -3099,7 +3164,7 @@ hexplot.all <- function(pen, diviser = 300, axes = 'xy', hideselect)
       if(axes == 'yz') {
         
         hexplot <- ggplot(fish.id, aes(fish.id$PosY, fish.id$PosZ))
-        hexplot <- hexplot + geom_hex(bins = 55, alpha = 0.6) + scale_fill_gradientn(colours=plot.col, space = 'Lab', limits = c(0, pingmax), na.value = plot.col[length(plot.col)], name = 'No. pings')
+        hexplot <- hexplot + geom_hex(bins = 55, alpha = 0.6) + scale_fill_gradientn(colours = plot.col, space = 'Lab', limits = c(10, NA), na.value = NA, trans = 'log', breaks = c(10, 100, 1000), name = 'No. pings')
         hexplot <- hexplot +
           annotate('segment', x = locations.lookup['12ES', 'ymin'], xend = locations.lookup['12EN', 'ymax'], y = 0, yend = 0, colour = pen.col, size = pen.size) + # pEE boundary
           annotate('segment', x = locations.lookup['12ES', 'ymin'], xend = locations.lookup['12ES', 'ymin'], y = 0, yend = 15, colour = pen.col, size = pen.size) +  # pEE boundary
@@ -3111,7 +3176,7 @@ hexplot.all <- function(pen, diviser = 300, axes = 'xy', hideselect)
           annotate('segment', x = locations.lookup['12ES', 'ymin'], xend = locations.lookup['12EN', 'ymax'], y = 15, yend = 15, colour = pen.col, linetype = 'dotted', size = pen.size) + # pEE location boundary
           annotate('rect', xmin = locations.lookup['FS12', 'ymin'], xmax = locations.lookup['FS12', 'ymax'], ymin = locations.lookup['FS12', 'zmin'], ymax = locations.lookup['FS12', 'zmax'], colour = pen.col, size = pen.size, alpha = 0.3) + # hide boundary
           theme(panel.background = element_rect(fill = 'white', colour = 'black')) +
-          scale_x_continuous('y (m)', limits = c(35, 70)) + scale_y_reverse('z (m)', limits = c(30,0))
+          scale_x_continuous('y (m)', limits = c(35, 70)) + scale_y_reverse('z (m)', limits = c(35,0))
         
         if(hideselect == 'E'){ # east hide
           hexplot <- hexplot +
@@ -3128,7 +3193,7 @@ hexplot.all <- function(pen, diviser = 300, axes = 'xy', hideselect)
     if(axes == 'xy') {
         
       hexplot <- ggplot(fish.id, aes(fish.id$PosX, fish.id$PosY))
-      hexplot <- hexplot + geom_hex(bins = 55, alpha = 0.6) + scale_fill_gradientn(colours=plot.col, space = 'Lab', limits = c(0, pingmax), na.value = plot.col[length(plot.col)], name = 'No. pings')
+      hexplot <- hexplot + geom_hex(bins = 55, alpha = 0.6) + scale_fill_gradientn(colours = plot.col, space = 'Lab', limits = c(10, NA), na.value = NA, trans = 'log', breaks = c(10, 100, 1000), name = 'No. pings')
       hexplot <- hexplot +
         annotate('segment', x = locations.lookup['12CSW', 'xmin'], xend = locations.lookup['12CSE', 'xmax'], y = locations.lookup['12CSW', 'ymin'], yend = locations.lookup['12CSE', 'ymin'], colour = pen.col, size = pen.size) + # pen boundary
         annotate('segment', x = locations.lookup['12CSW', 'xmin'], xend = locations.lookup['12CNW', 'xmin'], y = locations.lookup['12CSW', 'ymin'], yend = locations.lookup['12CNW', 'ymax'], colour = pen.col, size = pen.size) +  # pen boundary
@@ -3160,11 +3225,11 @@ hexplot.all <- function(pen, diviser = 300, axes = 'xy', hideselect)
     
     
     fish.id <- subset(dayfile, PEN == 14)  
-    pingmax <- as.integer((as.double(max(fish.id$EchoTime))-as.double(min(fish.id$EchoTime)))/diviser)
+    #pingmax <- as.integer((as.double(max(fish.id$EchoTime))-as.double(min(fish.id$EchoTime)))/diviser)
     
     if(axes == 'xz') {
       hexplot <- ggplot(fish.id, aes(fish.id$PosX, fish.id$PosZ))
-      hexplot <- hexplot + geom_hex(bins = 55, alpha = 0.6) + scale_fill_gradientn(colours=plot.col, space = 'Lab', limits = c(0, pingmax), na.value = plot.col[length(plot.col)], name = 'No. pings')
+      hexplot <- hexplot + geom_hex(bins = 55, alpha = 0.6) + scale_fill_gradientn(colours = plot.col, space = 'Lab', limits = c(10, NA), na.value = NA, trans = 'log', breaks = c(10, 100, 1000), name = 'No. pings')
       hexplot <- hexplot +
         annotate('segment', x = locations.lookup['14EW', 'xmin'], xend = locations.lookup['14EE', 'xmax'], y = 0, yend = 0, colour = pen.col, size = pen.size) + # pEE boundary
         annotate('segment', x = locations.lookup['14EW', 'xmin'], xend = locations.lookup['14EW', 'xmin'], y = 0, yend = 15, colour = pen.col, size = pen.size) +  # pEE boundary
@@ -3178,7 +3243,7 @@ hexplot.all <- function(pen, diviser = 300, axes = 'xy', hideselect)
         #annotate('polygon', x = c(locations.lookup['14HWT', 'xmin'], locations.lookup['14HWT', 'xmax'], locations.lookup['14HWB', 'xmax'], locations.lookup['14HWB', 'xmin']), y = c(locations.lookup['14HWT', 'zmin'], locations.lookup['14HWT', 'zmin'], locations.lookup['14HWT', 'zmax'], locations.lookup['14HWT', 'zmax']), colour = pen.col, size = pen.size, alpha = 0.3) + # hide boundary
         annotate('rect', xmin = locations.lookup['FS14', 'xmin'], xmax = locations.lookup['FS14', 'xmax'], ymin = locations.lookup['FS14', 'zmin'], ymax = locations.lookup['FS14', 'zmax'], colour = pen.col, size = pen.size, alpha = 0.3) + # hide boundary
         theme(panel.background = element_rect(fill = 'white', colour = 'black')) +
-        scale_x_continuous('x (m)', limits = c(10, 45)) + scale_y_reverse('z (m)', limits = c(30,0))
+        scale_x_continuous('x (m)', limits = c(10, 45)) + scale_y_reverse('z (m)', limits = c(35,0))
       
       if(hideselect == 'E'){ # east hide
         hexplot <- hexplot +
@@ -3196,7 +3261,7 @@ hexplot.all <- function(pen, diviser = 300, axes = 'xy', hideselect)
     if(axes == 'yz') {
       
       hexplot <- ggplot(fish.id, aes(fish.id$PosY, fish.id$PosZ))
-      hexplot <- hexplot + geom_hex(bins = 55, alpha = 0.6) + scale_fill_gradientn(colours=plot.col, space = 'Lab', limits = c(0, pingmax), na.value = plot.col[length(plot.col)], name = 'No. pings')
+      hexplot <- hexplot + geom_hex(bins = 55, alpha = 0.6) + scale_fill_gradientn(colours = plot.col, space = 'Lab', limits = c(10, NA), na.value = NA, trans = 'log', breaks = c(10, 100, 1000), name = 'No. pings')
       hexplot <- hexplot +
         annotate('segment', x = locations.lookup['14ES', 'ymin'], xend = locations.lookup['14EN', 'ymax'], y = 0, yend = 0, colour = pen.col, size = pen.size) + # pEE boundary
         annotate('segment', x = locations.lookup['14ES', 'ymin'], xend = locations.lookup['14ES', 'ymin'], y = 0, yend = 15, colour = pen.col, size = pen.size) +  # pEE boundary
@@ -3210,7 +3275,7 @@ hexplot.all <- function(pen, diviser = 300, axes = 'xy', hideselect)
         #annotate('polygon', x = c(locations.lookup['14HWT', 'ymin'], locations.lookup['14HWT', 'ymax'], locations.lookup['14HWB', 'ymax'], locations.lookup['14HWB', 'ymin']), y = c(locations.lookup['14HWT', 'zmin'], locations.lookup['14HWT', 'zmin'], locations.lookup['14HWT', 'zmax'], locations.lookup['14HWT', 'zmax']), colour = pen.col, size = pen.size, alpha = 0.3) + # hide boundary
         annotate('rect', xmin = locations.lookup['FS14', 'ymin'], xmax = locations.lookup['FS14', 'ymax'], ymin = locations.lookup['FS14', 'zmin'], ymax = locations.lookup['FS14', 'zmax'], colour = pen.col, size = pen.size, alpha = 0.3) + # hide boundary
         theme(panel.background = element_rect(fill = 'white', colour = 'black')) +
-        scale_x_continuous('y (m)', limits = c(35, 70)) + scale_y_reverse('z (m)', limits = c(30,0))
+        scale_x_continuous('y (m)', limits = c(35, 70)) + scale_y_reverse('z (m)', limits = c(35,0))
       
       if(hideselect == 'E'){ # east hide
         hexplot <- hexplot +
@@ -3228,7 +3293,7 @@ hexplot.all <- function(pen, diviser = 300, axes = 'xy', hideselect)
     if(axes == 'xy') {
       
     hexplot <- ggplot(fish.id, aes(fish.id$PosX, fish.id$PosY))
-    hexplot <- hexplot + geom_hex(bins = 55, alpha = 0.6) + scale_fill_gradientn(colours=plot.col, space = 'Lab', limits = c(0, pingmax), na.value = plot.col[length(plot.col)], name = 'No. pings')
+    hexplot <- hexplot + geom_hex(bins = 55, alpha = 0.6) + scale_fill_gradientn(colours = plot.col, space = 'Lab', limits = c(10, NA), na.value = NA, trans = 'log', breaks = c(10, 100, 1000), name = 'No. pings')
     hexplot <- hexplot +
       annotate('segment', x = locations.lookup['14CSW', 'xmin'], xend = locations.lookup['14CSE', 'xmax'], y = locations.lookup['14CSW', 'ymin'], yend = locations.lookup['14CSE', 'ymin'], colour = pen.col, size = pen.size) + # pen boundary
       annotate('segment', x = locations.lookup['14CSW', 'xmin'], xend = locations.lookup['14CNW', 'xmin'], y = locations.lookup['14CSW', 'ymin'], yend = locations.lookup['14CNW', 'ymax'], colour = pen.col, size = pen.size) +  # pen boundary
@@ -3263,11 +3328,11 @@ hexplot.all <- function(pen, diviser = 300, axes = 'xy', hideselect)
     
     
     fish.id <- subset(dayfile, PEN == 15)  
-    pingmax <- as.integer((as.double(max(fish.id$EchoTime))-as.double(min(fish.id$EchoTime)))/diviser)
+    #pingmax <- as.integer((as.double(max(fish.id$EchoTime))-as.double(min(fish.id$EchoTime)))/diviser)
     
     if(axes == 'xz') {
       hexplot <- ggplot(fish.id, aes(fish.id$PosX, fish.id$PosZ))
-      hexplot <- hexplot + geom_hex(bins = 55, alpha = 0.6) + scale_fill_gradientn(colours=plot.col, space = 'Lab', limits = c(0, pingmax), na.value = plot.col[length(plot.col)], name = 'No. pings')
+      hexplot <- hexplot + geom_hex(bins = 55, alpha = 0.6) + scale_fill_gradientn(colours = plot.col, space = 'Lab', limits = c(10, NA), na.value = NA, trans = 'log', breaks = c(10, 100, 1000), name = 'No. pings')
       hexplot <- hexplot +
         annotate('segment', x = locations.lookup['15EW', 'xmin'], xend = locations.lookup['15EE', 'xmax'], y = 0, yend = 0, colour = pen.col, size = pen.size) + # pEE boundary
         annotate('segment', x = locations.lookup['15EW', 'xmin'], xend = locations.lookup['15EW', 'xmin'], y = 0, yend = 15, colour = pen.col, size = pen.size) +  # pEE boundary
@@ -3281,7 +3346,7 @@ hexplot.all <- function(pen, diviser = 300, axes = 'xy', hideselect)
         #annotate('polygon', x = c(locations.lookup['15HWT', 'xmin'], locations.lookup['15HWT', 'xmax'], locations.lookup['15HWB', 'xmax'], locations.lookup['15HWB', 'xmin']), y = c(locations.lookup['15HWT', 'zmin'], locations.lookup['15HWT', 'zmin'], locations.lookup['15HWT', 'zmax'], locations.lookup['15HWT', 'zmax']), colour = pen.col, size = pen.size, alpha = 0.3) + # hide boundary
         annotate('rect', xmin = locations.lookup['FS15', 'xmin'], xmax = locations.lookup['FS15', 'xmax'], ymin = locations.lookup['FS15', 'zmin'], ymax = locations.lookup['FS15', 'zmax'], colour = pen.col, size = pen.size, alpha = 0.3) + # hide boundary
         theme(panel.background = element_rect(fill = 'white', colour = 'black')) +
-        scale_x_continuous('x (m)', limits = c(10, 45)) + scale_y_reverse('z (m)', limits = c(30,0))
+        scale_x_continuous('x (m)', limits = c(10, 45)) + scale_y_reverse('z (m)', limits = c(35,0))
       
       if(hideselect == 'E'){ # east hide
         hexplot <- hexplot +
@@ -3293,13 +3358,12 @@ hexplot.all <- function(pen, diviser = 300, axes = 'xy', hideselect)
           annotate('polygon', x = c(locations.lookup['15HWT', 'xmin'], locations.lookup['15HWT', 'xmax'], locations.lookup['15HWB', 'xmax'], locations.lookup['15HWB', 'xmin']), y = c(locations.lookup['15HWT', 'zmin'], locations.lookup['15HWT', 'zmin'], locations.lookup['15HWT', 'zmax'], locations.lookup['15HWT', 'zmax']), colour = pen.col, size = pen.size, alpha = 0.3) # west hide
       }
       
-      
     }
     
     if(axes == 'yz') {
       
       hexplot <- ggplot(fish.id, aes(fish.id$PosY, fish.id$PosZ))
-      hexplot <- hexplot + geom_hex(bins = 55, alpha = 0.6) + scale_fill_gradientn(colours=plot.col, space = 'Lab', limits = c(0, pingmax), na.value = plot.col[length(plot.col)], name = 'No. pings')
+      hexplot <- hexplot + geom_hex(bins = 55, alpha = 0.6) + scale_fill_gradientn(colours = plot.col, space = 'Lab', limits = c(10, NA), na.value = NA, trans = 'log', breaks = c(10, 100, 1000), name = 'No. pings')
       hexplot <- hexplot +
         annotate('segment', x = locations.lookup['15ES', 'ymin'], xend = locations.lookup['15EN', 'ymax'], y = 0, yend = 0, colour = pen.col, size = pen.size) + # pEE boundary
         annotate('segment', x = locations.lookup['15ES', 'ymin'], xend = locations.lookup['15ES', 'ymin'], y = 0, yend = 15, colour = pen.col, size = pen.size) +  # pEE boundary
@@ -3313,7 +3377,7 @@ hexplot.all <- function(pen, diviser = 300, axes = 'xy', hideselect)
         #annotate('polygon', x = c(locations.lookup['15HWT', 'ymin'], locations.lookup['15HWT', 'ymax'], locations.lookup['15HWB', 'ymax'], locations.lookup['15HWB', 'ymin']), y = c(locations.lookup['15HWT', 'zmin'], locations.lookup['15HWT', 'zmin'], locations.lookup['15HWT', 'zmax'], locations.lookup['15HWT', 'zmax']), colour = pen.col, size = pen.size, alpha = 0.3) + # hide boundary
         annotate('rect', xmin = locations.lookup['FS15', 'ymin'], xmax = locations.lookup['FS15', 'ymax'], ymin = locations.lookup['FS15', 'zmin'], ymax = locations.lookup['FS15', 'zmax'], colour = pen.col, size = pen.size, alpha = 0.3) + # hide boundary
         theme(panel.background = element_rect(fill = 'white', colour = 'black')) +
-        scale_x_continuous('y (m)', limits = c(10, 45)) + scale_y_reverse('z (m)', limits = c(30,0))
+        scale_x_continuous('y (m)', limits = c(10, 45)) + scale_y_reverse('z (m)', limits = c(35,0))
       
       if(hideselect == 'E'){ # east hide
         hexplot <- hexplot +
@@ -3325,14 +3389,13 @@ hexplot.all <- function(pen, diviser = 300, axes = 'xy', hideselect)
           annotate('polygon', x = c(locations.lookup['15HWT', 'ymin'], locations.lookup['15HWT', 'ymax'], locations.lookup['15HWB', 'ymax'], locations.lookup['15HWB', 'ymin']), y = c(locations.lookup['15HWT', 'zmin'], locations.lookup['15HWT', 'zmin'], locations.lookup['15HWT', 'zmax'], locations.lookup['15HWT', 'zmax']), colour = pen.col, size = pen.size, alpha = 0.3)
       }
       
-      
     } 
     
     
     if(axes == 'xy') {
       
     hexplot <- ggplot(fish.id, aes(fish.id$PosX, fish.id$PosY))
-    hexplot <- hexplot + geom_hex(bins = 55, alpha = 0.6) + scale_fill_gradientn(colours=plot.col, space = 'Lab', limits = c(0, pingmax), na.value = plot.col[length(plot.col)], name = 'No. pings')
+    hexplot <- hexplot + geom_hex(bins = 55, alpha = 0.6) + scale_fill_gradientn(colours = plot.col, space = 'Lab', limits = c(10, NA), na.value = NA, trans = 'log', breaks = c(10, 100, 1000), name = 'No. pings')
     hexplot <- hexplot +
       annotate('segment', x = locations.lookup['15CSW', 'xmin'], xend = locations.lookup['15CSE', 'xmax'], y = locations.lookup['15CSW', 'ymin'], yend = locations.lookup['15CSE', 'ymin'], colour = pen.col, size = pen.size) + # pen boundary
       annotate('segment', x = locations.lookup['15CSW', 'xmin'], xend = locations.lookup['15CNW', 'xmin'], y = locations.lookup['15CSW', 'ymin'], yend = locations.lookup['15CNW', 'ymax'], colour = pen.col, size = pen.size) +  # pen boundary
